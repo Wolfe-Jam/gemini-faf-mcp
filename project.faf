@@ -1,46 +1,39 @@
-faf_version: "2.5.0"
-generated: "2026-01-29T21:00:00.000Z"
-
+faf_version: 2.5.0
+generated: '2026-01-30T12:36:31.473436Z'
 project:
-  name: "gemini-faf-mcp"
-  goal: "Google Cloud Function for FAF integration with Gemini"
-  main_language: "Python"
-  type: "mcp-server"
-
+  name: gemini-faf-mcp
+  goal: Google Cloud Function for FAF integration with Gemini
+  main_language: Python
+  type: mcp-server
 stack:
-  backend: "Google Cloud Functions"
-  api_type: "HTTP"
-  runtime: "Python 3.12"
-  hosting: "Google Cloud Run"
-  build: "Cloud Build"
-  cicd: "Cloud Build Triggers"
-
+  backend: Google Cloud Functions
+  api_type: HTTP
+  runtime: Python 3.12
+  hosting: Google Cloud Run
+  build: Cloud Build
+  cicd: Cloud Build Triggers
 human_context:
-  who: "Developers using Gemini with FAF-enabled projects"
-  what: "Cloud Function that parses .faf files and returns JSON for Gemini"
-  why: "Enable Gemini to read project DNA as Source of Truth"
-  where: "Google Cloud Run (us-east1)"
-  when: "On-demand via HTTP calls from Gemini"
-  how: "Python + functions-framework + PyYAML"
-
+  who: Developers using Gemini with FAF-enabled projects
+  what: Cloud Function that parses .faf files and returns JSON for Gemini
+  why: Enable Gemini to read project DNA as Source of Truth
+  where: Google Cloud Run (us-east1)
+  when: On-demand via HTTP calls from Gemini
+  how: Python + functions-framework + PyYAML
 ai_instructions:
-  priority: "Read project.faf first, then GEMINI.md"
-  usage: "Code-first, minimal explanations"
-  message: "This is part of the FAF ecosystem (IANA registered)"
-
+  priority: Read project.faf first, then GEMINI.md
+  usage: Code-first, minimal explanations
+  message: This is part of the FAF ecosystem (IANA registered)
 preferences:
-  quality_bar: "zero_errors"
-  commit_style: "conventional_emoji"
-  communication: "direct"
-
+  quality_bar: zero_errors
+  commit_style: conventional_emoji
+  communication: direct
 state:
-  phase: "production"
-  version: "1.0.0"
-  status: "green_flag"
-  focus: "Vertex AI Extension integration"
-
+  phase: production
+  version: 1.0.0
+  status: green_flag
+  focus: Voice integration complete
 scores:
   faf_score: 100
   slot_based_percentage: 100
   total_slots: 14
-  scoring_philosophy: "MCP server type - 14 applicable slots"
+  scoring_philosophy: MCP server type - 14 applicable slots
