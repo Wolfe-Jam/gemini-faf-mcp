@@ -1,3 +1,6 @@
+options:
+  logging: CLOUD_LOGGING_ONLY
+
 steps:
   # Deploy the .faf parser to Cloud Run functions
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
