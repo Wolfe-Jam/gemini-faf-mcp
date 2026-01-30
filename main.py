@@ -39,7 +39,7 @@ def get_github_token():
     try:
         from google.cloud import secretmanager
         client = secretmanager.SecretManagerServiceClient()
-        name = f"projects/bucket-460122/secrets/github-token/versions/latest"
+        name = f"projects/bucket-460122/secrets/GITHUB_TOKEN/versions/latest"
         response = client.access_secret_version(request={"name": name})
         return response.payload.data.decode("UTF-8")
     except Exception:

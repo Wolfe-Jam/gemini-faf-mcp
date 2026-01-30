@@ -124,14 +124,14 @@ Voice-to-FAF requires a GitHub token stored in Google Secret Manager:
 
 ```bash
 # 1. Create the secret
-gcloud secrets create github-token --replication-policy="automatic"
+gcloud secrets create GITHUB_TOKEN --replication-policy="automatic"
 
 # 2. Add your token (needs 'contents: write' permission)
-echo -n "ghp_your_token_here" | gcloud secrets add-secret-version github-token --data-file=-
+echo -n "ghp_your_token_here" | gcloud secrets versions add GITHUB_TOKEN --data-file=-
 
 # 3. Grant Cloud Function access
-gcloud secrets add-iam-policy-binding github-token \
-  --member="serviceAccount:bucket-460122@appspot.gserviceaccount.com" \
+gcloud secrets add-iam-policy-binding GITHUB_TOKEN \
+  --member="serviceAccount:631316210911-compute@developer.gserviceaccount.com" \
   --role="roles/secretmanager.secretAccessor"
 ```
 
