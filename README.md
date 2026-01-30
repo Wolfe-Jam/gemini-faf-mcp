@@ -77,6 +77,75 @@ X-FAF-Agent-Detected: <detected-agent>
 
 This lets you verify which dialect was applied.
 
+## Voice-to-FAF
+
+Update your project DNA by voice through Gemini Live.
+
+### How It Works
+
+```
+You (speaking): "Set the project focus to IETF submission"
+     ↓
+Gemini Live → Cloud Function (PUT) → GitHub API → Commit
+     ↓
+Cloud Build triggers → Function redeployed → Badge updates
+```
+
+### API Usage
+
+```bash
+# Update DNA fields (supports dot notation)
+curl -X PUT https://us-east1-bucket-460122.cloudfunctions.net/faf-source-of-truth \
+  -H "Content-Type: application/json" \
+  -d '{
+    "updates": {
+      "state.focus": "IETF Draft Submission",
+      "state.phase": "review"
+    },
+    "message": "voice-sync: pivoting to IETF focus"
+  }'
+```
+
+### Response
+
+```json
+{
+  "success": true,
+  "message": "voice-sync: pivoting to IETF focus",
+  "sha": "abc123...",
+  "url": "https://github.com/Wolfe-Jam/gemini-faf-mcp/blob/main/project.faf",
+  "updates_applied": ["state.focus", "state.phase"]
+}
+```
+
+### Setup (Secret Manager)
+
+Voice-to-FAF requires a GitHub token stored in Google Secret Manager:
+
+```bash
+# 1. Create the secret
+gcloud secrets create github-token --replication-policy="automatic"
+
+# 2. Add your token (needs 'contents: write' permission)
+echo -n "ghp_your_token_here" | gcloud secrets add-secret-version github-token --data-file=-
+
+# 3. Grant Cloud Function access
+gcloud secrets add-iam-policy-binding github-token \
+  --member="serviceAccount:bucket-460122@appspot.gserviceaccount.com" \
+  --role="roles/secretmanager.secretAccessor"
+```
+
+### Gemini Live Integration
+
+Add to your GEMINI.md:
+
+```markdown
+## Voice Commands
+- "Update the project focus to X" → Calls PUT with state.focus
+- "Set priority to high" → Calls PUT with ai_instructions.priority
+- "Mark phase as beta" → Calls PUT with state.phase
+```
+
 ### Make Gemini-Callable
 
 ```python

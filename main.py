@@ -5,8 +5,9 @@ Media Type: application/vnd.faf+yaml
 Endpoint: https://faf-source-of-truth-*.run.app
 
 Features:
-- POST: Parse .faf file, return JSON for AI grounding
 - GET: Return live SVG badge showing FAF score
+- POST: Parse .faf file, return payload optimized for calling agent
+- PUT: Voice-to-FAF - update DNA via Gemini Live voice commands
 - Multi-Agent Handshake: Optimize payload per AI dialect
 """
 
@@ -14,6 +15,122 @@ import functions_framework
 import yaml
 import json
 import re
+import os
+import base64
+import requests
+from datetime import datetime
+
+
+# =============================================================================
+# VOICE-TO-FAF: GITHUB COMMIT LAYER
+# =============================================================================
+
+def get_github_token():
+    """
+    Get GitHub token from environment or Secret Manager.
+    Token must have 'contents: write' permission on the repo.
+    """
+    # Try environment first (for local testing)
+    token = os.environ.get('GITHUB_TOKEN')
+    if token:
+        return token
+
+    # Try Google Secret Manager
+    try:
+        from google.cloud import secretmanager
+        client = secretmanager.SecretManagerServiceClient()
+        name = f"projects/bucket-460122/secrets/github-token/versions/latest"
+        response = client.access_secret_version(request={"name": name})
+        return response.payload.data.decode("UTF-8")
+    except Exception:
+        return None
+
+
+def commit_to_github(new_dna_content, commit_message=None):
+    """
+    Commit updated FAF DNA to GitHub.
+
+    This enables Voice-to-FAF: speak your updates via Gemini Live,
+    and they're committed directly to the repo.
+    """
+    token = get_github_token()
+    if not token:
+        return {"error": "GitHub token not configured", "code": 500}
+
+    REPO = "Wolfe-Jam/gemini-faf-mcp"
+    PATH = "project.faf"
+
+    headers = {
+        "Authorization": f"token {token}",
+        "Accept": "application/vnd.github.v3+json"
+    }
+
+    # 1. Get current file SHA (required for updates)
+    url = f"https://api.github.com/repos/{REPO}/contents/{PATH}"
+    try:
+        r = requests.get(url, headers=headers)
+        if r.status_code != 200:
+            return {"error": f"Failed to get file: {r.text}", "code": r.status_code}
+        sha = r.json()['sha']
+    except Exception as e:
+        return {"error": f"GitHub API error: {str(e)}", "code": 500}
+
+    # 2. Prepare commit
+    timestamp = datetime.utcnow().isoformat() + "Z"
+    if not commit_message:
+        commit_message = f"voice-sync: DNA update via Gemini Live [{timestamp}]"
+
+    # Update generated timestamp in DNA
+    new_dna_content['generated'] = timestamp
+
+    # 3. Encode and push
+    yaml_content = yaml.dump(new_dna_content, default_flow_style=False, sort_keys=False)
+    encoded_content = base64.b64encode(yaml_content.encode()).decode()
+
+    payload = {
+        "message": commit_message,
+        "content": encoded_content,
+        "sha": sha
+    }
+
+    try:
+        r = requests.put(url, headers=headers, json=payload)
+        if r.status_code in (200, 201):
+            return {
+                "success": True,
+                "message": commit_message,
+                "sha": r.json().get('commit', {}).get('sha', 'unknown'),
+                "url": f"https://github.com/{REPO}/blob/main/{PATH}"
+            }
+        else:
+            return {"error": f"Commit failed: {r.text}", "code": r.status_code}
+    except Exception as e:
+        return {"error": f"Commit error: {str(e)}", "code": 500}
+
+
+def merge_dna_updates(existing, updates):
+    """
+    Deep merge updates into existing DNA.
+    Supports dot notation: {"project.goal": "new goal"}
+    """
+    def set_nested(d, keys, value):
+        for key in keys[:-1]:
+            d = d.setdefault(key, {})
+        d[keys[-1]] = value
+
+    for key, value in updates.items():
+        if '.' in key:
+            # Dot notation: project.goal -> project: {goal: ...}
+            keys = key.split('.')
+            set_nested(existing, keys, value)
+        else:
+            # Direct key
+            if isinstance(value, dict) and key in existing and isinstance(existing[key], dict):
+                existing[key].update(value)
+            else:
+                existing[key] = value
+
+    return existing
 
 
 # =============================================================================
@@ -238,8 +355,9 @@ def parse_faf(request):
     """
     FAF Source of Truth - Multi-Agent Context Broker.
 
-    GET: Returns live SVG badge showing FAF score and distinction
+    GET:  Returns live SVG badge showing FAF score and distinction
     POST: Parse .faf file and return payload optimized for calling agent
+    PUT:  Voice-to-FAF - update DNA and commit to GitHub
 
     Multi-Agent Handshake:
     - Detects caller via User-Agent or X-FAF-Agent header
@@ -250,9 +368,52 @@ def parse_faf(request):
     - Codex/Copilot/Cursor: Code-focused JSON
     - Unknown: Full JSON payload
 
+    Voice-to-FAF (PUT):
+    - Accepts JSON with updates: {"project.goal": "new goal", "state.phase": "beta"}
+    - Merges into existing DNA
+    - Commits to GitHub
+    - Triggers Cloud Build redeploy
+
     Headers returned:
     - X-FAF-Agent-Detected: Which agent was identified
     """
+
+    # Handle PUT request - Voice-to-FAF DNA updates
+    if request.method == 'PUT':
+        try:
+            request_json = request.get_json(silent=True)
+            if not request_json:
+                return json.dumps({"error": "Request body required"}), 400, {'Content-Type': 'application/json'}
+
+            updates = request_json.get('updates', {})
+            commit_msg = request_json.get('message')
+
+            if not updates:
+                return json.dumps({"error": "No updates provided"}), 400, {'Content-Type': 'application/json'}
+
+            # Load current DNA
+            with open('project.faf', 'r') as f:
+                current_dna = yaml.safe_load(f)
+
+            # Merge updates
+            updated_dna = merge_dna_updates(current_dna, updates)
+
+            # Commit to GitHub
+            result = commit_to_github(updated_dna, commit_msg)
+
+            if result.get('success'):
+                return json.dumps({
+                    "success": True,
+                    "message": result['message'],
+                    "sha": result['sha'],
+                    "url": result['url'],
+                    "updates_applied": list(updates.keys())
+                }), 200, {'Content-Type': 'application/json'}
+            else:
+                return json.dumps(result), result.get('code', 500), {'Content-Type': 'application/json'}
+
+        except Exception as e:
+            return json.dumps({"error": f"Voice-to-FAF error: {str(e)}"}), 500, {'Content-Type': 'application/json'}
 
     # Handle GET request - return badge
     if request.method == 'GET':
