@@ -1,5 +1,5 @@
 faf_version: 2.5.0
-generated: '2026-01-30T12:53:36.177088Z'
+generated: '2026-01-30T12:53:38.000671Z'
 project:
   name: gemini-faf-mcp
   goal: Google Cloud Function for FAF integration with Gemini
@@ -32,9 +32,9 @@ state:
   version: 1.0.0
   status: v2_release_test
   focus: Voice integration complete
+  wjttc_test: passed
 scores:
   faf_score: 100
   slot_based_percentage: 100
   total_slots: 14
   scoring_philosophy: MCP server type - 14 applicable slots
-test_field: test_value
