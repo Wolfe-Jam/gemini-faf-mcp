@@ -1,0 +1,31 @@
+openapi: 3.0.0
+info:
+  title: FAF Source of Truth
+  description: Retrieves the authoritative .faf Project DNA for context-aware AI operations.
+  version: 1.0.0
+servers:
+  - url: https://us-east1-bucket-460122.cloudfunctions.net/faf-source-of-truth
+paths:
+  /:
+    post:
+      summary: Parse Project DNA
+      operationId: parseFafContext
+      description: Reads a .faf file and returns the parsed JSON context for project grounding.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                path:
+                  type: string
+                  description: The path to the .faf file (default is project.faf).
+                  example: "project.faf"
+      responses:
+        '200':
+          description: Parsed project context successfully retrieved.
+          content:
+            application/json:
+              schema:
+                type: object
