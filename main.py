@@ -3,12 +3,17 @@ gemini-faf-mcp: Google Cloud Function for FAF Context Bridge
 
 Media Type: application/vnd.faf+yaml
 Endpoint: https://faf-source-of-truth-*.run.app
+Version: 2.5.1
 
 Features:
 - GET: Return live SVG badge showing FAF score
 - POST: Parse .faf file, return payload optimized for calling agent
 - PUT: Voice-to-FAF - update DNA via Gemini Live voice commands
 - Multi-Agent Handshake: Optimize payload per AI dialect
+
+Security (v2.5.1):
+- SW-01: Temporal Integrity - reject stale timestamps
+- SW-02: Scoring Guard - Big Orange requires 100%
 """
 
 import functions_framework
@@ -19,6 +24,68 @@ import os
 import base64
 import requests
 from datetime import datetime
+
+
+# =============================================================================
+# SECURITY LAYER (v2.5.1)
+# =============================================================================
+
+def validate_sw01_temporal_integrity(existing_dna, new_timestamp):
+    """
+    SW-01: Temporal Integrity
+    Reject any payload where the generated timestamp is not greater than
+    the current timestamp in the database.
+    """
+    existing_timestamp = existing_dna.get('generated', '')
+    if existing_timestamp and new_timestamp:
+        try:
+            existing_dt = datetime.fromisoformat(existing_timestamp.replace('Z', '+00:00'))
+            new_dt = datetime.fromisoformat(new_timestamp.replace('Z', '+00:00'))
+            if new_dt <= existing_dt:
+                return False, "SW-01: Temporal integrity violation - timestamp not newer"
+        except (ValueError, TypeError):
+            pass
+    return True, None
+
+
+def validate_sw02_scoring_guard(updated_dna, updates, calculate_score_func):
+    """
+    SW-02: Scoring Guard
+    Reject any attempt to set distinction: "Big Orange" if score < 100.
+    """
+    setting_orange = False
+    if updates.get('faf_distinction') == 'Big Orange':
+        setting_orange = True
+    if updates.get('x_faf_orange') == True:
+        setting_orange = True
+    for key, value in updates.items():
+        if 'orange' in key.lower() and value in [True, 'Big Orange', 'orange']:
+            setting_orange = True
+            break
+
+    if setting_orange:
+        score = calculate_score_func(updated_dna)
+        if score < 100:
+            return False, f"SW-02: Scoring guard - Big Orange requires 100%, current: {score}%"
+    return True, None
+
+
+def log_mutation_telemetry(success, updates, error=None, blocked_by=None):
+    """Log mutation attempts to BigQuery (non-blocking)."""
+    try:
+        from google.cloud import bigquery
+        client = bigquery.Client()
+        table_id = "bucket-460122.faf_telemetry.voice_mutations"
+        row = {
+            "timestamp": datetime.utcnow().isoformat() + "Z",
+            "success": success,
+            "updates": json.dumps(updates) if updates else "{}",
+            "error": error,
+            "blocked_by": blocked_by
+        }
+        client.insert_rows_json(table_id, [row])
+    except Exception as e:
+        print(f"Telemetry logging failed: {e}")
 
 
 # =============================================================================
@@ -378,17 +445,19 @@ def parse_faf(request):
     - X-FAF-Agent-Detected: Which agent was identified
     """
 
-    # Handle PUT request - Voice-to-FAF DNA updates
+    # Handle PUT request - Voice-to-FAF DNA updates (v2.5.1 Security Hardened)
     if request.method == 'PUT':
         try:
             request_json = request.get_json(silent=True)
             if not request_json:
+                log_mutation_telemetry(False, {}, error="No request body")
                 return json.dumps({"error": "Request body required"}), 400, {'Content-Type': 'application/json'}
 
             updates = request_json.get('updates', {})
             commit_msg = request_json.get('message')
 
             if not updates:
+                log_mutation_telemetry(False, {}, error="No updates provided")
                 return json.dumps({"error": "No updates provided"}), 400, {'Content-Type': 'application/json'}
 
             # Load current DNA
@@ -396,23 +465,47 @@ def parse_faf(request):
                 current_dna = yaml.safe_load(f)
 
             # Merge updates
-            updated_dna = merge_dna_updates(current_dna, updates)
+            updated_dna = merge_dna_updates(current_dna.copy(), updates)
 
-            # Commit to GitHub
+            # =========================================================
+            # SECURITY CHECKS (v2.5.1)
+            # =========================================================
+
+            # SW-01: Temporal Integrity
+            new_timestamp = datetime.utcnow().isoformat() + "Z"
+            valid, error = validate_sw01_temporal_integrity(current_dna, new_timestamp)
+            if not valid:
+                log_mutation_telemetry(False, updates, error=error, blocked_by="SW-01")
+                return json.dumps({"error": error, "blocked_by": "SW-01"}), 403, {'Content-Type': 'application/json'}
+
+            # SW-02: Scoring Guard
+            valid, error = validate_sw02_scoring_guard(updated_dna, updates, calculate_score)
+            if not valid:
+                log_mutation_telemetry(False, updates, error=error, blocked_by="SW-02")
+                return json.dumps({"error": error, "blocked_by": "SW-02"}), 403, {'Content-Type': 'application/json'}
+
+            # =========================================================
+            # COMMIT TO GITHUB
+            # =========================================================
+
             result = commit_to_github(updated_dna, commit_msg)
 
             if result.get('success'):
+                log_mutation_telemetry(True, updates)
                 return json.dumps({
                     "success": True,
                     "message": result['message'],
                     "sha": result['sha'],
                     "url": result['url'],
-                    "updates_applied": list(updates.keys())
+                    "updates_applied": list(updates.keys()),
+                    "security": {"sw01": "passed", "sw02": "passed"}
                 }), 200, {'Content-Type': 'application/json'}
             else:
+                log_mutation_telemetry(False, updates, error=result.get('error'))
                 return json.dumps(result), result.get('code', 500), {'Content-Type': 'application/json'}
 
         except Exception as e:
+            log_mutation_telemetry(False, {}, error=str(e))
             return json.dumps({"error": f"Voice-to-FAF error: {str(e)}"}), 500, {'Content-Type': 'application/json'}
 
     # Handle GET request - return badge

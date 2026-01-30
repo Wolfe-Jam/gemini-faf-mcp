@@ -3,3 +3,4 @@ PyYAML==6.0.1
 python-frontmatter==1.1.0
 requests==2.31.0
 google-cloud-secret-manager==2.18.0
+google-cloud-bigquery==3.14.0
