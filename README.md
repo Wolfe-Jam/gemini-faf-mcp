@@ -1,5 +1,7 @@
 # gemini-faf-mcp
 
+![FAF Status](https://us-east1-bucket-460122.cloudfunctions.net/faf-source-of-truth)
+
 Google Cloud Function for FAF (Foundational AI-context Format) integration with Gemini.
 
 ## What This Does
