@@ -15,6 +15,8 @@ import json
 
 # Live endpoint
 BASE_URL = "https://us-east1-bucket-460122.cloudfunctions.net/faf-source-of-truth"
+# Dry-run endpoint for PUT tests (prevents production pollution)
+DRY_RUN_URL = f"{BASE_URL}?dry_run=true"
 
 
 # =============================================================================
@@ -222,41 +224,42 @@ class TestTier3Aero:
 # =============================================================================
 
 class TestTier4Voice:
-    """Voice-to-FAF specific tests."""
+    """Voice-to-FAF specific tests (using dry_run to prevent production pollution)."""
 
     def test_voice_put_structure(self):
-        """PUT accepts correct structure."""
-        # This test doesn't actually commit - just validates structure
+        """PUT accepts correct structure (dry_run)."""
         r = requests.put(
-            BASE_URL,
+            DRY_RUN_URL,
             headers={"Content-Type": "application/json"},
             json={
                 "updates": {"test_field": "test_value"},
                 "message": "wjttc-test: structure validation"
             }
         )
-        # Should either succeed (200) or fail gracefully (not 500)
-        assert r.status_code in [200, 400, 401, 403]
+        assert r.status_code == 200
+        data = r.json()
+        assert data.get("dry_run") == True
 
     def test_voice_response_fields(self):
-        """PUT response contains expected fields on success."""
+        """PUT dry_run response contains expected fields."""
         r = requests.put(
-            BASE_URL,
+            DRY_RUN_URL,
             headers={"Content-Type": "application/json"},
             json={
                 "updates": {"state.wjttc_test": "passed"},
                 "message": "wjttc-test: response field validation"
             }
         )
-        if r.status_code == 200:
-            data = r.json()
-            assert "success" in data
-            assert "sha" in data or "error" in data
+        assert r.status_code == 200
+        data = r.json()
+        assert "dry_run" in data
+        assert "would_apply" in data
+        assert "preview" in data
 
     def test_voice_no_token_exposure(self):
-        """GitHub token not exposed in response."""
+        """GitHub token not exposed in response (dry_run)."""
         r = requests.put(
-            BASE_URL,
+            DRY_RUN_URL,
             headers={"Content-Type": "application/json"},
             json={
                 "updates": {"state.security_test": "checking"},
@@ -268,35 +271,36 @@ class TestTier4Voice:
         assert "ghp_" not in r.text
 
     def test_voice_custom_message(self):
-        """Custom commit message used when provided."""
+        """Custom commit message shown in dry_run preview."""
         custom_msg = "wjttc-test: custom message test"
         r = requests.put(
-            BASE_URL,
+            DRY_RUN_URL,
             headers={"Content-Type": "application/json"},
             json={
                 "updates": {"state.message_test": "custom"},
                 "message": custom_msg
             }
         )
-        if r.status_code == 200:
-            data = r.json()
-            if "message" in data:
-                assert custom_msg in data["message"]
+        assert r.status_code == 200
+        data = r.json()
+        assert custom_msg in data.get("message", "")
 
-    def test_voice_url_points_to_github(self):
-        """Response URL points to GitHub."""
+    def test_voice_preview_includes_score(self):
+        """Dry_run preview includes score and orange status."""
         r = requests.put(
-            BASE_URL,
+            DRY_RUN_URL,
             headers={"Content-Type": "application/json"},
             json={
-                "updates": {"state.url_test": "checking"},
-                "message": "wjttc-test: url validation"
+                "updates": {"state.preview_test": "checking"},
+                "message": "wjttc-test: preview validation"
             }
         )
-        if r.status_code == 200:
-            data = r.json()
-            if "url" in data:
-                assert "github.com" in data["url"]
+        assert r.status_code == 200
+        data = r.json()
+        preview = data.get("preview", {})
+        assert "score" in preview
+        assert "has_orange" in preview
+        assert "security" in preview
 
 
 # =============================================================================
@@ -342,28 +346,29 @@ class TestIntegration:
 # =============================================================================
 
 class TestTier5Security:
-    """v2.5.1 Security tests - SW-01, SW-02, Telemetry."""
+    """v2.5.1 Security tests - SW-01, SW-02, Telemetry (using dry_run)."""
 
-    def test_security_fields_in_success_response(self):
-        """Successful PUT includes security status fields."""
+    def test_security_fields_in_dry_run_response(self):
+        """Dry_run includes security status in preview."""
         r = requests.put(
-            BASE_URL,
+            DRY_RUN_URL,
             headers={"Content-Type": "application/json"},
             json={
                 "updates": {"state.security_test": "v2.5.1"},
                 "message": "wjttc-test: security fields validation"
             }
         )
-        if r.status_code == 200:
-            data = r.json()
-            assert "security" in data
-            assert data["security"].get("sw01") == "passed"
-            assert data["security"].get("sw02") == "passed"
+        assert r.status_code == 200
+        data = r.json()
+        assert data.get("dry_run") == True
+        preview = data.get("preview", {})
+        assert preview.get("security", {}).get("sw01") == "passed"
+        assert preview.get("security", {}).get("sw02") == "passed"
 
     def test_sw02_blocks_unauthorized_orange(self):
-        """SW-02: Cannot set Big Orange without 100% score."""
+        """SW-02: Cannot set Big Orange without 100% score (even in dry_run)."""
         r = requests.put(
-            BASE_URL,
+            DRY_RUN_URL,
             headers={"Content-Type": "application/json"},
             json={
                 "updates": {
@@ -373,7 +378,7 @@ class TestTier5Security:
                 "message": "wjttc-test: SW-02 validation"
             }
         )
-        # Should be blocked by SW-02 or succeed only if score is 100
+        # Should be blocked by SW-02 (security checks run before dry_run)
         if r.status_code == 403:
             data = r.json()
             assert data.get("blocked_by") == "SW-02"
@@ -382,63 +387,63 @@ class TestTier5Security:
     def test_blocked_response_includes_blocker(self):
         """Blocked responses identify which security check failed."""
         r = requests.put(
-            BASE_URL,
+            DRY_RUN_URL,
             headers={"Content-Type": "application/json"},
             json={
                 "updates": {"x_faf_orange": True},
                 "message": "wjttc-test: blocker identification"
             }
         )
+        # May pass if score is 100, or block if trying to set orange
         if r.status_code == 403:
             data = r.json()
             assert "blocked_by" in data
             assert data["blocked_by"] in ["SW-01", "SW-02"]
 
-    def test_updates_applied_list_returned(self):
-        """Successful PUT returns list of applied updates."""
+    def test_would_apply_list_in_dry_run(self):
+        """Dry_run returns list of updates that would be applied."""
         r = requests.put(
-            BASE_URL,
+            DRY_RUN_URL,
             headers={"Content-Type": "application/json"},
             json={
                 "updates": {"state.test_field": "test_value"},
-                "message": "wjttc-test: updates_applied validation"
+                "message": "wjttc-test: would_apply validation"
             }
         )
-        if r.status_code == 200:
-            data = r.json()
-            assert "updates_applied" in data
-            assert isinstance(data["updates_applied"], list)
-            assert "state.test_field" in data["updates_applied"]
+        assert r.status_code == 200
+        data = r.json()
+        assert "would_apply" in data
+        assert isinstance(data["would_apply"], list)
+        assert "state.test_field" in data["would_apply"]
 
-    def test_agent_header_detected_for_telemetry(self):
-        """Agent header is detected for telemetry logging."""
+    def test_agent_header_accepted(self):
+        """Agent header accepted in dry_run."""
         r = requests.put(
-            BASE_URL,
+            DRY_RUN_URL,
             headers={
                 "Content-Type": "application/json",
                 "X-FAF-Agent": "gemini"
             },
             json={
                 "updates": {"state.agent_test": "gemini"},
-                "message": "wjttc-test: agent telemetry"
+                "message": "wjttc-test: agent header"
             }
         )
-        # Agent should be logged in telemetry (we verify response succeeds)
-        assert r.status_code in [200, 403]
+        assert r.status_code == 200
 
-    def test_dot_notation_updates_work(self):
-        """Dot notation for nested updates works correctly."""
+    def test_dot_notation_in_dry_run(self):
+        """Dot notation for nested updates works in dry_run."""
         r = requests.put(
-            BASE_URL,
+            DRY_RUN_URL,
             headers={"Content-Type": "application/json"},
             json={
                 "updates": {"state.nested.deep.value": "test"},
                 "message": "wjttc-test: dot notation"
             }
         )
-        if r.status_code == 200:
-            data = r.json()
-            assert "state.nested.deep.value" in data.get("updates_applied", [])
+        assert r.status_code == 200
+        data = r.json()
+        assert "state.nested.deep.value" in data.get("would_apply", [])
 
 
 if __name__ == "__main__":

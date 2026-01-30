@@ -96,7 +96,15 @@ paths:
         - SW-02: Scoring Guard (Big Orange requires 100%)
 
         All mutations logged to BigQuery.
+
+        **Dry-run mode**: Add `?dry_run=true` to validate without committing.
       parameters:
+        - name: dry_run
+          in: query
+          description: If true, validates and previews changes without committing to GitHub
+          schema:
+            type: boolean
+            default: false
         - name: X-FAF-Agent
           in: header
           description: Agent identifier for telemetry
@@ -202,6 +210,42 @@ components:
           type: string
           enum: [SW-01, SW-02]
           description: Which security check blocked the mutation
+
+    DryRunResponse:
+      type: object
+      properties:
+        dry_run:
+          type: boolean
+          example: true
+        would_apply:
+          type: array
+          items:
+            type: string
+          description: List of fields that would be updated
+        preview:
+          type: object
+          properties:
+            score:
+              type: integer
+              description: Projected FAF score after changes
+            has_orange:
+              type: boolean
+              description: Projected orange status after changes
+            security:
+              type: object
+              properties:
+                sw01:
+                  type: string
+                  example: passed
+                sw02:
+                  type: string
+                  example: passed
+        message:
+          type: string
+          description: Commit message that would be used
+        note:
+          type: string
+          example: "No changes committed. Remove ?dry_run=true to apply."
 
     Error:
       type: object

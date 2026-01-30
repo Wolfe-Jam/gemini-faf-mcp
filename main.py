@@ -501,6 +501,26 @@ def parse_faf(request):
                 return json.dumps({"error": error, "blocked_by": "SW-02"}), 403, {'Content-Type': 'application/json'}
 
             # =========================================================
+            # DRY-RUN MODE (for testing without committing)
+            # =========================================================
+
+            dry_run = request.args.get('dry_run', 'false').lower() == 'true'
+            if dry_run:
+                preview_score = calculate_score(updated_dna)
+                preview_orange = check_orange(updated_dna)
+                return json.dumps({
+                    "dry_run": True,
+                    "would_apply": list(updates.keys()),
+                    "preview": {
+                        "score": preview_score,
+                        "has_orange": preview_orange,
+                        "security": {"sw01": "passed", "sw02": "passed"}
+                    },
+                    "message": commit_msg or f"voice-sync: DNA update [{datetime.utcnow().isoformat()}Z]",
+                    "note": "No changes committed. Remove ?dry_run=true to apply."
+                }), 200, {'Content-Type': 'application/json'}
+
+            # =========================================================
             # COMMIT TO GITHUB
             # =========================================================
 
