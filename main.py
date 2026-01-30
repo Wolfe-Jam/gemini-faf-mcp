@@ -70,18 +70,31 @@ def validate_sw02_scoring_guard(updated_dna, updates, calculate_score_func):
     return True, None
 
 
-def log_mutation_telemetry(success, updates, error=None, blocked_by=None):
+def log_mutation_telemetry(success, updates, agent='voice', score=None, has_orange=False, error=None, blocked_by=None):
     """Log mutation attempts to BigQuery (non-blocking)."""
     try:
+        import uuid
         from google.cloud import bigquery
         client = bigquery.Client()
         table_id = "bucket-460122.faf_telemetry.voice_mutations"
+
+        # Build security status
+        if blocked_by:
+            security_status = f"BLOCKED:{blocked_by}"
+        elif success:
+            security_status = "SW-01:passed,SW-02:passed"
+        else:
+            security_status = f"ERROR:{error}" if error else "UNKNOWN"
+
         row = {
-            "timestamp": datetime.utcnow().isoformat() + "Z",
-            "success": success,
-            "updates": json.dumps(updates) if updates else "{}",
-            "error": error,
-            "blocked_by": blocked_by
+            "request_id": str(uuid.uuid4()),
+            "timestamp": datetime.utcnow().isoformat(),
+            "agent": agent,
+            "mutation_summary": json.dumps(updates) if updates else "{}",
+            "new_score": score if score is not None else 0,
+            "has_orange": has_orange,
+            "security_status": security_status,
+            "raw_input": json.dumps({"updates": updates, "error": error})
         }
         client.insert_rows_json(table_id, [row])
     except Exception as e:
@@ -471,17 +484,20 @@ def parse_faf(request):
             # SECURITY CHECKS (v2.5.1)
             # =========================================================
 
+            # Detect agent for telemetry
+            agent = detect_agent(request)
+
             # SW-01: Temporal Integrity
             new_timestamp = datetime.utcnow().isoformat() + "Z"
             valid, error = validate_sw01_temporal_integrity(current_dna, new_timestamp)
             if not valid:
-                log_mutation_telemetry(False, updates, error=error, blocked_by="SW-01")
+                log_mutation_telemetry(False, updates, agent=agent, score=calculate_score(current_dna), error=error, blocked_by="SW-01")
                 return json.dumps({"error": error, "blocked_by": "SW-01"}), 403, {'Content-Type': 'application/json'}
 
             # SW-02: Scoring Guard
             valid, error = validate_sw02_scoring_guard(updated_dna, updates, calculate_score)
             if not valid:
-                log_mutation_telemetry(False, updates, error=error, blocked_by="SW-02")
+                log_mutation_telemetry(False, updates, agent=agent, score=calculate_score(updated_dna), error=error, blocked_by="SW-02")
                 return json.dumps({"error": error, "blocked_by": "SW-02"}), 403, {'Content-Type': 'application/json'}
 
             # =========================================================
@@ -491,7 +507,9 @@ def parse_faf(request):
             result = commit_to_github(updated_dna, commit_msg)
 
             if result.get('success'):
-                log_mutation_telemetry(True, updates)
+                final_score = calculate_score(updated_dna)
+                final_orange = check_orange(updated_dna)
+                log_mutation_telemetry(True, updates, agent=agent, score=final_score, has_orange=final_orange)
                 return json.dumps({
                     "success": True,
                     "message": result['message'],

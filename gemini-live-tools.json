@@ -11,7 +11,7 @@
     },
     {
       "name": "update_project_dna",
-      "description": "Update the project DNA via voice command. Use this when the user wants to change project focus, status, phase, goals, or any other DNA field. Changes are committed directly to GitHub.",
+      "description": "HIGH-VALUE MUTATION: Update the project DNA via voice command. IMPORTANT: Always verbally confirm the exact changes with the user before executing, as this commits directly to GitHub via GITHUB_TOKEN. Use when the user explicitly requests changes to project focus, status, phase, goals, or other DNA fields.",
       "parameters": {
         "type": "object",
         "properties": {

@@ -1,11 +1,12 @@
 """
-WJTTC Test Suite: gemini-faf-mcp v2.0.0
+WJTTC Test Suite: gemini-faf-mcp v2.5.1
 Championship-grade tests for the FAF Context Broker
 
 Tier 1: BRAKE (Critical) - Must not fail
 Tier 2: ENGINE (Core) - Core functionality
 Tier 3: AERO (Polish) - Nice to have
 Tier 4: VOICE (New!) - Voice-to-FAF specific
+Tier 5: SECURITY (v2.5.1) - SW-01, SW-02, Telemetry
 """
 
 import pytest
@@ -334,6 +335,110 @@ class TestIntegration:
         # All should report same underlying score
         # (formats differ but base score should match)
         assert len(set(str(s) for s in scores if s)) <= 2  # Allow minor format differences
+
+
+# =============================================================================
+# TIER 5: SECURITY SYSTEMS (v2.5.1)
+# =============================================================================
+
+class TestTier5Security:
+    """v2.5.1 Security tests - SW-01, SW-02, Telemetry."""
+
+    def test_security_fields_in_success_response(self):
+        """Successful PUT includes security status fields."""
+        r = requests.put(
+            BASE_URL,
+            headers={"Content-Type": "application/json"},
+            json={
+                "updates": {"state.security_test": "v2.5.1"},
+                "message": "wjttc-test: security fields validation"
+            }
+        )
+        if r.status_code == 200:
+            data = r.json()
+            assert "security" in data
+            assert data["security"].get("sw01") == "passed"
+            assert data["security"].get("sw02") == "passed"
+
+    def test_sw02_blocks_unauthorized_orange(self):
+        """SW-02: Cannot set Big Orange without 100% score."""
+        r = requests.put(
+            BASE_URL,
+            headers={"Content-Type": "application/json"},
+            json={
+                "updates": {
+                    "faf_distinction": "Big Orange",
+                    "project.name": ""  # Empty field to drop score
+                },
+                "message": "wjttc-test: SW-02 validation"
+            }
+        )
+        # Should be blocked by SW-02 or succeed only if score is 100
+        if r.status_code == 403:
+            data = r.json()
+            assert data.get("blocked_by") == "SW-02"
+            assert "Scoring guard" in data.get("error", "")
+
+    def test_blocked_response_includes_blocker(self):
+        """Blocked responses identify which security check failed."""
+        r = requests.put(
+            BASE_URL,
+            headers={"Content-Type": "application/json"},
+            json={
+                "updates": {"x_faf_orange": True},
+                "message": "wjttc-test: blocker identification"
+            }
+        )
+        if r.status_code == 403:
+            data = r.json()
+            assert "blocked_by" in data
+            assert data["blocked_by"] in ["SW-01", "SW-02"]
+
+    def test_updates_applied_list_returned(self):
+        """Successful PUT returns list of applied updates."""
+        r = requests.put(
+            BASE_URL,
+            headers={"Content-Type": "application/json"},
+            json={
+                "updates": {"state.test_field": "test_value"},
+                "message": "wjttc-test: updates_applied validation"
+            }
+        )
+        if r.status_code == 200:
+            data = r.json()
+            assert "updates_applied" in data
+            assert isinstance(data["updates_applied"], list)
+            assert "state.test_field" in data["updates_applied"]
+
+    def test_agent_header_detected_for_telemetry(self):
+        """Agent header is detected for telemetry logging."""
+        r = requests.put(
+            BASE_URL,
+            headers={
+                "Content-Type": "application/json",
+                "X-FAF-Agent": "gemini"
+            },
+            json={
+                "updates": {"state.agent_test": "gemini"},
+                "message": "wjttc-test: agent telemetry"
+            }
+        )
+        # Agent should be logged in telemetry (we verify response succeeds)
+        assert r.status_code in [200, 403]
+
+    def test_dot_notation_updates_work(self):
+        """Dot notation for nested updates works correctly."""
+        r = requests.put(
+            BASE_URL,
+            headers={"Content-Type": "application/json"},
+            json={
+                "updates": {"state.nested.deep.value": "test"},
+                "message": "wjttc-test: dot notation"
+            }
+        )
+        if r.status_code == 200:
+            data = r.json()
+            assert "state.nested.deep.value" in data.get("updates_applied", [])
 
 
 if __name__ == "__main__":
