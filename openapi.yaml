@@ -1,18 +1,62 @@
 openapi: 3.0.0
 info:
   title: FAF Source of Truth
-  description: Retrieves the authoritative .faf Project DNA for context-aware AI operations.
-  version: 1.0.0
+  description: |
+    Google Cloud Function for FAF (Foundational AI-context Format) integration.
+
+    Features:
+    - Multi-Agent Handshake (Claude, Gemini, Grok, Jules, Codex)
+    - Voice-to-FAF mutations via PUT
+    - Live SVG badge generation
+    - Security enforcement (SW-01, SW-02)
+
+    Media Type: application/vnd.faf+yaml
+  version: 2.5.1
+  contact:
+    name: wolfejam
+    url: https://faf.one
+
 servers:
+  - url: https://faf-source-of-truth-6wqmwwyfoq-ue.a.run.app
+    description: Production (Cloud Run)
   - url: https://us-east1-bucket-460122.cloudfunctions.net/faf-source-of-truth
+    description: Production (Cloud Functions)
+
 paths:
   /:
+    get:
+      summary: Get FAF Badge
+      operationId: getFafBadge
+      description: Returns a live SVG badge showing the current FAF score and tier.
+      responses:
+        '200':
+          description: SVG badge with score and tier indicator
+          content:
+            image/svg+xml:
+              schema:
+                type: string
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+                example: no-cache
+
     post:
-      summary: Parse Project DNA
-      operationId: parseFafContext
-      description: Reads a .faf file and returns the parsed JSON context for project grounding.
+      summary: Read Project DNA
+      operationId: readProjectDna
+      description: |
+        Reads the .faf file and returns payload optimized for the calling agent.
+
+        Agent detection via X-FAF-Agent header or User-Agent pattern matching.
+      parameters:
+        - name: X-FAF-Agent
+          in: header
+          description: Explicit agent identifier (claude, gemini, grok, jules, codex, copilot, cursor)
+          schema:
+            type: string
+            enum: [claude, gemini, grok, jules, codex, copilot, cursor]
       requestBody:
-        required: true
+        required: false
         content:
           application/json:
             schema:
@@ -20,12 +64,148 @@ paths:
               properties:
                 path:
                   type: string
-                  description: The path to the .faf file (default is project.faf).
-                  example: "project.faf"
+                  description: Path to .faf file (default is project.faf)
+                  example: project.faf
       responses:
         '200':
-          description: Parsed project context successfully retrieved.
+          description: Project DNA payload (format varies by agent)
           content:
             application/json:
               schema:
-                type: object
+                $ref: '#/components/schemas/DnaResponse'
+            application/xml:
+              schema:
+                type: string
+                description: XML format for Claude agent
+          headers:
+            X-FAF-Agent-Detected:
+              schema:
+                type: string
+              description: Which agent dialect was applied
+
+    put:
+      summary: Voice-to-FAF Mutation
+      operationId: updateProjectDna
+      description: |
+        Update project DNA via voice command. Changes are committed directly to GitHub.
+
+        **HIGH-VALUE MUTATION**: Gemini Live should verbally confirm before executing.
+
+        Security:
+        - SW-01: Temporal Integrity (rejects stale timestamps)
+        - SW-02: Scoring Guard (Big Orange requires 100%)
+
+        All mutations logged to BigQuery.
+      parameters:
+        - name: X-FAF-Agent
+          in: header
+          description: Agent identifier for telemetry
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MutationRequest'
+      responses:
+        '200':
+          description: Mutation successful, committed to GitHub
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MutationSuccess'
+        '400':
+          description: Invalid request (missing body or updates)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Blocked by security check (SW-01 or SW-02)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SecurityBlock'
+
+components:
+  schemas:
+    DnaResponse:
+      type: object
+      properties:
+        _agent:
+          type: string
+          description: Detected agent
+        _format:
+          type: string
+          enum: [minimal, direct, structured, code_focused, full]
+        score:
+          type: integer
+          description: FAF compliance score (0-100)
+      additionalProperties: true
+
+    MutationRequest:
+      type: object
+      required:
+        - updates
+      properties:
+        updates:
+          type: object
+          description: Key-value pairs to update (supports dot notation)
+          additionalProperties:
+            type: string
+          example:
+            state.focus: "IETF submission"
+            state.phase: "review"
+        message:
+          type: string
+          description: Optional commit message
+          example: "voice-sync: updated focus"
+
+    MutationSuccess:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          description: Commit message used
+        sha:
+          type: string
+          description: Git commit SHA
+        url:
+          type: string
+          description: GitHub URL to updated file
+        updates_applied:
+          type: array
+          items:
+            type: string
+          description: List of fields that were updated
+        security:
+          type: object
+          properties:
+            sw01:
+              type: string
+              example: passed
+            sw02:
+              type: string
+              example: passed
+
+    SecurityBlock:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Security violation message
+        blocked_by:
+          type: string
+          enum: [SW-01, SW-02]
+          description: Which security check blocked the mutation
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error message
