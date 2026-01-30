@@ -7,11 +7,156 @@ Endpoint: https://faf-source-of-truth-*.run.app
 Features:
 - POST: Parse .faf file, return JSON for AI grounding
 - GET: Return live SVG badge showing FAF score
+- Multi-Agent Handshake: Optimize payload per AI dialect
 """
 
 import functions_framework
 import yaml
 import json
+import re
+
+
+# =============================================================================
+# MULTI-AGENT TRANSLATION LAYER
+# =============================================================================
+
+def detect_agent(request):
+    """
+    Detect calling AI agent from headers.
+
+    Priority:
+    1. X-FAF-Agent header (explicit)
+    2. User-Agent pattern matching
+    3. Default to 'unknown'
+    """
+    # Check explicit header first
+    explicit_agent = request.headers.get('X-FAF-Agent', '').lower()
+    if explicit_agent:
+        return explicit_agent
+
+    # Pattern match User-Agent
+    user_agent = request.headers.get('User-Agent', '').lower()
+
+    agent_patterns = {
+        'claude': r'claude|anthropic',
+        'gemini': r'gemini|google-ai|vertex',
+        'grok': r'grok|xai',
+        'jules': r'jules|google-labs',
+        'codex': r'codex|openai',
+        'cursor': r'cursor',
+        'copilot': r'copilot|github',
+    }
+
+    for agent, pattern in agent_patterns.items():
+        if re.search(pattern, user_agent):
+            return agent
+
+    return 'unknown'
+
+
+def translate_for_agent(faf_data, agent):
+    """
+    Reshape FAF DNA based on calling agent's needs.
+
+    Philosophy:
+    - Small models (Jules): Minimal, focused payload
+    - Large models (Claude): Full technical depth
+    - Balanced models (Gemini): Structured, prioritized
+    - Action models (Grok): Direct, concise
+    """
+
+    if agent == 'jules':
+        # MINIMAL: Just the essentials for small context windows
+        return {
+            '_agent': 'jules',
+            '_format': 'minimal',
+            'project': faf_data.get('project', {}).get('name', 'Unknown'),
+            'goal': faf_data.get('project', {}).get('goal', ''),
+            'language': faf_data.get('project', {}).get('main_language', ''),
+            'constraints': faf_data.get('ai_instructions', {}).get('constraints', []),
+            'score': calculate_score(faf_data)
+        }
+
+    elif agent == 'claude':
+        # FULL: Claude craves technical depth
+        return {
+            '_agent': 'claude',
+            '_format': 'full',
+            '_meta': {
+                'faf_version': faf_data.get('faf_version', '2.5.0'),
+                'score': calculate_score(faf_data),
+                'distinction': 'Big Orange' if check_orange(faf_data) else None
+            },
+            **faf_data  # Everything
+        }
+
+    elif agent == 'gemini':
+        # STRUCTURED: Prioritized sections for Gemini's reasoning
+        return {
+            '_agent': 'gemini',
+            '_format': 'structured',
+            'priority_1_identity': {
+                'name': faf_data.get('project', {}).get('name'),
+                'goal': faf_data.get('project', {}).get('goal'),
+                'type': faf_data.get('project', {}).get('type')
+            },
+            'priority_2_technical': faf_data.get('stack', {}),
+            'priority_3_behavioral': faf_data.get('ai_instructions', {}),
+            'priority_4_context': faf_data.get('human_context', {}),
+            'score': calculate_score(faf_data)
+        }
+
+    elif agent == 'grok':
+        # DIRECT: Action-oriented for Grok's style
+        return {
+            '_agent': 'grok',
+            '_format': 'direct',
+            'what': faf_data.get('project', {}).get('name'),
+            'why': faf_data.get('project', {}).get('goal'),
+            'how': faf_data.get('stack', {}),
+            'rules': faf_data.get('ai_instructions', {}).get('constraints', []),
+            'status': f"{calculate_score(faf_data)}%"
+        }
+
+    elif agent in ('codex', 'copilot', 'cursor'):
+        # CODE-FOCUSED: Emphasize stack and patterns
+        return {
+            '_agent': agent,
+            '_format': 'code_focused',
+            'project': faf_data.get('project', {}),
+            'stack': faf_data.get('stack', {}),
+            'patterns': faf_data.get('ai_instructions', {}).get('patterns', []),
+            'avoid': faf_data.get('ai_instructions', {}).get('avoid', []),
+            'score': calculate_score(faf_data)
+        }
+
+    else:
+        # DEFAULT: Full payload for unknown agents
+        return {
+            '_agent': agent or 'unknown',
+            '_format': 'full',
+            **faf_data
+        }
+
+
+def transform_to_xml(data, root='dna'):
+    """
+    Transform dict to XML for Claude.
+    Claude's performance spikes with XML-style "Thinking Blocks".
+    """
+    def dict_to_xml(d, parent_tag='item'):
+        xml_parts = []
+        for key, value in d.items():
+            if isinstance(value, dict):
+                xml_parts.append(f'<{key}>{dict_to_xml(value)}</{key}>')
+            elif isinstance(value, list):
+                items = ''.join(f'<item>{v}</item>' for v in value)
+                xml_parts.append(f'<{key}>{items}</{key}>')
+            elif value is not None:
+                xml_parts.append(f'<{key}>{value}</{key}>')
+        return ''.join(xml_parts)
+
+    return f'<?xml version="1.0"?><{root}>{dict_to_xml(data)}</{root}>'
 
 
 def generate_badge(score, has_orange):
@@ -91,10 +236,22 @@ def check_orange(data):
 @functions_framework.http
 def parse_faf(request):
     """
-    FAF Source of Truth endpoint.
+    FAF Source of Truth - Multi-Agent Context Broker.
 
-    GET: Returns SVG badge showing current FAF score
-    POST: Parse .faf file and return JSON for AI grounding
+    GET: Returns live SVG badge showing FAF score and distinction
+    POST: Parse .faf file and return payload optimized for calling agent
+
+    Multi-Agent Handshake:
+    - Detects caller via User-Agent or X-FAF-Agent header
+    - Claude: XML with thinking blocks (full depth)
+    - Gemini: Structured JSON (prioritized sections)
+    - Grok: Direct JSON (action-oriented)
+    - Jules: Minimal JSON (token-efficient)
+    - Codex/Copilot/Cursor: Code-focused JSON
+    - Unknown: Full JSON payload
+
+    Headers returned:
+    - X-FAF-Agent-Detected: Which agent was identified
     """
 
     # Handle GET request - return badge
@@ -113,14 +270,34 @@ def parse_faf(request):
             svg = generate_badge(0, False)
             return svg, 200, {'Content-Type': 'image/svg+xml'}
 
-    # Handle POST request - return JSON
+    # Handle POST request - Multi-Agent Context Broker
     request_json = request.get_json(silent=True)
     file_path = request_json.get('path', 'project.faf') if request_json else 'project.faf'
 
     try:
         with open(file_path, 'r') as f:
             faf_data = yaml.safe_load(f)
-            return json.dumps(faf_data), 200, {'Content-Type': 'application/json'}
+
+        # Detect calling agent
+        agent = detect_agent(request)
+
+        # Translate payload for agent's dialect
+        translated = translate_for_agent(faf_data, agent)
+
+        # Claude gets XML (performance boost with thinking blocks)
+        if agent == 'claude':
+            xml_response = transform_to_xml(translated)
+            return xml_response, 200, {
+                'Content-Type': 'application/xml',
+                'X-FAF-Agent-Detected': agent
+            }
+
+        # All others get JSON (optimized per agent)
+        return json.dumps(translated, indent=2), 200, {
+            'Content-Type': 'application/json',
+            'X-FAF-Agent-Detected': agent
+        }
+
     except FileNotFoundError:
         return json.dumps({"error": f"File {file_path} not found."}), 404
     except yaml.YAMLError as e:

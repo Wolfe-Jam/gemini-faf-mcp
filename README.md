@@ -26,10 +26,56 @@ https://faf-source-of-truth-631316210911.us-east1.run.app
 ### Test the Endpoint
 
 ```bash
+# Default response (full JSON)
 curl -X POST https://faf-source-of-truth-631316210911.us-east1.run.app \
   -H "Content-Type: application/json" \
   -d '{"path": "project.faf"}'
 ```
+
+## Multi-Agent Handshake
+
+The endpoint acts as a **Context Broker** - it speaks different AI dialects.
+
+### How It Works
+
+Send a request with your AI's identity, get back optimized payload:
+
+```bash
+# Claude: Gets XML with thinking blocks
+curl -X POST https://faf-source-of-truth-631316210911.us-east1.run.app \
+  -H "X-FAF-Agent: claude" \
+  -H "Content-Type: application/json"
+
+# Jules: Gets minimal JSON (token-efficient)
+curl -X POST https://faf-source-of-truth-631316210911.us-east1.run.app \
+  -H "X-FAF-Agent: jules" \
+  -H "Content-Type: application/json"
+
+# Grok: Gets direct, action-oriented JSON
+curl -X POST https://faf-source-of-truth-631316210911.us-east1.run.app \
+  -H "X-FAF-Agent: grok" \
+  -H "Content-Type: application/json"
+```
+
+### Agent Dialects
+
+| Agent | Format | Philosophy |
+|-------|--------|------------|
+| **Claude** | XML | Full depth, thinking blocks |
+| **Gemini** | Structured JSON | Prioritized sections |
+| **Grok** | Direct JSON | Action-oriented |
+| **Jules** | Minimal JSON | Token-efficient |
+| **Codex/Copilot/Cursor** | Code-focused JSON | Stack & patterns |
+| **Unknown** | Full JSON | Complete payload |
+
+### Response Headers
+
+Every response includes:
+```
+X-FAF-Agent-Detected: <detected-agent>
+```
+
+This lets you verify which dialect was applied.
 
 ### Make Gemini-Callable
 
