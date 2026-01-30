@@ -1,0 +1,10 @@
+#!/bin/sh
+# FAF Bi-Sync Pre-Commit Hook
+# Syncs GEMINI.md with project.faf before every commit
+#
+# Install:
+#   cp hooks/pre-commit .git/hooks/pre-commit
+#   chmod +x .git/hooks/pre-commit
+
+python3 sync_faf.py
+git add GEMINI.md
