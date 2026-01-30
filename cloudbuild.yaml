@@ -2,7 +2,7 @@ options:
   logging: CLOUD_LOGGING_ONLY
 
 steps:
-  # Deploy the .faf parser to Cloud Run functions
+  # Step 1: Deploy the .faf parser to Cloud Run functions
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     args:
       - gcloud
@@ -15,3 +15,12 @@ steps:
       - --runtime=python312
       - --entry-point=parse_faf
       - --allow-unauthenticated
+
+  # Step 2: Run Bi-Sync to update documentation
+  - name: 'python:3.12-slim'
+    entrypoint: 'pip'
+    args: ['install', '-r', 'requirements.txt']
+
+  - name: 'python:3.12-slim'
+    entrypoint: 'python'
+    args: ['sync_faf.py']
