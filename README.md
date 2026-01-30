@@ -4,6 +4,8 @@
 
 Google Cloud Function for FAF (Foundational AI-context Format) integration with Gemini.
 
+**Version:** 2.5.1 | **Tests:** 36/36 (Championship Grade)
+
 ## What This Does
 
 Provides a "Source of Truth" endpoint that Gemini can call to retrieve project DNA from `.faf` files.
@@ -114,9 +116,23 @@ curl -X PUT https://us-east1-bucket-460122.cloudfunctions.net/faf-source-of-trut
   "message": "voice-sync: pivoting to IETF focus",
   "sha": "abc123...",
   "url": "https://github.com/Wolfe-Jam/gemini-faf-mcp/blob/main/project.faf",
-  "updates_applied": ["state.focus", "state.phase"]
+  "updates_applied": ["state.focus", "state.phase"],
+  "security": {"sw01": "passed", "sw02": "passed"}
 }
 ```
+
+## Security (v2.5.1)
+
+### SW-01: Temporal Integrity
+Rejects mutations where the timestamp is not newer than the existing DNA. Prevents replay attacks and stale updates.
+
+### SW-02: Scoring Guard
+Rejects attempts to set `distinction: "Big Orange"` unless the FAF score is exactly 100%. The Orange must be earned.
+
+### Telemetry
+All mutation attempts (success and blocked) are logged to BigQuery:
+- Table: `bucket-460122.faf_telemetry.voice_mutations`
+- Fields: `request_id`, `timestamp`, `agent`, `mutation_summary`, `new_score`, `has_orange`, `security_status`
 
 ### Setup (Secret Manager)
 
