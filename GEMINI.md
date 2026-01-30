@@ -1,8 +1,8 @@
 ---
+faf_score: 42%
+faf_tier: Incomplete
 faf_version: 2.5.1
-faf_score: 100%
-faf_tier: Trophy
-last_sync: '2026-01-30'
+last_sync: '2026-01-30T19:27:16.111211Z'
 ---
 
 # Gemini Project DNA Alignment (FAF v2.5.1)
