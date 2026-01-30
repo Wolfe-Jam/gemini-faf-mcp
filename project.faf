@@ -1,5 +1,5 @@
 faf_version: 2.5.0
-generated: '2026-01-30T18:14:05.985666Z'
+generated: '2026-01-30T18:18:14.889824Z'
 project:
   name: gemini-faf-mcp
   goal: Google Cloud Function for FAF integration with Gemini
@@ -31,7 +31,7 @@ state:
   phase: production
   version: 1.0.0
   status: v2_release_test
-  focus: v2.5.1 telemetry test
+  focus: v2.5.1 telemetry verified
   url_test: checking
 scores:
   faf_score: 100
