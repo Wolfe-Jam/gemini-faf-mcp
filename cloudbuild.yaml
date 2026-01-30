@@ -1,0 +1,14 @@
+steps:
+  # Deploy the .faf parser to Cloud Run functions
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    args:
+      - gcloud
+      - functions
+      - deploy
+      - faf-source-of-truth
+      - --region=us-east1
+      - --source=.
+      - --trigger-http
+      - --runtime=python312
+      - --entry-point=parse_faf
+      - --allow-unauthenticated
