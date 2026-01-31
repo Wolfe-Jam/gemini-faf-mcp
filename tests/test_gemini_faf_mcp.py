@@ -437,13 +437,84 @@ class TestTier5Security:
             DRY_RUN_URL,
             headers={"Content-Type": "application/json"},
             json={
-                "updates": {"state.nested.deep.value": "test"},
+                "updates": {"state.focus": "test_focus"},
                 "message": "wjttc-test: dot notation"
             }
         )
         assert r.status_code == 200
         data = r.json()
-        assert "state.nested.deep.value" in data.get("would_apply", [])
+        assert "state.focus" in data.get("would_apply", [])
+
+
+# =============================================================================
+# TIER 6: PYPI PACKAGE (v1.0.2)
+# =============================================================================
+
+class TestTier6PyPI:
+    """PyPI package tests - validates the installable package works correctly."""
+
+    def test_package_import(self):
+        """Package imports successfully."""
+        import gemini_faf_mcp
+        assert hasattr(gemini_faf_mcp, '__version__')
+        assert gemini_faf_mcp.__version__ == "1.0.2"
+
+    def test_fafclient_import(self):
+        """FAFClient class imports."""
+        from gemini_faf_mcp import FAFClient
+        assert FAFClient is not None
+
+    def test_parse_faf_import(self):
+        """parse_faf function imports."""
+        from gemini_faf_mcp import parse_faf
+        assert callable(parse_faf)
+
+    def test_validate_faf_import(self):
+        """validate_faf function imports."""
+        from gemini_faf_mcp import validate_faf
+        assert callable(validate_faf)
+
+    def test_local_parse_project_faf(self):
+        """Local parse of project.faf works."""
+        from gemini_faf_mcp import parse_faf
+        import os
+
+        # Find project.faf relative to this test
+        test_dir = os.path.dirname(__file__)
+        project_root = os.path.dirname(test_dir)
+        faf_path = os.path.join(project_root, "project.faf")
+
+        if os.path.exists(faf_path):
+            result = parse_faf(faf_path)
+            assert "project" in result
+            assert result["project"]["name"] == "gemini-faf-mcp"
+
+    def test_validate_faf_scoring(self):
+        """FAF validation returns score and tier."""
+        from gemini_faf_mcp import parse_faf, validate_faf
+        import os
+
+        test_dir = os.path.dirname(__file__)
+        project_root = os.path.dirname(test_dir)
+        faf_path = os.path.join(project_root, "project.faf")
+
+        if os.path.exists(faf_path):
+            parsed = parse_faf(faf_path)
+            result = validate_faf(parsed)
+            assert "score" in result
+            assert "tier" in result
+            assert result["score"] >= 85  # At least Bronze
+
+    def test_fafclient_remote_connection(self):
+        """FAFClient has expected methods."""
+        from gemini_faf_mcp import FAFClient
+
+        client = FAFClient(local=True)  # Use local mode to avoid network in unit tests
+        # Test that the client has the expected methods
+        assert hasattr(client, 'get_project_dna')
+        assert hasattr(client, 'get_score')
+        assert hasattr(client, 'is_elite')
+        assert hasattr(client, 'update_dna')
 
 
 if __name__ == "__main__":

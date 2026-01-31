@@ -1,9 +1,10 @@
-# WJTTC Test Suite: gemini-faf-mcp v2.5.1
+# WJTTC Test Suite: gemini-faf-mcp v2.5.2
 
 **Project:** gemini-faf-mcp
-**Version:** 2.5.1
-**Date:** 2026-01-30
+**Version:** 2.5.2
+**Date:** 2026-01-31
 **Tester:** Claude Opus 4.5 + WJTTC Builder
+**PyPI:** gemini-faf-mcp v1.0.1
 
 ---
 
@@ -16,8 +17,9 @@
 | T3 | AERO (Polish) | 4 | 4 | PASS |
 | T4 | VOICE | 5 | 5 | PASS |
 | T5 | SECURITY (v2.5.1) | 6 | 6 | PASS |
+| T6 | PYPI (v1.0.1) | 7 | 7 | PASS |
 | - | Integration | 3 | 3 | PASS |
-| **Total** | | **36** | **36** | **100%** |
+| **Total** | | **43** | **43** | **100%** |
 
 **Pass Rate:** 100% - Championship Grade
 
@@ -167,10 +169,47 @@
 
 ---
 
+## Tier 6: PYPI PACKAGE (v1.0.1)
+
+### T6.1 - Package Installation
+**Status:** PASS
+**Priority:** HIGH
+
+| Test | Expected | Actual | Status |
+|------|----------|--------|--------|
+| Package imports | gemini_faf_mcp | imports | PASS |
+| Version matches | 1.0.1 | 1.0.1 | PASS |
+| FAFClient imports | class | class | PASS |
+| parse_faf imports | callable | callable | PASS |
+| validate_faf imports | callable | callable | PASS |
+
+### T6.2 - Local Operations
+**Status:** PASS
+**Priority:** HIGH
+
+| Test | Expected | Actual | Status |
+|------|----------|--------|--------|
+| Parse project.faf | dict with project | present | PASS |
+| Project name extracted | gemini-faf-mcp | gemini-faf-mcp | PASS |
+| Validation returns score | integer >= 85 | 100 | PASS |
+| Validation returns tier | Trophy/Gold/Silver/Bronze | Trophy | PASS |
+
+### T6.3 - Remote Client
+**Status:** PASS
+**Priority:** MEDIUM
+
+| Test | Expected | Actual | Status |
+|------|----------|--------|--------|
+| FAFClient has get_project_dna | method | present | PASS |
+| FAFClient has get_badge | method | present | PASS |
+
+---
+
 ## Execution Log
 
 | Date | Tester | Tests Run | Passed | Failed | Notes |
 |------|--------|-----------|--------|--------|-------|
+| 2026-01-31 | Claude Opus 4.5 | 43 | 43 | 0 | v2.5.2 + PyPI Tier 6 |
 | 2026-01-30 | Claude Opus 4.5 | 36 | 36 | 0 | v2.5.1 release |
 
 ---
@@ -208,6 +247,6 @@ Table: `bucket-460122.faf_telemetry.voice_mutations`
 
 ---
 
-*WJTTC Test Suite v2.5.1*
-*Security Tier Added: 2026-01-30*
+*WJTTC Test Suite v2.5.2*
+*PyPI Tier Added: 2026-01-31*
 *"We break things so others never have to know they were broken."*

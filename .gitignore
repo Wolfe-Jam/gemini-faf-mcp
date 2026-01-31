@@ -24,3 +24,4 @@ Thumbs.db
 dist/
 .venv/
 *.egg-info/
+.mcpregistry_*

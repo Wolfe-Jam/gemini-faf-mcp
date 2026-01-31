@@ -1,0 +1,76 @@
+# TAF - Testing AI-context Format
+# Hidden testing context for gemini-faf-mcp
+
+taf_version: 1.0.0
+project: gemini-faf-mcp
+
+testing:
+  framework: pytest
+  methodology: WJTTC
+  pass_rate: 100%
+  tier: Championship
+
+structure:
+  test_file: tests/test_gemini_faf_mcp.py
+  test_suite: tests/WJTTC-TEST-SUITE.md
+  coverage_target: 100%
+
+tiers:
+  tier1_brake:
+    name: BRAKE SYSTEMS (Critical)
+    count: 8
+    status: PASS
+    description: Showstoppers - failures here block release
+
+  tier2_engine:
+    name: ENGINE SYSTEMS (Core)
+    count: 10
+    status: PASS
+    description: Core functionality - multi-agent detection
+
+  tier3_aero:
+    name: AERO SYSTEMS (Polish)
+    count: 4
+    status: PASS
+    description: Edge cases and polish
+
+  tier4_voice:
+    name: VOICE SYSTEMS
+    count: 5
+    status: PASS
+    description: Voice-to-FAF mutations (dry_run safe)
+
+  tier5_security:
+    name: SECURITY SYSTEMS (v2.5.1)
+    count: 6
+    status: PASS
+    description: SW-01/SW-02 enforcement
+
+  integration:
+    name: Integration Tests
+    count: 3
+    status: PASS
+    description: Full workflow validation
+
+endpoints:
+  base_url: https://faf-source-of-truth-6wqmwwyfoq-ue.a.run.app
+  dry_run_param: "?dry_run=true"
+  safe_testing: true
+
+commands:
+  run_tests: python3 -m pytest tests/test_gemini_faf_mcp.py -v
+  coverage: python3 -m pytest tests/ --cov=src --cov-report=term
+
+ci:
+  enabled: true
+  workflow: .github/workflows/pypi.yml
+  trusted_publisher: true
+
+last_run:
+  date: 2026-01-30
+  tester: Claude Opus 4.5
+  total: 36
+  passed: 36
+  failed: 0
+
+# WJTTC Philosophy: "We break things so others never have to know they were broken."

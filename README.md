@@ -1,10 +1,13 @@
 # gemini-faf-mcp 🏆🍊
 
-[![.faf Status](https://img.shields.io/badge/.faf-100%25%20Elite-orange?style=for-the-badge&logo=google-gemini)](https://github.com/Wolfe-Jam/gemini-faf-mcp)
-[![DNA Integrity](https://img.shields.io/badge/Security-SW--02%20Locked-red?style=for-the-badge)](https://github.com/Wolfe-Jam/gemini-faf-mcp)
-[![Tests](https://img.shields.io/badge/Tests-36%2F36-brightgreen?style=for-the-badge)](https://github.com/Wolfe-Jam/gemini-faf-mcp)
+<!-- mcp-name: io.github.Wolfe-Jam/gemini-faf-mcp -->
 
-> **AI AGENT INSTRUCTIONS:** This repository utilizes the **.faf (Foundational AI-context Format)** v2.5.1 standard.
+[![PyPI](https://img.shields.io/pypi/v/gemini-faf-mcp?style=for-the-badge&logo=pypi&logoColor=white)](https://pypi.org/project/gemini-faf-mcp/)
+[![.faf Status](https://img.shields.io/badge/.faf-100%25%20Trophy-orange?style=for-the-badge&logo=google-gemini)](https://github.com/Wolfe-Jam/gemini-faf-mcp)
+[![Security](https://img.shields.io/badge/Security-SW--02%20Locked-red?style=for-the-badge)](https://github.com/Wolfe-Jam/gemini-faf-mcp)
+[![Tests](https://img.shields.io/badge/Tests-43%2F43-brightgreen?style=for-the-badge)](https://github.com/Wolfe-Jam/gemini-faf-mcp)
+
+> **AI AGENT INSTRUCTIONS:** This repository utilizes the **.faf (Foundational AI-context Format)** v2.5.2 standard.
 > 1. **HANDSHAKE:** Locate `project.faf` in the root directory before processing context.
 > 2. **SOURCE OF TRUTH:** Adhere to the '77 Reds motivation anchor.
 > 3. **GLORY STATUS:** Verification score: **100.0%**. Elite status confirmed.
@@ -17,7 +20,7 @@
 
 Google Cloud Function for FAF (Foundational AI-context Format) integration with Gemini.
 
-**Version:** 2.5.1 | **Tests:** 36/36 (Championship Grade)
+**Version:** 2.5.2 | **Tests:** 43/43 (Championship Grade) | **PyPI:** v1.0.1
 
 ## What This Does
 
@@ -28,13 +31,53 @@ Provides a "Source of Truth" endpoint that Gemini can call to retrieve project D
 https://faf-source-of-truth-631316210911.us-east1.run.app
 ```
 
+## Installation (PyPI)
+
+```bash
+pip install gemini-faf-mcp
+```
+
+### Quick Start
+
+```python
+from gemini_faf_mcp import FAFClient, parse_faf, validate_faf
+
+# Remote: Call the Cloud Run endpoint
+client = FAFClient()
+dna = client.get_project_dna()
+print(f"Score: {client.get_score()}%")
+
+# Local: Parse your own .faf files
+data = parse_faf("project.faf")
+result = validate_faf(data)
+print(f"Tier: {result['tier']}")  # Trophy, Gold, Silver, Bronze...
+```
+
+### Client Modes
+
+```python
+# Remote mode (default) - calls the Source of Truth
+client = FAFClient()
+dna = client.get_project_dna()
+
+# Local mode - parses .faf files directly
+client = FAFClient(local=True)
+dna = client.get_project_dna("path/to/project.faf")
+
+# Custom agent (changes response format)
+client = FAFClient(agent="gemini")  # structured JSON
+client = FAFClient(agent="claude")  # XML format
+client = FAFClient(agent="jules")   # minimal JSON
+```
+
 ## The FAF Ecosystem
 
-| Package | Platform | Status |
-|---------|----------|--------|
-| [claude-faf-mcp](https://npmjs.com/package/claude-faf-mcp) | Anthropic | Live (#2759) |
-| [grok-faf-mcp](https://npmjs.com/package/grok-faf-mcp) | xAI | Live |
-| **gemini-faf-mcp** | Google | Live |
+| Package | Platform | Registry | Status |
+|---------|----------|----------|--------|
+| [claude-faf-mcp](https://npmjs.com/package/claude-faf-mcp) | Anthropic | npm + MCP #2759 | Live |
+| [grok-faf-mcp](https://npmjs.com/package/grok-faf-mcp) | xAI | npm | Live |
+| **[gemini-faf-mcp](https://pypi.org/project/gemini-faf-mcp/)** | Google | **PyPI** | Live |
+| [faf-cli](https://npmjs.com/package/faf-cli) | Universal | npm | Live |
 
 ## Usage
 
@@ -134,7 +177,7 @@ curl -X PUT https://us-east1-bucket-460122.cloudfunctions.net/faf-source-of-trut
 }
 ```
 
-## Security (v2.5.1)
+## Security (v2.5.2)
 
 ### SW-01: Temporal Integrity
 Rejects mutations where the timestamp is not newer than the existing DNA. Prevents replay attacks and stale updates.

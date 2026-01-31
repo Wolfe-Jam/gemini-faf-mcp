@@ -14,7 +14,7 @@ import os
 DEFAULT_ENDPOINT = "https://faf-source-of-truth-631316210911.us-east1.run.app"
 TELEMETRY_ENDPOINT = "https://faf-source-of-truth-631316210911.us-east1.run.app/telemetry"
 
-__version__ = "1.0.1"
+__version__ = "1.0.2"
 
 
 def _send_handshake():

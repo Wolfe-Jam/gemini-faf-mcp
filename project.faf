@@ -6,12 +6,16 @@ project:
   main_language: Python
   type: mcp-server
 stack:
+  frontend: API-only (no frontend)
   backend: Google Cloud Functions
+  database: BigQuery
+  testing: pytest + WJTTC
   api_type: HTTP
   runtime: Python 3.12
   hosting: Google Cloud Run
   build: Cloud Build
   cicd: Cloud Build Triggers
+  connection: HTTP/REST
 human_context:
   who: Developers using Gemini with FAF-enabled projects
   what: Cloud Function that parses .faf files and returns JSON for Gemini
