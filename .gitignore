@@ -25,3 +25,7 @@ dist/
 .venv/
 *.egg-info/
 .mcpregistry_*
+
+# Testing & Benchmarks (added by repo-maintainer)
+.pytest_cache/
+.benchmarks/
