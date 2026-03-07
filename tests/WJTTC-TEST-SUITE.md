@@ -1,10 +1,10 @@
-# WJTTC Test Suite: gemini-faf-mcp v2.5.2
+# WJTTC Test Suite: gemini-faf-mcp v1.1.0
 
 **Project:** gemini-faf-mcp
-**Version:** 2.5.2
-**Date:** 2026-01-31
-**Tester:** Claude Opus 4.5 + WJTTC Builder
-**PyPI:** gemini-faf-mcp v1.0.1
+**Version:** 1.1.0
+**Date:** 2026-03-07
+**Tester:** Claude Opus 4.6 + WJTTC Builder
+**PyPI:** gemini-faf-mcp v1.1.0
 
 ---
 
@@ -17,9 +17,10 @@
 | T3 | AERO (Polish) | 4 | 4 | PASS |
 | T4 | VOICE | 5 | 5 | PASS |
 | T5 | SECURITY (v2.5.1) | 6 | 6 | PASS |
-| T6 | PYPI (v1.0.1) | 7 | 7 | PASS |
+| T6 | PYPI (v1.1.0) | 7 | 7 | PASS |
+| T7 | v1.1.0 FIXES | 14 | 14 | PASS |
 | - | Integration | 3 | 3 | PASS |
-| **Total** | | **43** | **43** | **100%** |
+| **Total** | | **57** | **57** | **100%** |
 
 **Pass Rate:** 100% - Championship Grade
 
@@ -169,7 +170,7 @@
 
 ---
 
-## Tier 6: PYPI PACKAGE (v1.0.1)
+## Tier 6: PYPI PACKAGE (v1.1.0)
 
 ### T6.1 - Package Installation
 **Status:** PASS
@@ -178,7 +179,7 @@
 | Test | Expected | Actual | Status |
 |------|----------|--------|--------|
 | Package imports | gemini_faf_mcp | imports | PASS |
-| Version matches | 1.0.1 | 1.0.1 | PASS |
+| Version matches | 1.1.0 | 1.1.0 | PASS |
 | FAFClient imports | class | class | PASS |
 | parse_faf imports | callable | callable | PASS |
 | validate_faf imports | callable | callable | PASS |
@@ -201,7 +202,69 @@
 | Test | Expected | Actual | Status |
 |------|----------|--------|--------|
 | FAFClient has get_project_dna | method | present | PASS |
-| FAFClient has get_badge | method | present | PASS |
+| FAFClient has get_score | method | present | PASS |
+| FAFClient has is_elite | method | present | PASS |
+| FAFClient has update_dna | method | present | PASS |
+
+---
+
+## Tier 7: v1.1.0 FIXES (Unit Tests)
+
+### T7.1 - Input Validation
+**Status:** PASS
+**Priority:** HIGH
+
+| Test | Expected | Actual | Status |
+|------|----------|--------|--------|
+| Reject > 50 updates | 400 error | rejected | PASS |
+| Reject key > 100 chars | 400 error | rejected | PASS |
+| Reject value > 10K chars | 400 error | rejected | PASS |
+| Accept valid payload | no error | accepted | PASS |
+
+### T7.2 - YAML Round-Trip
+**Status:** PASS
+**Priority:** HIGH
+
+| Test | Expected | Actual | Status |
+|------|----------|--------|--------|
+| Valid data survives round-trip | match | match | PASS |
+| Special characters survive | match | match | PASS |
+
+### T7.3 - find_faf_file
+**Status:** PASS
+**Priority:** MEDIUM
+
+| Test | Expected | Actual | Status |
+|------|----------|--------|--------|
+| Discovers project.faf | path found | found | PASS |
+| Returns None for empty dir | None | None | PASS |
+| In package __all__ | present | present | PASS |
+
+### T7.4 - validate_faf Edge Cases
+**Status:** PASS
+**Priority:** MEDIUM
+
+| Test | Expected | Actual | Status |
+|------|----------|--------|--------|
+| Empty dict → Red tier, score 0 | Red/0 | Red/0 | PASS |
+| Missing sections reported | issues list | reported | PASS |
+
+### T7.5 - Score Reading
+**Status:** PASS
+**Priority:** HIGH
+
+| Test | Expected | Actual | Status |
+|------|----------|--------|--------|
+| Reads scores.faf_score | 100 | 100 | PASS |
+| Fallback to slot counting | 0-100 | valid | PASS |
+
+### T7.6 - Version Consistency
+**Status:** PASS
+**Priority:** CRITICAL
+
+| Test | Expected | Actual | Status |
+|------|----------|--------|--------|
+| __init__.py + client.py match | 1.1.0 | 1.1.0 | PASS |
 
 ---
 
@@ -209,8 +272,9 @@
 
 | Date | Tester | Tests Run | Passed | Failed | Notes |
 |------|--------|-----------|--------|--------|-------|
-| 2026-01-31 | Claude Opus 4.5 | 43 | 43 | 0 | v2.5.2 + PyPI Tier 6 |
-| 2026-01-30 | Claude Opus 4.5 | 36 | 36 | 0 | v2.5.1 release |
+| 2026-03-07 | Claude Opus 4.6 | 57 | 57 | 0 | v1.1.0 + Tier 7 |
+| 2026-01-31 | Claude Opus 4.5 | 43 | 43 | 0 | v1.0.2 + PyPI Tier 6 |
+| 2026-01-30 | Claude Opus 4.5 | 36 | 36 | 0 | v1.0.0 release |
 
 ---
 
@@ -247,6 +311,6 @@ Table: `bucket-460122.faf_telemetry.voice_mutations`
 
 ---
 
-*WJTTC Test Suite v2.5.2*
-*PyPI Tier Added: 2026-01-31*
+*WJTTC Test Suite v1.1.0*
+*Tier 7 Added: 2026-03-07*
 *"We break things so others never have to know they were broken."*

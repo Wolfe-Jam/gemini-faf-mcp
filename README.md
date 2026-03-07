@@ -5,7 +5,7 @@
 [![PyPI](https://img.shields.io/pypi/v/gemini-faf-mcp?style=for-the-badge&logo=pypi&logoColor=white)](https://pypi.org/project/gemini-faf-mcp/)
 [![.faf Status](https://img.shields.io/badge/.faf-100%25%20Trophy-orange?style=for-the-badge&logo=google-gemini)](https://github.com/Wolfe-Jam/gemini-faf-mcp)
 [![Security](https://img.shields.io/badge/Security-SW--02%20Locked-red?style=for-the-badge)](https://github.com/Wolfe-Jam/gemini-faf-mcp)
-[![Tests](https://img.shields.io/badge/Tests-43%2F43-brightgreen?style=for-the-badge)](https://github.com/Wolfe-Jam/gemini-faf-mcp)
+[![Tests](https://img.shields.io/badge/Tests-57%2F57-brightgreen?style=for-the-badge)](https://github.com/Wolfe-Jam/gemini-faf-mcp)
 
 > **AI AGENT INSTRUCTIONS:** This repository utilizes the **.faf (Foundational AI-context Format)** v2.5.2 standard.
 > 1. **HANDSHAKE:** Locate `project.faf` in the root directory before processing context.
@@ -20,7 +20,7 @@
 
 Google Cloud Function for FAF (Foundational AI-context Format) integration with Gemini.
 
-**Version:** 2.5.2 | **Tests:** 43/43 (Championship Grade) | **PyPI:** v1.0.1
+**Version:** 1.1.0 | **Tests:** 57/57 (Championship Grade) | **PyPI:** [v1.1.0](https://pypi.org/project/gemini-faf-mcp/)
 
 ## What This Does
 
@@ -40,7 +40,7 @@ pip install gemini-faf-mcp
 ### Quick Start
 
 ```python
-from gemini_faf_mcp import FAFClient, parse_faf, validate_faf
+from gemini_faf_mcp import FAFClient, parse_faf, validate_faf, find_faf_file
 
 # Remote: Call the Cloud Run endpoint
 client = FAFClient()
@@ -51,6 +51,9 @@ print(f"Score: {client.get_score()}%")
 data = parse_faf("project.faf")
 result = validate_faf(data)
 print(f"Tier: {result['tier']}")  # Trophy, Gold, Silver, Bronze...
+
+# Discovery: Find .faf files automatically
+faf_path = find_faf_file(".")  # Searches project.faf, .faf, *.faf
 ```
 
 ### Client Modes
@@ -74,10 +77,10 @@ client = FAFClient(agent="jules")   # minimal JSON
 
 | Package | Platform | Registry | Status |
 |---------|----------|----------|--------|
-| [claude-faf-mcp](https://npmjs.com/package/claude-faf-mcp) | Anthropic | npm + MCP #2759 | Live |
-| [grok-faf-mcp](https://npmjs.com/package/grok-faf-mcp) | xAI | npm | Live |
-| **[gemini-faf-mcp](https://pypi.org/project/gemini-faf-mcp/)** | Google | **PyPI** | Live |
-| [faf-cli](https://npmjs.com/package/faf-cli) | Universal | npm | Live |
+| [claude-faf-mcp](https://npmjs.com/package/claude-faf-mcp) | Anthropic | npm + MCP #2759 | v5.1.0 |
+| [grok-faf-mcp](https://npmjs.com/package/grok-faf-mcp) | xAI | npm | v1.0.2 |
+| **[gemini-faf-mcp](https://pypi.org/project/gemini-faf-mcp/)** | **Google** | **PyPI** | **v1.1.0** |
+| [faf-cli](https://npmjs.com/package/faf-cli) | Universal | npm | v4.5.0 |
 
 ## Usage
 
@@ -131,9 +134,10 @@ curl -X POST https://faf-source-of-truth-631316210911.us-east1.run.app \
 Every response includes:
 ```
 X-FAF-Agent-Detected: <detected-agent>
+X-FAF-Version: 1.1.0
 ```
 
-This lets you verify which dialect was applied.
+`X-FAF-Agent-Detected` confirms which dialect was applied. `X-FAF-Version` lets clients verify the endpoint version.
 
 ## Voice-to-FAF
 
@@ -177,7 +181,14 @@ curl -X PUT https://us-east1-bucket-460122.cloudfunctions.net/faf-source-of-trut
 }
 ```
 
-## Security (v2.5.2)
+## Security
+
+### Input Validation (v1.1.0)
+All PUT payloads are validated before processing:
+- Maximum 50 updates per request
+- Key length capped at 100 characters
+- Value length capped at 10,000 characters
+- YAML round-trip validation before commit (prevents malformed data)
 
 ### SW-01: Temporal Integrity
 Rejects mutations where the timestamp is not newer than the existing DNA. Prevents replay attacks and stale updates.

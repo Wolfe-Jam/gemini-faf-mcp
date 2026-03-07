@@ -11,28 +11,31 @@
 - **Name:** gemini-faf-mcp
 - **Purpose:** Universal Context Landing Pad for FAF integration with Google Gemini
 - **Stack:** Python 3.12 / Google Cloud Run
-- **Quality:** Championship Grade (43/43 WJTTC Tests)
+- **Quality:** Championship Grade (57/57 WJTTC Tests)
 
 ### 📊 Context Quality Status
 - **FAF Score:** 🏆 100% (Trophy) - 14/14 slots
-- **WJTTC:** 43/43 PASS
-- **Security:** SW-01 + SW-02 Enforced
-- **Last Updated:** 2026-01-31
+- **WJTTC:** 57/57 PASS (7 tiers + integration)
+- **Security:** SW-01 + SW-02 + Input Validation + YAML Round-trip
+- **Version:** 1.1.0
+- **Last Updated:** 2026-03-07
 
 ---
 
 ## 🏗️ Architecture
 
 ```
-gemini-faf-mcp
+gemini-faf-mcp v1.1.0
 ├── Cloud Function (main.py)
 │   ├── GET  → Live SVG badge
 │   ├── POST → Read DNA (multi-agent dialects)
-│   └── PUT  → Voice-to-FAF mutations
+│   ├── PUT  → Voice-to-FAF mutations
+│   └── Security: Input validation + YAML round-trip + SW-01/SW-02
 ├── PyPI Package (gemini-faf-mcp)
 │   ├── FAFClient → Remote/local client
 │   ├── parse_faf → Local .faf parsing
-│   └── validate_faf → FAF v2.5.2 validation
+│   ├── validate_faf → FAF v2.5.2 validation
+│   └── find_faf_file → .faf file discovery
 └── BigQuery Telemetry
     └── bucket-460122.faf_telemetry.voice_mutations
 ```
@@ -104,7 +107,7 @@ gcloud builds submit
 
 **STATUS: BI-SYNC ACTIVE 🔗 - Synchronized with .faf context!**
 
-*Last Sync: 2026-01-31T17:30:00.000Z*
+*Last Sync: 2026-03-07T00:00:00.000Z*
 *Sync Engine: F1-Inspired Software Engineering*
 *🏎️⚡️_championship_sync*
 
