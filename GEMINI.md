@@ -1,7 +1,7 @@
 ---
-faf_score: 42%
+faf_score: 100%
 faf_slots: 14/14
-faf_tier: Incomplete
+faf_tier: Trophy
 faf_version: 2.5.2
 last_sync: '2026-01-30T20:29:57.467467Z'
 ---

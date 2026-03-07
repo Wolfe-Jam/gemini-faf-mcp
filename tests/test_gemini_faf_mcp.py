@@ -457,7 +457,7 @@ class TestTier6PyPI:
         """Package imports successfully."""
         import gemini_faf_mcp
         assert hasattr(gemini_faf_mcp, '__version__')
-        assert gemini_faf_mcp.__version__ == "1.0.2"
+        assert gemini_faf_mcp.__version__ == "1.1.0"
 
     def test_fafclient_import(self):
         """FAFClient class imports."""
@@ -515,6 +515,138 @@ class TestTier6PyPI:
         assert hasattr(client, 'get_score')
         assert hasattr(client, 'is_elite')
         assert hasattr(client, 'update_dna')
+
+
+# =============================================================================
+# TIER 7: v1.1.0 FIXES (Unit Tests)
+# =============================================================================
+
+class TestTier7Fixes:
+    """v1.1.0 fix validation - unit tests (no network required)."""
+
+    # --- Input validation ---
+
+    def test_input_validation_rejects_too_many_updates(self):
+        """Reject payloads with > MAX_UPDATES keys."""
+        from main import validate_input_limits, MAX_UPDATES
+        big_updates = {f"key_{i}": f"val_{i}" for i in range(MAX_UPDATES + 1)}
+        valid, error = validate_input_limits(big_updates)
+        assert not valid
+        assert "Too many updates" in error
+
+    def test_input_validation_rejects_long_key(self):
+        """Reject keys longer than MAX_KEY_LENGTH."""
+        from main import validate_input_limits, MAX_KEY_LENGTH
+        updates = {"x" * (MAX_KEY_LENGTH + 1): "value"}
+        valid, error = validate_input_limits(updates)
+        assert not valid
+        assert "Key too long" in error
+
+    def test_input_validation_rejects_long_value(self):
+        """Reject values longer than MAX_VALUE_LENGTH."""
+        from main import validate_input_limits, MAX_VALUE_LENGTH
+        updates = {"key": "x" * (MAX_VALUE_LENGTH + 1)}
+        valid, error = validate_input_limits(updates)
+        assert not valid
+        assert "Value too long" in error
+
+    def test_input_validation_accepts_valid_payload(self):
+        """Accept normal-sized payloads."""
+        from main import validate_input_limits
+        updates = {"project.goal": "Build something great", "state.phase": "beta"}
+        valid, error = validate_input_limits(updates)
+        assert valid
+        assert error is None
+
+    # --- YAML round-trip ---
+
+    def test_yaml_roundtrip_valid_data(self):
+        """Valid YAML data survives round-trip."""
+        from main import validate_yaml_roundtrip
+        data = {"project": {"name": "test", "goal": "testing"}, "score": 100}
+        valid, error = validate_yaml_roundtrip(data)
+        assert valid
+        assert error is None
+
+    def test_yaml_roundtrip_with_special_chars(self):
+        """YAML with special characters survives round-trip."""
+        from main import validate_yaml_roundtrip
+        data = {"project": {"name": "test: special", "tags": ["a", "b", "c"]}}
+        valid, error = validate_yaml_roundtrip(data)
+        assert valid
+
+    # --- find_faf_file ---
+
+    def test_find_faf_file_discovers_project_faf(self):
+        """find_faf_file discovers project.faf in repo root."""
+        from gemini_faf_mcp import find_faf_file
+        import os
+        test_dir = os.path.dirname(__file__)
+        project_root = os.path.dirname(test_dir)
+        result = find_faf_file(project_root)
+        assert result is not None
+        assert result.endswith("project.faf")
+
+    def test_find_faf_file_returns_none_for_empty_dir(self):
+        """find_faf_file returns None when no .faf exists."""
+        from gemini_faf_mcp import find_faf_file
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmpdir:
+            result = find_faf_file(tmpdir)
+            assert result is None
+
+    def test_find_faf_file_in_exports(self):
+        """find_faf_file is in package __all__."""
+        import gemini_faf_mcp
+        assert "find_faf_file" in gemini_faf_mcp.__all__
+
+    # --- validate_faf edge cases ---
+
+    def test_validate_faf_empty_dict(self):
+        """validate_faf handles empty dict."""
+        from gemini_faf_mcp import validate_faf
+        result = validate_faf({})
+        assert result["score"] == 0
+        assert result["tier"] == "Red"
+        assert not result["valid"]
+        assert len(result["issues"]) > 0
+
+    def test_validate_faf_missing_sections(self):
+        """validate_faf reports missing required sections."""
+        from gemini_faf_mcp import validate_faf
+        result = validate_faf({"faf_version": "2.5.2"})
+        assert result["score"] > 0  # faf_version counted
+        assert not result["valid"]  # missing project + human_context
+        assert any("project.name" in issue for issue in result["issues"])
+
+    # --- sync_faf score reading ---
+
+    def test_sync_get_faf_score_reads_from_scores(self):
+        """get_faf_score reads scores.faf_score when present."""
+        import sys, os
+        sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
+        from sync_faf import get_faf_score
+        data = {"scores": {"faf_score": 100}}
+        assert get_faf_score(data) == 100
+
+    def test_sync_get_faf_score_fallback(self):
+        """get_faf_score falls back to slot counting when no scores section."""
+        import sys, os
+        sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
+        from sync_faf import get_faf_score
+        data = {"faf_version": "2.5.0", "project": {"name": "test"}}
+        score = get_faf_score(data)
+        assert isinstance(score, int)
+        assert 0 <= score <= 100
+
+    # --- Version consistency ---
+
+    def test_version_consistency(self):
+        """All version strings match 1.1.0."""
+        import gemini_faf_mcp
+        from gemini_faf_mcp import client
+        assert gemini_faf_mcp.__version__ == "1.1.0"
+        assert client.__version__ == "1.1.0"
 
 
 if __name__ == "__main__":

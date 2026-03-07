@@ -3,7 +3,7 @@ gemini-faf-mcp: Google Cloud Function for FAF Context Bridge
 
 Media Type: application/vnd.faf+yaml
 Endpoint: https://faf-source-of-truth-*.run.app
-Version: 2.5.1
+Version: 1.1.0
 
 Features:
 - GET: Return live SVG badge showing FAF score
@@ -14,7 +14,11 @@ Features:
 Security (v2.5.1):
 - SW-01: Temporal Integrity - reject stale timestamps
 - SW-02: Scoring Guard - Big Orange requires 100%
+- Input validation: size limits on updates
+- YAML round-trip: validate before commit
 """
+
+__version__ = "1.1.0"
 
 import functions_framework
 import yaml
@@ -68,6 +72,47 @@ def validate_sw02_scoring_guard(updated_dna, updates, calculate_score_func):
         if score < 100:
             return False, f"SW-02: Scoring guard - Big Orange requires 100%, current: {score}%"
     return True, None
+
+
+# =============================================================================
+# INPUT VALIDATION (v1.1.0)
+# =============================================================================
+
+MAX_UPDATES = 50
+MAX_KEY_LENGTH = 100
+MAX_VALUE_LENGTH = 10000
+
+
+def validate_input_limits(updates):
+    """
+    Validate update payload size limits.
+    Returns (valid, error_message).
+    """
+    if len(updates) > MAX_UPDATES:
+        return False, f"Too many updates: {len(updates)} (max {MAX_UPDATES})"
+
+    for key, value in updates.items():
+        if len(str(key)) > MAX_KEY_LENGTH:
+            return False, f"Key too long: '{key[:20]}...' ({len(str(key))} chars, max {MAX_KEY_LENGTH})"
+        if len(str(value)) > MAX_VALUE_LENGTH:
+            return False, f"Value too long for key '{key}' ({len(str(value))} chars, max {MAX_VALUE_LENGTH})"
+
+    return True, None
+
+
+def validate_yaml_roundtrip(data):
+    """
+    Validate that data survives a YAML dump/load round-trip.
+    Returns (valid, error_message).
+    """
+    try:
+        dumped = yaml.dump(data, default_flow_style=False, sort_keys=False)
+        reloaded = yaml.safe_load(dumped)
+        if reloaded != data:
+            return False, "YAML round-trip mismatch: data changed after dump/reload"
+        return True, None
+    except Exception as e:
+        return False, f"YAML round-trip failed: {str(e)}"
 
 
 def log_mutation_telemetry(success, updates, agent='voice', score=None, has_orange=False, error=None, blocked_by=None):
@@ -473,12 +518,24 @@ def parse_faf(request):
                 log_mutation_telemetry(False, {}, error="No updates provided")
                 return json.dumps({"error": "No updates provided"}), 400, {'Content-Type': 'application/json'}
 
+            # Input validation (v1.1.0)
+            valid, error = validate_input_limits(updates)
+            if not valid:
+                log_mutation_telemetry(False, {}, error=error)
+                return json.dumps({"error": error}), 400, {'Content-Type': 'application/json'}
+
             # Load current DNA
             with open('project.faf', 'r') as f:
                 current_dna = yaml.safe_load(f)
 
             # Merge updates
             updated_dna = merge_dna_updates(current_dna.copy(), updates)
+
+            # YAML round-trip validation (v1.1.0)
+            valid, error = validate_yaml_roundtrip(updated_dna)
+            if not valid:
+                log_mutation_telemetry(False, updates, error=error)
+                return json.dumps({"error": error}), 400, {'Content-Type': 'application/json'}
 
             # =========================================================
             # SECURITY CHECKS (v2.5.1)
@@ -537,7 +594,7 @@ def parse_faf(request):
                     "url": result['url'],
                     "updates_applied": list(updates.keys()),
                     "security": {"sw01": "passed", "sw02": "passed"}
-                }), 200, {'Content-Type': 'application/json'}
+                }), 200, {'Content-Type': 'application/json', 'X-FAF-Version': __version__}
             else:
                 log_mutation_telemetry(False, updates, error=result.get('error'))
                 return json.dumps(result), result.get('code', 500), {'Content-Type': 'application/json'}
@@ -556,11 +613,11 @@ def parse_faf(request):
             has_orange = check_orange(faf_data)
 
             svg = generate_badge(score, has_orange)
-            return svg, 200, {'Content-Type': 'image/svg+xml', 'Cache-Control': 'no-cache'}
+            return svg, 200, {'Content-Type': 'image/svg+xml', 'Cache-Control': 'no-cache', 'X-FAF-Version': __version__}
         except Exception as e:
             # Return error badge
             svg = generate_badge(0, False)
-            return svg, 200, {'Content-Type': 'image/svg+xml'}
+            return svg, 200, {'Content-Type': 'image/svg+xml', 'X-FAF-Version': __version__}
 
     # Handle POST request - Multi-Agent Context Broker
     request_json = request.get_json(silent=True)
@@ -581,13 +638,15 @@ def parse_faf(request):
             xml_response = transform_to_xml(translated)
             return xml_response, 200, {
                 'Content-Type': 'application/xml',
-                'X-FAF-Agent-Detected': agent
+                'X-FAF-Agent-Detected': agent,
+                'X-FAF-Version': __version__
             }
 
         # All others get JSON (optimized per agent)
         return json.dumps(translated, indent=2), 200, {
             'Content-Type': 'application/json',
-            'X-FAF-Agent-Detected': agent
+            'X-FAF-Agent-Detected': agent,
+            'X-FAF-Version': __version__
         }
 
     except FileNotFoundError:

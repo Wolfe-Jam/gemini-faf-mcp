@@ -22,10 +22,10 @@ Glory Wall:
     https://faf-landing.vercel.app/glory.html
 """
 
-__version__ = "1.0.2"
+__version__ = "1.1.0"
 __author__ = "wolfejam"
 
 from .client import FAFClient
-from .parser import parse_faf, validate_faf
+from .parser import parse_faf, validate_faf, find_faf_file
 
-__all__ = ["FAFClient", "parse_faf", "validate_faf", "__version__"]
+__all__ = ["FAFClient", "parse_faf", "validate_faf", "find_faf_file", "__version__"]
