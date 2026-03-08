@@ -97,12 +97,12 @@ tags:
     - pypi
   user_defined: null
 human_context:
-  who: Developers using Gemini CLI with FAF-enabled projects
-  what: MCP server providing 10 tools for reading, validating, scoring, and exporting .faf project DNA
-  why: Enable Gemini to understand any project instantly via structured IANA-registered context
-  where: Google Cloud Run (us-east1) + local MCP stdio
-  when: On-demand via Gemini CLI or direct MCP connection
-  how: Python + FastMCP + faf-python-sdk + Cloud Run REST API
+  who: Gemini CLI developers who want instant project context
+  what: MCP server that reads, validates, scores, and exports .faf project DNA
+  why: Eliminate re-explaining your project every Gemini session
+  where: Gemini CLI via Extensions Gallery, local MCP server
+  when: Every coding session — context loads automatically via GEMINI.md
+  how: Install extension, run /gemini-faf-mcp:setup, project DNA flows to Gemini
 ai_scoring_details:
   system_date: 2025-09-20
   slot_based_percentage: 100

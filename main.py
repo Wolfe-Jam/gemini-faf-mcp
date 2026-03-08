@@ -27,7 +27,15 @@ import re
 import os
 import base64
 import requests
-from datetime import datetime
+from datetime import datetime, date
+
+
+class FafJSONEncoder(json.JSONEncoder):
+    """Handle datetime objects from YAML parsing."""
+    def default(self, obj):
+        if isinstance(obj, (datetime, date)):
+            return obj.isoformat()
+        return super().default(obj)
 
 
 # =============================================================================
@@ -135,11 +143,11 @@ def log_mutation_telemetry(success, updates, agent='voice', score=None, has_oran
             "request_id": str(uuid.uuid4()),
             "timestamp": datetime.utcnow().isoformat(),
             "agent": agent,
-            "mutation_summary": json.dumps(updates) if updates else "{}",
+            "mutation_summary": json.dumps(updates, cls=FafJSONEncoder) if updates else "{}",
             "new_score": score if score is not None else 0,
             "has_orange": has_orange,
             "security_status": security_status,
-            "raw_input": json.dumps({"updates": updates, "error": error})
+            "raw_input": json.dumps({"updates": updates, "error": error}, cls=FafJSONEncoder)
         }
         client.insert_rows_json(table_id, [row])
     except Exception as e:
@@ -643,7 +651,7 @@ def parse_faf(request):
             }
 
         # All others get JSON (optimized per agent)
-        return json.dumps(translated, indent=2), 200, {
+        return json.dumps(translated, indent=2, cls=FafJSONEncoder), 200, {
             'Content-Type': 'application/json',
             'X-FAF-Agent-Detected': agent,
             'X-FAF-Version': __version__
