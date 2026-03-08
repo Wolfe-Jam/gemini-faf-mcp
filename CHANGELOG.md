@@ -2,6 +2,25 @@
 
 All notable changes to gemini-faf-mcp are documented here.
 
+## [2.0.0] - 2026-03-08
+
+### Added
+- **FastMCP MCP server** (`server.py`) — 10 tools powered by faf-python-sdk
+  - `faf_read`, `faf_validate`, `faf_score`, `faf_discover`, `faf_init`
+  - `faf_stringify`, `faf_context`, `faf_gemini`, `faf_agents`, `faf_about`
+- **faf-python-sdk** integration for parsing, validation, and discovery
+- **WJTTC 9-tier test suite** for MCP server (111 tests across Brake, Engine, Aero, Scoring, Exports, Safety, Contract, Roundtrip, Gallery)
+- Console entry point: `gemini-faf-mcp` command
+- `gemini-extension.json` updated for native Python MCP server
+
+### Changed
+- Python requirement: `>=3.12` → `>=3.10` (FastMCP minimum)
+- Test count: 57 → 168 (111 MCP server + 57 Cloud Function)
+- README restructured for clarity (MCP server first, REST API second)
+
+### Dependencies
+- Added: `fastmcp>=3.0.0`, `faf-python-sdk>=1.0.2`
+
 ## [1.1.0] - 2026-03-07
 
 ### Fixed
@@ -58,6 +77,7 @@ All notable changes to gemini-faf-mcp are documented here.
 - OpenAPI manifest for Vertex AI Extension
 - Initial Cloud Function deployment
 
+[2.0.0]: https://github.com/Wolfe-Jam/gemini-faf-mcp/compare/v1.1.0...v2.0.0
 [1.1.0]: https://github.com/Wolfe-Jam/gemini-faf-mcp/compare/v1.0.2...v1.1.0
 [1.0.2]: https://github.com/Wolfe-Jam/gemini-faf-mcp/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/Wolfe-Jam/gemini-faf-mcp/compare/v1.0.0...v1.0.1
