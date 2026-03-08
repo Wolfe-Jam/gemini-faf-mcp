@@ -1,12 +1,14 @@
 # gemini-faf-mcp
 
+> Structured project context for any AI. 10 MCP tools for Gemini CLI.
+
 <!-- mcp-name: io.github.Wolfe-Jam/gemini-faf-mcp -->
 
 [![PyPI](https://img.shields.io/pypi/v/gemini-faf-mcp?style=for-the-badge&logo=pypi&logoColor=white)](https://pypi.org/project/gemini-faf-mcp/)
 [![Tests](https://img.shields.io/badge/Tests-168%20passing-brightgreen?style=for-the-badge)](https://github.com/Wolfe-Jam/gemini-faf-mcp)
 [![MCP Tools](https://img.shields.io/badge/MCP_Tools-10-blue?style=for-the-badge)](https://github.com/Wolfe-Jam/gemini-faf-mcp)
 
-MCP server for [FAF](https://faf.one) (Foundational AI-context Format) — the IANA-registered standard for AI project context (`application/vnd.faf+yaml`). 10 tools powered by [faf-python-sdk](https://pypi.org/project/faf-python-sdk/).
+MCP server for [FAF](https://faf.one) (Foundational AI-context Format) — the IANA-registered standard for AI project context (`application/vnd.faf+yaml`). Built on [FastMCP](https://github.com/jlowin/fastmcp). 10 tools powered by [faf-python-sdk](https://pypi.org/project/faf-python-sdk/).
 
 ## Install
 
@@ -58,14 +60,14 @@ npx @modelcontextprotocol/inspector --command python3 server.py
 
 | Score | Tier |
 |-------|------|
-| 100% | Trophy |
-| 99% | Gold |
-| 95% | Silver |
-| 85% | Bronze |
-| 70% | Green |
-| 55% | Yellow |
-| <55% | Red |
-| 0% | White |
+| 100% | 🏆 Trophy |
+| 99% | 🥇 Gold |
+| 95% | 🥈 Silver |
+| 85% | 🥉 Bronze |
+| 70% | 🟢 Green |
+| 55% | 🟡 Yellow |
+| <55% | 🔴 Red |
+| 0% | ⚪ White |
 
 ## Architecture
 
@@ -175,6 +177,15 @@ Auto-deploys via Cloud Build on push to `main`. See `cloudbuild.yaml`.
 | [grok-faf-mcp](https://npmjs.com/package/grok-faf-mcp) | xAI | npm |
 | [rust-faf-mcp](https://crates.io/crates/rust-faf-mcp) | Rust | crates.io |
 | [faf-cli](https://npmjs.com/package/faf-cli) | Universal | npm |
+
+## Google Integration
+
+FAF works across the Gemini ecosystem:
+
+- **Gemini CLI** — MCP server with 10 tools (this package)
+- **Antigravity IDE** — reads GEMINI.md exported by `faf_gemini`
+- **Vertex AI** — OpenAPI manifest for extension integration
+- **Gemini Live** — voice-to-FAF mutations via Cloud Run API
 
 ## Links
 
