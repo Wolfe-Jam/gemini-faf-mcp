@@ -108,7 +108,7 @@ def faf_discover(start_dir: str = ".") -> dict:
     Searches the current directory and parent directories for project.faf.
     Use this before faf_read to locate the file automatically."""
     result = find_faf_file(start_dir)
-    if result:
+    if result and Path(result).is_file():
         return {"found": True, "path": result}
     return {"found": False, "searched_from": os.path.abspath(start_dir)}
 
