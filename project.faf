@@ -11,7 +11,7 @@ ai_tldr:
   current_focus: Gemini Extensions Gallery listing
   your_role: Build features with perfect context
 instant_context:
-  what_building: Native MCP server for FAF — 11 tools for Gemini CLI, plus Cloud Run REST API
+  what_building: Native MCP server for FAF — 12 tools for Gemini CLI, plus Cloud Run REST API
   tech_stack: Python + FastMCP + faf-python-sdk + Cloud Run
   main_language: Python
   key_files:
@@ -27,7 +27,7 @@ context_quality:
   missing_context: null
 project:
   name: gemini-faf-mcp
-  goal: MCP server for FAF — read, validate, score, and export IANA-registered .faf project DNA from Gemini CLI
+  goal: MCP server for FAF — read, validate, auto-detect, score, and export IANA-registered .faf project DNA from Gemini CLI
   main_language: Python
   type: mcp-server
 ai_instructions:
@@ -41,7 +41,7 @@ ai_instructions:
     quality_bar: zero_errors
     testing: required
   warnings:
-    - All changes must pass 168 tests before commit
+    - All changes must pass 183 tests before commit
     - faf-python-sdk handles parsing — server.py delegates
     - Version must match in pyproject.toml, __init__.py, client.py, server.py, main.py
 stack:
@@ -73,7 +73,7 @@ preferences:
   documentation: as_needed
 state:
   phase: production
-  version: 2.0.1
+  version: 2.1.0
   focus: Gemini Extensions Gallery listing
   status: green_flag
   next_milestone: gallery_listing

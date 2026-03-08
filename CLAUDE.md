@@ -92,6 +92,6 @@ Trusted Publisher (OIDC) — tag + GitHub Release triggers `pypi.yml` workflow. 
 
 **STATUS: BI-SYNC ACTIVE 🔗 - Synchronized with .faf context!**
 
-*Last Sync: 2026-03-08T07:36:54.017Z*
+*Last Sync: 2026-03-08T21:48:02.000Z*
 *Sync Engine: F1-Inspired Software Engineering*
 *🏎️⚡️_championship_sync*
