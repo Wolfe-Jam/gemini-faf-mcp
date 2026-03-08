@@ -4,8 +4,8 @@
   "description": "FAF — Universal AI context from IANA-registered .faf files. Read, validate, score, and generate project DNA for any AI.",
   "mcpServers": {
     "faf": {
-      "command": "python3",
-      "args": ["${extensionPath}/server.py"]
+      "command": "${extensionPath}/run.sh",
+      "args": []
     }
   },
   "contextFileName": "GEMINI.md"
