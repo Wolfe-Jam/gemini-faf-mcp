@@ -1,6 +1,6 @@
 {
   "name": "gemini-faf-mcp",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "FAF — Universal AI context from IANA-registered .faf files. Read, validate, score, and generate project DNA for any AI.",
   "mcpServers": {
     "faf": {

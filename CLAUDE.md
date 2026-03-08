@@ -1,123 +1,88 @@
-# 🏎️ CLAUDE.md - AI Telemetry Link
+# CLAUDE.md — gemini-faf-mcp
 
-## PROJECT STATE: PRODUCTION 🍊
-**Tyre Compound:** ULTRASOFT C5 (Maximum Performance)
-
----
-
-## 🎨 CORE CONTEXT
-
-### Project Identity
+## Project
 - **Name:** gemini-faf-mcp
-- **Purpose:** Universal Context Landing Pad for FAF integration with Google Gemini
-- **Stack:** Python 3.12 / Google Cloud Run
-- **Quality:** Championship Grade (57/57 WJTTC Tests)
+- **Version:** 2.0.1
+- **Purpose:** MCP server + Cloud Run API for FAF (Foundational AI-context Format)
+- **Stack:** Python 3.10+ / FastMCP / faf-python-sdk / Cloud Run
+- **Tests:** 168/168 passing (111 MCP server + 57 Cloud Function)
+- **Registry:** PyPI
+- **Format:** IANA `application/vnd.faf+yaml`
 
-### 📊 Context Quality Status
-- **FAF Score:** 🏆 100% (Trophy) - 14/14 slots
-- **WJTTC:** 57/57 PASS (7 tiers + integration)
-- **Security:** SW-01 + SW-02 + Input Validation + YAML Round-trip
-- **Version:** 1.1.0
-- **Last Updated:** 2026-03-07
-
----
-
-## 🏗️ Architecture
+## Architecture
 
 ```
-gemini-faf-mcp v1.1.0
-├── Cloud Function (main.py)
-│   ├── GET  → Live SVG badge
-│   ├── POST → Read DNA (multi-agent dialects)
-│   ├── PUT  → Voice-to-FAF mutations
-│   └── Security: Input validation + YAML round-trip + SW-01/SW-02
-├── PyPI Package (gemini-faf-mcp)
-│   ├── FAFClient → Remote/local client
-│   ├── parse_faf → Local .faf parsing
-│   ├── validate_faf → FAF v2.5.2 validation
-│   └── find_faf_file → .faf file discovery
-└── BigQuery Telemetry
-    └── bucket-460122.faf_telemetry.voice_mutations
+gemini-faf-mcp v2.0.1
+├── server.py              → FastMCP MCP server (10 tools)
+├── main.py                → Cloud Run REST API (GET/POST/PUT)
+├── src/gemini_faf_mcp/    → Python SDK (FAFClient, parser)
+└── tests/
+    ├── test_fastmcp_server.py  → 111 tests (WJTTC 9-tier)
+    └── test_gemini_faf_mcp.py  → 57 tests (7 tiers + integration)
 ```
 
----
+## MCP Tools (10)
 
-## 🔗 Ecosystem Position
+| Tool | Source |
+|------|--------|
+| `faf_read` | `faf_sdk.parse_file()` |
+| `faf_validate` | `faf_sdk.validate()` |
+| `faf_score` | `faf_sdk.validate()` |
+| `faf_discover` | `faf_sdk.find_faf_file()` |
+| `faf_init` | Custom |
+| `faf_stringify` | `faf_sdk.stringify()` |
+| `faf_context` | Custom |
+| `faf_gemini` | Custom |
+| `faf_agents` | Custom |
+| `faf_about` | Static |
 
-| Package | Registry | Status |
-|---------|----------|--------|
-| [claude-faf-mcp](https://npmjs.com/package/claude-faf-mcp) | npm / MCP Registry #2759 | Live |
-| **gemini-faf-mcp** | PyPI / MCP Registry (pending) | Live |
-| [grok-faf-mcp](https://npmjs.com/package/grok-faf-mcp) | npm | Live |
-| [faf-cli](https://npmjs.com/package/faf-cli) | npm | Live |
-
----
-
-## 🛠️ Development Commands
-
-```bash
-# Install from PyPI
-pip install gemini-faf-mcp
-
-# Run tests
-python -m pytest tests/ -v
-
-# Build package
-python -m build
-
-# Deploy to Cloud Run
-gcloud builds submit
-```
-
----
-
-## 🎯 Key Files
+## Key Files
 
 | File | Purpose |
 |------|---------|
-| `project.faf` | Project DNA (100% score) |
+| `server.py` | FastMCP MCP server (entry point) |
+| `main.py` | Cloud Run REST API |
+| `pyproject.toml` | Package config, deps, version |
+| `gemini-extension.json` | Gemini Extensions Gallery manifest |
 | `GEMINI.md` | Gemini AI context |
-| `CLAUDE.md` | Claude AI context (this file) |
-| `.taf` | Testing context (TAF standard) |
-| `main.py` | Cloud Function entry point |
-| `src/gemini_faf_mcp/` | PyPI package source |
-| `tests/WJTTC-TEST-SUITE.md` | Championship test results |
+| `project.faf` | Project DNA |
+| `src/gemini_faf_mcp/` | PyPI SDK (FAFClient, parser) |
 
----
+## Commands
 
-## 💡 AI Assistant Notes
+```bash
+# MCP server
+python server.py
 
-- This is a **showcase repo** for FAF standards
-- Read `project.faf` FIRST for DNA context
-- Multi-agent support: Claude, Gemini, Grok, Jules, Codex
-- SW-01 (Temporal Integrity) and SW-02 (Scoring Guard) enforced
-- All mutations logged to BigQuery telemetry
-- The Big Orange 🍊 must be EARNED, not claimed
+# Tests
+pip install -e ".[dev]"
+python -m pytest tests/ -v
 
----
+# Build
+python -m build
+twine check dist/*
 
-## 🏆 Standards Compliance
+# MCP Inspector
+npx @modelcontextprotocol/inspector --command python3 server.py
+```
 
-- **FAF:** v2.5.2 (IANA: application/vnd.faf+yaml)
-- **TAF:** Testing context enabled
-- **WJTTC:** Championship Grade (100%)
-- **MCP:** Model Context Protocol compliant
+## Ecosystem
 
----
+| Package | Platform | Registry |
+|---------|----------|----------|
+| claude-faf-mcp | Anthropic | npm + MCP #2759 |
+| **gemini-faf-mcp** | **Google** | **PyPI** |
+| grok-faf-mcp | xAI | npm |
+| rust-faf-mcp | Rust | crates.io |
+| faf-cli | Universal | npm |
 
-**STATUS: BI-SYNC ACTIVE 🔗 - Synchronized with .faf context!**
+## Publish
 
-*Last Sync: 2026-03-07T00:00:00.000Z*
-*Sync Engine: F1-Inspired Software Engineering*
-*🏎️⚡️_championship_sync*
+Trusted Publisher (OIDC) — tag + GitHub Release triggers `pypi.yml` workflow. No tokens.
 
----
+## Notes
 
-*"Efficiency is the goal, but we play for the 🏆. YNWA."*
----
-
-**STATUS: BI-SYNC ACTIVE 🔗 - Synchronized with .faf context!**
-
-*Last Sync: 2026-03-08T06:37:10.513Z*
-*Sync Engine: F1-Inspired Software Engineering*
-*🏎️⚡️_championship_sync*
+- `faf-python-sdk` handles all parsing/validation — server.py delegates
+- Cloud Run API stays for badges, multi-agent handshake, voice-to-FAF
+- Version tests read from pyproject.toml dynamically
+- Python 3.10+ (FastMCP minimum)
