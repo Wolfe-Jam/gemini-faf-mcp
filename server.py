@@ -15,7 +15,7 @@ from models import get_model, list_models
 import os
 from pathlib import Path
 
-__version__ = "2.1.0"
+__version__ = "2.1.1"
 
 mcp = FastMCP(
     "gemini-faf-mcp",

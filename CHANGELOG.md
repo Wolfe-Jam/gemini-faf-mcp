@@ -3,6 +3,13 @@
 All notable changes to gemini-faf-mcp are documented here.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
+## [2.1.1] - 2026-03-08
+
+### Fixed
+- **Packaging bug:** `models.py` was missing from PyPI distribution — `gemini-faf-mcp` entry point would fail with `ModuleNotFoundError: No module named 'models'`
+
+---
+
 ## [2.1.0] - 2026-03-08
 
 ### Added

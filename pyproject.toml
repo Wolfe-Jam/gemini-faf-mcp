@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "gemini-faf-mcp"
-version = "2.1.0"
+version = "2.1.1"
 authors = [
   { name="wolfejam", email="james@wolfejam.dev" },
 ]
@@ -51,7 +51,7 @@ dev = [
 ]
 
 [tool.setuptools]
-py-modules = ["server"]
+py-modules = ["server", "models"]
 packages = ["gemini_faf_mcp"]
 package-dir = {"gemini_faf_mcp" = "src/gemini_faf_mcp"}
 
