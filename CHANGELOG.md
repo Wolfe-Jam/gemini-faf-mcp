@@ -6,6 +6,11 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 ## [2.0.1] - 2026-03-08
 
 ### Added
+- **Tool #11: `faf_model`** — 100% Trophy-scored example .faf files for 15 project types
+  - mcp-server, web-app, saas, cli-tool, api-service, mobile-app, chrome-extension
+  - python-ml, rust-crate, library, monorepo, android-app, iot-device, desktop-app, game
+  - Call without arguments to list types, with type to get complete example
+- **Model library** (`models.py`) — comprehensive reference for AI to target 100% scores
 - **Gemini CLI commands** — slash commands via `.toml` files in `commands/gemini-faf-mcp/`
   - `/gemini-faf-mcp:setup` — one-shot project DNA setup (faf_init → faf_score)
   - `/gemini-faf-mcp:score` — quick score check with improvement suggestions

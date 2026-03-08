@@ -11,6 +11,7 @@ Spec: https://faf.one
 from fastmcp import FastMCP
 from faf_sdk import parse_file, parse, validate, find_faf_file, stringify
 from faf_sdk.parser import FafParseError
+from models import get_model, list_models
 import os
 from pathlib import Path
 
@@ -326,7 +327,7 @@ def faf_about() -> dict:
         "server": "gemini-faf-mcp",
         "server_version": __version__,
         "sdk": "faf-python-sdk",
-        "tools": 10,
+        "tools": 11,
         "ecosystem": {
             "claude": "claude-faf-mcp (npm)",
             "gemini": "gemini-faf-mcp (PyPI)",
@@ -344,6 +345,34 @@ def faf_about() -> dict:
             "<55%": "Red",
             "0%": "White",
         },
+    }
+
+
+@mcp.tool()
+def faf_model(project_type: str = "") -> dict:
+    """Get a 100% Trophy-scored example .faf file for a specific project type.
+    Returns a complete, realistic project.faf that fills all 21 scored slots.
+    Use this as a reference when building or improving a .faf file — shows exactly what 100% looks like.
+    Call without arguments to list all 15 available project types."""
+    if not project_type:
+        return {
+            "available_types": list_models(),
+            "usage": "Call faf_model with a project_type to get the full example .faf",
+        }
+
+    model = get_model(project_type)
+    if not model:
+        return {
+            "error": f"Unknown project type: {project_type}",
+            "available_types": list_models(),
+        }
+
+    return {
+        "type": project_type,
+        "description": model["description"],
+        "covers": model["covers"],
+        "faf": model["faf"],
+        "note": "This is a 100% Trophy-scored example. Use it as a reference for structure and completeness.",
     }
 
 

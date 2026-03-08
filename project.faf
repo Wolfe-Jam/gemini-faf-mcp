@@ -11,7 +11,7 @@ ai_tldr:
   current_focus: Gemini Extensions Gallery listing
   your_role: Build features with perfect context
 instant_context:
-  what_building: Native MCP server for FAF — 10 tools for Gemini CLI, plus Cloud Run REST API
+  what_building: Native MCP server for FAF — 11 tools for Gemini CLI, plus Cloud Run REST API
   tech_stack: Python + FastMCP + faf-python-sdk + Cloud Run
   main_language: Python
   key_files:

@@ -144,18 +144,18 @@ class TestTier1Brake:
         assert __version__ == expected
 
     async def test_tool_count(self, client):
-        """Exactly 10 tools registered."""
+        """Exactly 11 tools registered."""
         tools = await client.list_tools()
-        assert len(tools) == 10
+        assert len(tools) == 11
 
     async def test_all_tool_names(self, client):
-        """All 10 expected tools are present."""
+        """All 11 expected tools are present."""
         tools = await client.list_tools()
         names = {t.name for t in tools}
         expected = {
             "faf_read", "faf_validate", "faf_score", "faf_discover",
             "faf_init", "faf_stringify", "faf_context",
-            "faf_gemini", "faf_agents", "faf_about",
+            "faf_gemini", "faf_agents", "faf_about", "faf_model",
         }
         assert names == expected
 
@@ -321,7 +321,7 @@ class TestTier2Engine:
         data = _parse(result)
         assert data["iana_registered"] is True
         assert data["media_type"] == "application/vnd.faf+yaml"
-        assert data["tools"] == 10
+        assert data["tools"] == 11
         assert len(data["ecosystem"]) >= 5
 
 

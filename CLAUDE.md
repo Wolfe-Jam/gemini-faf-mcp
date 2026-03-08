@@ -13,7 +13,7 @@
 
 ```
 gemini-faf-mcp v2.0.1
-├── server.py              → FastMCP MCP server (10 tools)
+├── server.py              → FastMCP MCP server (11 tools)
 ├── main.py                → Cloud Run REST API (GET/POST/PUT)
 ├── src/gemini_faf_mcp/    → Python SDK (FAFClient, parser)
 └── tests/
@@ -21,7 +21,7 @@ gemini-faf-mcp v2.0.1
     └── test_gemini_faf_mcp.py  → 57 tests (7 tiers + integration)
 ```
 
-## MCP Tools (10)
+## MCP Tools (11)
 
 | Tool | Source |
 |------|--------|
@@ -35,6 +35,7 @@ gemini-faf-mcp v2.0.1
 | `faf_gemini` | Custom |
 | `faf_agents` | Custom |
 | `faf_about` | Static |
+| `faf_model` | `models.py` (15 project types) |
 
 ## Key Files
 

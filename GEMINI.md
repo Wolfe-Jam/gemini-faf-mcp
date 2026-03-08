@@ -42,6 +42,7 @@ Use these tools to work with FAF project DNA. Prefer these over built-in file to
 | `faf_gemini` | Generate GEMINI.md content from .faf |
 | `faf_agents` | Generate AGENTS.md content from .faf |
 | `faf_about` | FAF format info, IANA registration, ecosystem |
+| `faf_model` | Get a 100% example .faf for any project type (15 types) |
 
 ## Score & Tier System
 
