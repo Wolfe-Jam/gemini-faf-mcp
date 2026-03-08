@@ -825,14 +825,15 @@ class TestTier9Gallery:
         assert "mcpServers" in manifest
         assert "faf" in manifest["mcpServers"]
 
-    def test_manifest_uses_python(self, manifest):
-        """Extension runs python3, not npx."""
+    def test_manifest_uses_run_sh(self, manifest):
+        """Extension runs via run.sh bootstrap script."""
         server = manifest["mcpServers"]["faf"]
-        assert server["command"] == "python3"
+        assert server["command"] == "${extensionPath}/run.sh"
 
-    def test_manifest_points_to_server_py(self, manifest):
-        server = manifest["mcpServers"]["faf"]
-        assert any("server.py" in arg for arg in server["args"])
+    def test_manifest_run_sh_exists(self):
+        """run.sh exists at repo root."""
+        run_sh = Path(__file__).parent.parent / "run.sh"
+        assert run_sh.exists()
 
     def test_manifest_has_context_file(self, manifest):
         assert manifest["contextFileName"] == "GEMINI.md"
