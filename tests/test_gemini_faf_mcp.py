@@ -455,9 +455,12 @@ class TestTier6PyPI:
 
     def test_package_import(self):
         """Package imports successfully."""
+        import tomllib
         import gemini_faf_mcp
         assert hasattr(gemini_faf_mcp, '__version__')
-        assert gemini_faf_mcp.__version__ == "2.0.0"
+        with open("pyproject.toml", "rb") as f:
+            expected = tomllib.load(f)["project"]["version"]
+        assert gemini_faf_mcp.__version__ == expected
 
     def test_fafclient_import(self):
         """FAFClient class imports."""
@@ -642,11 +645,14 @@ class TestTier7Fixes:
     # --- Version consistency ---
 
     def test_version_consistency(self):
-        """All version strings match 1.1.0."""
+        """All version strings match pyproject.toml."""
+        import tomllib
         import gemini_faf_mcp
         from gemini_faf_mcp import client
-        assert gemini_faf_mcp.__version__ == "2.0.0"
-        assert client.__version__ == "2.0.0"
+        with open("pyproject.toml", "rb") as f:
+            expected = tomllib.load(f)["project"]["version"]
+        assert gemini_faf_mcp.__version__ == expected
+        assert client.__version__ == expected
 
 
 if __name__ == "__main__":

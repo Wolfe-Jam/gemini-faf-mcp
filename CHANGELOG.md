@@ -2,6 +2,12 @@
 
 All notable changes to gemini-faf-mcp are documented here.
 
+## [2.0.1] - 2026-03-08
+
+### Changed
+- README polished: subtitle, FastMCP mention, tier emojis, Google Integration section
+- Version tests now read from pyproject.toml (no more hardcoded version strings)
+
 ## [2.0.0] - 2026-03-08
 
 ### Added
@@ -77,6 +83,7 @@ All notable changes to gemini-faf-mcp are documented here.
 - OpenAPI manifest for Vertex AI Extension
 - Initial Cloud Function deployment
 
+[2.0.1]: https://github.com/Wolfe-Jam/gemini-faf-mcp/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/Wolfe-Jam/gemini-faf-mcp/compare/v1.1.0...v2.0.0
 [1.1.0]: https://github.com/Wolfe-Jam/gemini-faf-mcp/compare/v1.0.2...v1.1.0
 [1.0.2]: https://github.com/Wolfe-Jam/gemini-faf-mcp/compare/v1.0.1...v1.0.2

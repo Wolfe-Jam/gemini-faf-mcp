@@ -137,8 +137,11 @@ class TestTier1Brake:
         assert mcp.name == "gemini-faf-mcp"
 
     async def test_server_version(self):
-        """Server version matches 2.0.0."""
-        assert __version__ == "2.0.0"
+        """Server version matches pyproject.toml."""
+        import tomllib
+        with open("pyproject.toml", "rb") as f:
+            expected = tomllib.load(f)["project"]["version"]
+        assert __version__ == expected
 
     async def test_tool_count(self, client):
         """Exactly 10 tools registered."""

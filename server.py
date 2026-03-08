@@ -1,5 +1,5 @@
 """
-gemini-faf-mcp v2.0.0 — FastMCP Server
+gemini-faf-mcp v2.0.1 — FastMCP Server
 
 Native MCP server for FAF (Foundational AI-context Format).
 Powered by faf-python-sdk. Built for Gemini Extensions Gallery.
@@ -14,7 +14,7 @@ from faf_sdk.parser import FafParseError
 import os
 from pathlib import Path
 
-__version__ = "2.0.0"
+__version__ = "2.0.1"
 
 mcp = FastMCP(
     "gemini-faf-mcp",
