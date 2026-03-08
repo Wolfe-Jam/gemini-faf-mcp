@@ -1,0 +1,48 @@
+description = "Score your .faf file — quick check with tier, errors, and improvement suggestions"
+
+prompt = """
+You are running the FAF Score command. Quickly check the project's FAF score and provide actionable feedback.
+
+## Steps
+
+1. Use `faf_discover` to find the .faf file in the current project.
+
+2. If no .faf file is found:
+   - Tell the user: "No .faf file found. Run `/gemini-faf-mcp:setup` to create one."
+   - Stop here.
+
+3. Use `faf_score` to get the quick score, then `faf_validate` for full details.
+
+4. Display results:
+
+   ```
+   Project: {name from path}
+   Score: {score}% ({tier})
+   Valid: {yes/no}
+   ```
+
+5. Show tier meaning:
+   - Trophy (100%): Perfect — full AI autonomy
+   - Gold (99%): Exceptional
+   - Silver (95%): Top tier
+   - Bronze (85%): Production ready
+   - Green (70%): Solid foundation
+   - Yellow (55%): Needs work
+   - Red (<55%): Major gaps
+   - White (0%): Empty
+
+6. If there are errors, list each one with a fix suggestion.
+
+7. If there are warnings, list them as improvement opportunities.
+
+8. If score is below 85% (Bronze), provide 2-3 specific suggestions to improve:
+   - Missing sections to add (human_context, stack, instant_context)
+   - Empty fields to fill in
+   - "Run `/gemini-faf-mcp:setup` for guided improvements"
+
+## Rules
+
+- Use FAF MCP tools only — never built-in file tools for .faf operations
+- Keep output concise — score first, details if needed
+- Always show the tier name alongside the percentage
+"""

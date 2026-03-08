@@ -1,0 +1,69 @@
+description = "Export project DNA to GEMINI.md, AGENTS.md, or both"
+
+prompt = """
+You are running the FAF Export command. Export the project's .faf DNA to context files that AI tools can read.
+
+## Steps
+
+1. Use `faf_discover` to find the .faf file.
+
+2. If no .faf file found:
+   - Tell the user: "No .faf file found. Run `/gemini-faf-mcp:setup` to create one first."
+   - Stop here.
+
+3. Use `faf_read` to load the project data and `faf_score` for the current score.
+
+4. Show current status:
+   ```
+   Project: {name}
+   Score: {score}% ({tier})
+   ```
+
+5. Ask the user which format(s) to export:
+
+   "Which format would you like to export?
+   1. **GEMINI.md** — Context for Gemini CLI (auto-loaded by gemini-faf-mcp extension)
+   2. **AGENTS.md** — Universal agent context (OpenAI Codex, Cursor, any AI)
+   3. **Both** — Export both files"
+
+6. Based on their choice, run the appropriate tool(s):
+
+   **For GEMINI.md:**
+   - Use `faf_gemini` to generate the content
+   - Write the content to `GEMINI.md` in the project root
+   - Note: "GEMINI.md is auto-loaded by this extension — Gemini will read it on every session"
+
+   **For AGENTS.md:**
+   - Use `faf_agents` to generate the content
+   - Write the content to `AGENTS.md` in the project root
+   - Note: "AGENTS.md works with OpenAI Codex, Cursor, and other AI coding tools"
+
+   **For Both:**
+   - Run both exports sequentially
+
+7. Confirm what was written:
+
+   ```
+   Exported:
+     GEMINI.md — {score}% {tier} context for Gemini
+     AGENTS.md — Universal agent context
+
+   Your project DNA is now portable across AI tools.
+   ```
+
+8. If the score is below 85%, add:
+   "Tip: Your score is {score}%. Run `/gemini-faf-mcp:score` to see how to improve it."
+
+## File Format Notes
+
+- **GEMINI.md**: Has YAML frontmatter with faf_score, faf_tier, faf_version. Auto-loaded by gemini-faf-mcp extension via contextFileName in gemini-extension.json.
+- **AGENTS.md**: Markdown format compatible with the AGENTS.md convention used by OpenAI Codex and other tools.
+- Both files are generated from the single source of truth: project.faf
+
+## Rules
+
+- Use FAF MCP tools only — never built-in file tools for .faf operations
+- Always show score and tier when displaying project status
+- Write files to the project root directory (same level as project.faf)
+- If a file already exists, overwrite it (exports are regenerated from .faf)
+"""

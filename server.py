@@ -47,7 +47,9 @@ def _get_tier(score: int) -> str:
 
 @mcp.tool()
 def faf_read(path: str = "project.faf") -> dict:
-    """Read project DNA from a .faf file. Returns the full parsed structure."""
+    """Read project DNA from a .faf file. Returns the full parsed structure
+    including project info, stack, preferences, and scoring data.
+    Use this as the first step to understand any FAF-enabled project."""
     try:
         faf = parse_file(path)
         return {"success": True, "path": path, "data": faf.raw}
@@ -59,7 +61,9 @@ def faf_read(path: str = "project.faf") -> dict:
 
 @mcp.tool()
 def faf_validate(path: str = "project.faf") -> dict:
-    """Validate a .faf file and return score, tier, and issues."""
+    """Validate a .faf file and return score, tier, and issues.
+    Returns errors (must fix) and warnings (should fix) with specific messages.
+    Use after faf_init or when checking if a .faf file meets quality standards."""
     try:
         faf = parse_file(path)
         result = validate(faf)
@@ -80,7 +84,9 @@ def faf_validate(path: str = "project.faf") -> dict:
 
 @mcp.tool()
 def faf_score(path: str = "project.faf") -> dict:
-    """Quick score check — returns score (0-100%) and tier."""
+    """Quick score check — returns score (0-100%) and tier.
+    Faster than faf_validate when you only need the number and tier name.
+    Use this for status checks; use faf_validate when you need error details."""
     try:
         faf = parse_file(path)
         result = validate(faf)
@@ -98,7 +104,9 @@ def faf_score(path: str = "project.faf") -> dict:
 
 @mcp.tool()
 def faf_discover(start_dir: str = ".") -> dict:
-    """Find .faf files in the project tree by walking up from start_dir."""
+    """Find .faf files in the project tree by walking up from start_dir.
+    Searches the current directory and parent directories for project.faf.
+    Use this before faf_read to locate the file automatically."""
     result = find_faf_file(start_dir)
     if result:
         return {"found": True, "path": result}
@@ -112,7 +120,9 @@ def faf_init(
     language: str = "",
     path: str = "project.faf",
 ) -> dict:
-    """Create a starter .faf file from project analysis."""
+    """Create a starter .faf file with project name, goal, and language.
+    Generates a valid FAF YAML file with all required sections.
+    Will not overwrite an existing file — use faf_discover first to check."""
     if os.path.exists(path):
         return {"success": False, "error": f"File already exists: {path}"}
 
@@ -147,7 +157,9 @@ state:
 
 @mcp.tool()
 def faf_stringify(path: str = "project.faf") -> dict:
-    """Convert parsed FAF data back to YAML string."""
+    """Convert parsed FAF data back to YAML string.
+    Useful for displaying the raw .faf content or preparing it for editing.
+    Reads the file, parses it, then re-serializes to clean YAML."""
     try:
         faf = parse_file(path)
         yaml_str = stringify(faf)
@@ -160,7 +172,9 @@ def faf_stringify(path: str = "project.faf") -> dict:
 
 @mcp.tool()
 def faf_context(path: str = "project.faf") -> dict:
-    """Get Gemini-optimized context from a .faf file. Returns the key sections an AI needs."""
+    """Get Gemini-optimized context from a .faf file.
+    Returns the key sections an AI needs: project info, stack, instructions, and score.
+    Use this to quickly understand a project without reading the full .faf structure."""
     try:
         faf = parse_file(path)
         data = faf.data
@@ -214,7 +228,9 @@ def faf_context(path: str = "project.faf") -> dict:
 
 @mcp.tool()
 def faf_gemini(path: str = "project.faf") -> dict:
-    """Export GEMINI.md content from a .faf file."""
+    """Export GEMINI.md content from a .faf file.
+    Generates a Markdown file with YAML frontmatter optimized for Gemini CLI.
+    The output should be written to GEMINI.md in the project root for auto-loading."""
     try:
         faf = parse_file(path)
         data = faf.data
@@ -252,7 +268,9 @@ Media Type: application/vnd.faf+yaml (IANA registered)
 
 @mcp.tool()
 def faf_agents(path: str = "project.faf") -> dict:
-    """Export AGENTS.md content from a .faf file."""
+    """Export AGENTS.md content from a .faf file.
+    Generates a universal agent context file compatible with OpenAI Codex, Cursor, and other AI tools.
+    Write the output to AGENTS.md in the project root."""
     try:
         faf = parse_file(path)
         data = faf.data
@@ -297,7 +315,9 @@ def faf_agents(path: str = "project.faf") -> dict:
 
 @mcp.tool()
 def faf_about() -> dict:
-    """FAF format info — IANA registration, version, ecosystem."""
+    """FAF format info — IANA registration, version, ecosystem.
+    Returns metadata about the FAF format, server version, and available MCP bridges.
+    Use this when users ask what FAF is or how it connects to other AI platforms."""
     return {
         "name": "FAF (Foundational AI-context Format)",
         "media_type": "application/vnd.faf+yaml",
