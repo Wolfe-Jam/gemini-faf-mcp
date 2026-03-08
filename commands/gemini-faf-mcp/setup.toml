@@ -1,42 +1,31 @@
-description = "Set up FAF project DNA — discover or create a .faf file, score it, done"
+description = "Set up FAF project DNA — create or score your .faf file"
 
 prompt = """
-You are setting up FAF project DNA. Be fast and direct. Use FAF MCP tools only — never built-in file tools for .faf operations.
+Set up FAF project DNA in the current directory. Use FAF MCP tools only.
 
-## Step 1: Check
+## What to do
 
-Use `faf_discover` to check if project.faf exists in the current directory.
+Run `faf_init` with `path` set to `project.faf`.
 
-**If found:** Use `faf_score` to get the score. Show it:
-```
-Found: {path}
-Score: {score}% ({tier})
-```
-If score < 85%, use `faf_validate` and list the errors/warnings. Done.
-
-**If NOT found:** Go to Step 2 immediately. Do not search other directories. Do not explore the filesystem.
-
-## Step 2: Create
-
-Run `faf_init` right now with the current directory name as the project name. Do not ask the user questions — just create it. FAF detects everything it needs.
-
-```
-faf_init(name="{current_directory_name}", path="project.faf")
-```
-
-Then run `faf_score` on the new file and show the result:
+**If it succeeds** (file created): Run `faf_score` and show the result.
 ```
 Created: project.faf
 Score: {score}% ({tier})
+
+Edit project.faf to improve your score.
 ```
 
-Done. The user can edit project.faf to improve their score.
+**If it fails** (file already exists): Run `faf_score` on the existing file and show the result.
+```
+Found: project.faf
+Score: {score}% ({tier})
+```
+If score < 85%, run `faf_validate` and list the errors and warnings.
 
 ## Rules
 
-- Default to action. Create the file, don't ask permission.
-- Never explore the filesystem looking for .faf files in other directories.
-- Never ask the user what language, goal, or stack they use — faf_init handles defaults.
-- Use FAF MCP tools only (faf_discover, faf_init, faf_score, faf_validate).
-- One operation, one result. No menus, no wizards, no export prompts.
+- Run faf_init first. Always. That's the whole command.
+- Do not search for .faf files. Do not explore the filesystem.
+- Do not ask the user questions. Just do it.
+- Use FAF MCP tools only (faf_init, faf_score, faf_validate). Never built-in file tools.
 """
