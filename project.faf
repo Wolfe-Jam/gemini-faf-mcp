@@ -1,45 +1,49 @@
+# project.faf — Machine-readable project context for AI tools
+# https://github.com/Wolfe-Jam/gemini-faf-mcp
+# Spec: https://faf.dev | MIME: application/vnd.faf+yaml
+# Generated: npx faf-cli git Wolfe-Jam/gemini-faf-mcp
+
 faf_version: 2.5.0
-generated: '2026-01-30T20:29:57.467467Z'
 project:
   name: gemini-faf-mcp
-  goal: Google Cloud Function for FAF integration with Gemini
-  main_language: Python
-  type: mcp-server
-stack:
-  frontend: API-only (no frontend)
-  backend: Google Cloud Functions
-  database: BigQuery
-  testing: pytest + WJTTC
-  api_type: HTTP
-  runtime: Python 3.12
-  hosting: Google Cloud Run
-  build: Cloud Build
-  cicd: Cloud Build Triggers
-  connection: HTTP/REST
-human_context:
-  who: Developers using Gemini with FAF-enabled projects
-  what: Cloud Function that parses .faf files and returns JSON for Gemini
-  why: Enable Gemini to read project DNA as Source of Truth
-  where: Google Cloud Run (us-east1)
-  when: On-demand via HTTP calls from Gemini
-  how: Python + functions-framework + PyYAML
-ai_instructions:
-  priority: Read project.faf first, then GEMINI.md
-  usage: Code-first, minimal explanations
-  message: This is part of the FAF ecosystem (IANA registered)
-preferences:
-  quality_bar: zero_errors
-  commit_style: conventional_emoji
-  communication: direct
-state:
-  phase: production
-  version: 1.0.0
-  status: production
-  focus: v2.5.1 stable
-  url_test: null
-  nested: null
-scores:
-  faf_score: 100
-  slot_based_percentage: 100
-  total_slots: 14
-  scoring_philosophy: MCP server type - 14 applicable slots
+  description: Google Cloud Function for FAF (Foundational AI-context Format)
+    integration with Gemini
+  language: Python
+  type: application
+metadata:
+  repository: https://github.com/Wolfe-Jam/gemini-faf-mcp
+  owner: Wolfe-Jam
+  stars: "1"
+  topics:
+    - agents-md
+    - ai-context
+    - ai-readiness
+    - context-engineering
+    - crates-io
+    - developer-tools
+    - faf
+    - gemini
+    - gemini-cli
+    - gemini-cli-extension
+    - google-cloud
+    - iana
+    - mcp
+    - mcp-server
+    - model-context-protocol
+    - npm
+    - project-dna
+    - pypi
+    - python
+    - yaml
+  languages:
+    - Python (99.6%)
+    - Shell (0.4%)
+  default_branch: main
+context:
+  what: You are an expert developer assistant. Your primary "Source of Truth" is
+    the project.faf file.
+  how: pip install (see README)
+generated_by:
+  tool: faf-cli
+  version: 4.4.3
+  command: faf git Wolfe-Jam/gemini-faf-mcp
