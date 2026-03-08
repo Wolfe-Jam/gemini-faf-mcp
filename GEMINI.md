@@ -1,9 +1,9 @@
 ---
-faf_score: 100%
-faf_tier: Trophy
+faf_score: 23%
+faf_tier: Red
 faf_version: 2.5.2
+last_sync: unknown
 server_version: 2.0.0
-last_sync: '2026-03-08'
 ---
 
 # Gemini Project DNA — gemini-faf-mcp v2.0.0
