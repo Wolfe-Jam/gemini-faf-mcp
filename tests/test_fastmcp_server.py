@@ -144,18 +144,19 @@ class TestTier1Brake:
         assert __version__ == expected
 
     async def test_tool_count(self, client):
-        """Exactly 11 tools registered."""
+        """Exactly 12 tools registered."""
         tools = await client.list_tools()
-        assert len(tools) == 11
+        assert len(tools) == 12
 
     async def test_all_tool_names(self, client):
-        """All 11 expected tools are present."""
+        """All 12 expected tools are present."""
         tools = await client.list_tools()
         names = {t.name for t in tools}
         expected = {
             "faf_read", "faf_validate", "faf_score", "faf_discover",
             "faf_init", "faf_stringify", "faf_context",
             "faf_gemini", "faf_agents", "faf_about", "faf_model",
+            "faf_auto",
         }
         assert names == expected
 
@@ -321,7 +322,7 @@ class TestTier2Engine:
         data = _parse(result)
         assert data["iana_registered"] is True
         assert data["media_type"] == "application/vnd.faf+yaml"
-        assert data["tools"] == 11
+        assert data["tools"] == 12
         assert len(data["ecosystem"]) >= 5
 
 
@@ -797,6 +798,182 @@ class TestTier8Roundtrip:
         # agents
         d = _parse(await client.call_tool("faf_agents", {"path": target}))
         assert "champion" in d["content"]
+
+
+# ===================================================================
+# FAF_AUTO TESTS (across tiers)
+# ===================================================================
+
+
+class TestAutoTier2Engine:
+    """faf_auto happy-path tests."""
+
+    async def test_auto_creates_faf_from_python_project(self, client, tmp_path):
+        """pyproject.toml with setuptools → creates .faf with language=Python."""
+        (tmp_path / "pyproject.toml").write_text(
+            '[build-system]\nrequires = ["setuptools>=61.0"]\nbuild-backend = "setuptools.build_meta"\n'
+            '[project]\nname = "my-py-app"\n'
+        )
+        target = str(tmp_path / "project.faf")
+        data = _parse(await client.call_tool("faf_auto", {"directory": str(tmp_path), "path": target}))
+        assert data["success"] is True
+        assert data["created"] is True
+        assert data["detected"]["main_language"] == "Python"
+        assert data["detected"]["build_tool"] == "setuptools"
+
+    async def test_auto_creates_faf_from_node_project(self, client, tmp_path):
+        """package.json with express → language=JavaScript."""
+        (tmp_path / "package.json").write_text('{"name":"my-app","dependencies":{"express":"^4.0"}}')
+        target = str(tmp_path / "project.faf")
+        data = _parse(await client.call_tool("faf_auto", {"directory": str(tmp_path), "path": target}))
+        assert data["success"] is True
+        assert data["detected"]["main_language"] == "JavaScript"
+        assert data["detected"]["framework"] == "Express"
+
+    async def test_auto_creates_faf_from_rust_project(self, client, tmp_path):
+        """Cargo.toml → language=Rust."""
+        (tmp_path / "Cargo.toml").write_text('[package]\nname = "my-crate"\nversion = "0.1.0"\n')
+        target = str(tmp_path / "project.faf")
+        data = _parse(await client.call_tool("faf_auto", {"directory": str(tmp_path), "path": target}))
+        assert data["success"] is True
+        assert data["detected"]["main_language"] == "Rust"
+        assert data["detected"]["package_manager"] == "cargo"
+
+    async def test_auto_detects_fastmcp(self, client, tmp_path):
+        """pyproject.toml with fastmcp dep → api_type=MCP, framework=FastMCP."""
+        (tmp_path / "pyproject.toml").write_text(
+            '[build-system]\nrequires = ["setuptools"]\n'
+            '[project]\nname = "my-mcp"\ndependencies = ["fastmcp>=3.0"]\n'
+        )
+        target = str(tmp_path / "project.faf")
+        data = _parse(await client.call_tool("faf_auto", {"directory": str(tmp_path), "path": target}))
+        assert data["detected"]["framework"] == "FastMCP"
+        assert data["detected"]["api_type"] == "MCP"
+
+    async def test_auto_detects_fastapi(self, client, tmp_path):
+        """pyproject.toml with fastapi dep → api_type=REST, framework=FastAPI."""
+        (tmp_path / "pyproject.toml").write_text(
+            '[build-system]\nrequires = ["setuptools"]\n'
+            '[project]\nname = "api"\ndependencies = ["fastapi>=0.100"]\n'
+        )
+        target = str(tmp_path / "project.faf")
+        data = _parse(await client.call_tool("faf_auto", {"directory": str(tmp_path), "path": target}))
+        assert data["detected"]["framework"] == "FastAPI"
+        assert data["detected"]["api_type"] == "REST"
+
+    async def test_auto_updates_existing_faf(self, client, tmp_path):
+        """Existing .faf with null slots gets filled."""
+        (tmp_path / "pyproject.toml").write_text(
+            '[build-system]\nrequires = ["setuptools"]\n'
+            '[project]\nname = "filler"\ndependencies = ["pytest"]\n'
+        )
+        faf_path = tmp_path / "project.faf"
+        faf_path.write_text(EMPTY_PROJECT_FAF)
+        data = _parse(await client.call_tool("faf_auto", {"directory": str(tmp_path), "path": str(faf_path)}))
+        assert data["success"] is True
+        assert data["created"] is False
+        # null main_language should be filled
+        content = faf_path.read_text()
+        assert "main_language: Python" in content
+
+    async def test_auto_preserves_existing_values(self, client, tmp_path):
+        """Existing .faf with filled slots not overwritten."""
+        (tmp_path / "pyproject.toml").write_text(
+            '[build-system]\nrequires = ["setuptools"]\n'
+            '[project]\nname = "keeper"\n'
+        )
+        faf_path = tmp_path / "project.faf"
+        faf_path.write_text(FULL_FAF)
+        original = faf_path.read_text()
+        data = _parse(await client.call_tool("faf_auto", {"directory": str(tmp_path), "path": str(faf_path)}))
+        assert data["success"] is True
+        assert data["created"] is False
+        # Original values should be preserved (main_language was Python, not null)
+        assert faf_path.read_text() == original
+
+
+class TestAutoTier3Aero:
+    """faf_auto error paths."""
+
+    async def test_auto_empty_directory(self, client, tmp_path):
+        """No manifests → creates minimal .faf."""
+        empty = tmp_path / "empty_proj"
+        empty.mkdir()
+        target = str(empty / "project.faf")
+        data = _parse(await client.call_tool("faf_auto", {"directory": str(empty), "path": target}))
+        assert data["success"] is True
+        assert data["created"] is True
+        assert os.path.exists(target)
+
+    async def test_auto_invalid_directory(self, client):
+        """Nonexistent dir → success=False."""
+        data = _parse(await client.call_tool("faf_auto", {"directory": "/nonexistent/dir/xyz"}))
+        assert data["success"] is False
+        assert "error" in data
+
+
+class TestAutoTier7Contract:
+    """faf_auto response schema."""
+
+    async def test_auto_success_schema(self, client, tmp_path):
+        """Success return keys match expected schema."""
+        (tmp_path / "pyproject.toml").write_text('[project]\nname = "schema-test"\n')
+        target = str(tmp_path / "project.faf")
+        data = _parse(await client.call_tool("faf_auto", {"directory": str(tmp_path), "path": target}))
+        expected = {"success", "path", "created", "detected", "score", "tier", "message"}
+        assert expected == set(data.keys())
+        assert isinstance(data["detected"], dict)
+        detected_keys = {"main_language", "package_manager", "build_tool", "framework", "api_type", "database"}
+        assert detected_keys == set(data["detected"].keys())
+
+    async def test_auto_error_schema(self, client):
+        """Error return keys match expected schema."""
+        data = _parse(await client.call_tool("faf_auto", {"directory": "/nonexistent"}))
+        assert set(data.keys()) == {"success", "error"}
+
+
+class TestAutoTier8Roundtrip:
+    """faf_auto roundtrip tests."""
+
+    async def test_auto_then_read(self, client, tmp_path):
+        """auto → faf_read → valid data."""
+        (tmp_path / "Cargo.toml").write_text('[package]\nname = "rt-crate"\nversion = "0.1.0"\n')
+        target = str(tmp_path / "project.faf")
+        await client.call_tool("faf_auto", {"directory": str(tmp_path), "path": target})
+        data = _parse(await client.call_tool("faf_read", {"path": target}))
+        assert data["success"] is True
+        assert data["data"]["project"]["main_language"] == "Rust"
+
+    async def test_auto_then_validate(self, client, tmp_path):
+        """auto → faf_validate → score > 0."""
+        (tmp_path / "package.json").write_text('{"name":"rt-app","dependencies":{"react":"^18"}}')
+        target = str(tmp_path / "project.faf")
+        await client.call_tool("faf_auto", {"directory": str(tmp_path), "path": target})
+        data = _parse(await client.call_tool("faf_validate", {"path": target}))
+        assert data["success"] is True
+        assert data["score"] > 0
+
+    async def test_auto_python_no_wrong_defaults(self, client, tmp_path):
+        """No poetry/File-based/None in output when not detected."""
+        (tmp_path / "pyproject.toml").write_text(
+            '[build-system]\nrequires = ["setuptools"]\nbuild-backend = "setuptools.build_meta"\n'
+            '[project]\nname = "clean"\ndependencies = ["fastmcp"]\n'
+        )
+        target = str(tmp_path / "project.faf")
+        data = _parse(await client.call_tool("faf_auto", {"directory": str(tmp_path), "path": target}))
+        # Should not have wrong defaults
+        content = Path(target).read_text()
+        assert "File-based" not in content
+        assert data["detected"]["build_tool"] == "setuptools"
+        assert data["detected"]["package_manager"] == "pip"
+
+    async def test_auto_priority_python_over_js(self, client, tmp_path):
+        """Both pyproject.toml + package.json → language=Python (priority rule)."""
+        (tmp_path / "pyproject.toml").write_text('[project]\nname = "dual"\n')
+        (tmp_path / "package.json").write_text('{"name":"dual","dependencies":{"express":"^4"}}')
+        target = str(tmp_path / "project.faf")
+        data = _parse(await client.call_tool("faf_auto", {"directory": str(tmp_path), "path": target}))
+        assert data["detected"]["main_language"] == "Python"
 
 
 # ===================================================================

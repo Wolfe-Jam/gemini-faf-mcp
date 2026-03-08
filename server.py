@@ -15,7 +15,7 @@ from models import get_model, list_models
 import os
 from pathlib import Path
 
-__version__ = "2.0.1"
+__version__ = "2.1.0"
 
 mcp = FastMCP(
     "gemini-faf-mcp",
@@ -327,7 +327,7 @@ def faf_about() -> dict:
         "server": "gemini-faf-mcp",
         "server_version": __version__,
         "sdk": "faf-python-sdk",
-        "tools": 11,
+        "tools": 12,
         "ecosystem": {
             "claude": "claude-faf-mcp (npm)",
             "gemini": "gemini-faf-mcp (PyPI)",
@@ -374,6 +374,275 @@ def faf_model(project_type: str = "") -> dict:
         "faf": model["faf"],
         "note": "This is a 100% Trophy-scored example. Use it as a reference for structure and completeness.",
     }
+
+
+# --- Stack detection helper ---
+
+
+def _detect_stack(directory: str) -> dict:
+    """Scan directory for manifest files and detect project stack.
+    Only sets values that are actually detected — never hardcodes defaults."""
+    detected = {}
+    dir_path = Path(directory).resolve()
+
+    # Check which manifest files exist
+    has_pyproject = (dir_path / "pyproject.toml").is_file()
+    has_package_json = (dir_path / "package.json").is_file()
+    has_cargo = (dir_path / "Cargo.toml").is_file()
+    has_go_mod = (dir_path / "go.mod").is_file()
+    has_requirements = (dir_path / "requirements.txt").is_file()
+    has_gemfile = (dir_path / "Gemfile").is_file()
+    has_composer = (dir_path / "composer.json").is_file()
+    has_tsconfig = (dir_path / "tsconfig.json").is_file()
+
+    # Priority: pyproject.toml / Cargo.toml / go.mod > package.json
+    if has_pyproject:
+        detected["main_language"] = "Python"
+        try:
+            content = (dir_path / "pyproject.toml").read_text()
+            # Detect build system
+            if "setuptools" in content:
+                detected["build_tool"] = "setuptools"
+            elif "hatchling" in content or "hatch" in content:
+                detected["build_tool"] = "hatch"
+            elif "flit" in content:
+                detected["build_tool"] = "flit"
+            elif "pdm" in content:
+                detected["build_tool"] = "pdm"
+            elif "poetry" in content:
+                detected["build_tool"] = "poetry"
+            detected["package_manager"] = "pip"
+
+            # Detect frameworks from dependencies
+            content_lower = content.lower()
+            if "fastmcp" in content_lower:
+                detected["framework"] = "FastMCP"
+                detected["api_type"] = "MCP"
+            elif "fastapi" in content_lower:
+                detected["framework"] = "FastAPI"
+                detected["api_type"] = "REST"
+            elif "flask" in content_lower:
+                detected["framework"] = "Flask"
+                detected["api_type"] = "REST"
+            elif "django" in content_lower:
+                detected["framework"] = "Django"
+                detected["api_type"] = "REST"
+
+            # Detect databases
+            if "bigquery" in content_lower or "google-cloud-bigquery" in content_lower:
+                detected["database"] = "BigQuery"
+            elif "psycopg" in content_lower or "asyncpg" in content_lower or "postgresql" in content_lower:
+                detected["database"] = "PostgreSQL"
+            elif "pymongo" in content_lower or "motor" in content_lower:
+                detected["database"] = "MongoDB"
+            elif "redis" in content_lower:
+                detected["database"] = "Redis"
+            elif "sqlalchemy" in content_lower:
+                detected["database"] = "SQLAlchemy"
+
+            # Detect testing
+            if "pytest" in content_lower:
+                detected["testing"] = "pytest"
+        except Exception:
+            pass
+
+    elif has_cargo:
+        detected["main_language"] = "Rust"
+        detected["package_manager"] = "cargo"
+        try:
+            content = (dir_path / "Cargo.toml").read_text()
+            content_lower = content.lower()
+            if "tokio" in content_lower:
+                detected["framework"] = "Tokio"
+            if "axum" in content_lower:
+                detected["framework"] = "Axum"
+                detected["api_type"] = "REST"
+            elif "actix" in content_lower:
+                detected["framework"] = "Actix"
+                detected["api_type"] = "REST"
+        except Exception:
+            pass
+
+    elif has_go_mod:
+        detected["main_language"] = "Go"
+        detected["package_manager"] = "go modules"
+        try:
+            content = (dir_path / "go.mod").read_text()
+            if "gin-gonic" in content:
+                detected["framework"] = "Gin"
+                detected["api_type"] = "REST"
+            elif "echo" in content:
+                detected["framework"] = "Echo"
+                detected["api_type"] = "REST"
+        except Exception:
+            pass
+
+    elif has_package_json:
+        detected["main_language"] = "TypeScript" if has_tsconfig else "JavaScript"
+        detected["package_manager"] = "npm"
+        try:
+            import json as _json
+            pkg = _json.loads((dir_path / "package.json").read_text())
+            all_deps = {}
+            all_deps.update(pkg.get("dependencies", {}))
+            all_deps.update(pkg.get("devDependencies", {}))
+            dep_keys = " ".join(all_deps.keys()).lower()
+
+            if "next" in all_deps:
+                detected["framework"] = "Next.js"
+            elif "react" in all_deps:
+                detected["framework"] = "React"
+            elif "vue" in all_deps:
+                detected["framework"] = "Vue"
+            elif "svelte" in all_deps or "@sveltejs/kit" in all_deps:
+                detected["framework"] = "Svelte"
+            elif "express" in all_deps:
+                detected["framework"] = "Express"
+                detected["api_type"] = "REST"
+
+            if "jest" in dep_keys:
+                detected["testing"] = "Jest"
+            elif "vitest" in dep_keys:
+                detected["testing"] = "Vitest"
+            elif "mocha" in dep_keys:
+                detected["testing"] = "Mocha"
+
+            if "yarn.lock" in [f.name for f in dir_path.iterdir() if f.is_file()]:
+                detected["package_manager"] = "yarn"
+            elif "pnpm-lock.yaml" in [f.name for f in dir_path.iterdir() if f.is_file()]:
+                detected["package_manager"] = "pnpm"
+        except Exception:
+            pass
+
+    elif has_requirements:
+        detected["main_language"] = "Python"
+        detected["package_manager"] = "pip"
+
+    elif has_gemfile:
+        detected["main_language"] = "Ruby"
+        detected["package_manager"] = "bundler"
+
+    elif has_composer:
+        detected["main_language"] = "PHP"
+        detected["package_manager"] = "composer"
+
+    # TypeScript upgrade if tsconfig exists alongside non-TS detection
+    if has_tsconfig and detected.get("main_language") == "JavaScript":
+        detected["main_language"] = "TypeScript"
+
+    return detected
+
+
+@mcp.tool()
+def faf_auto(directory: str = ".", path: str = "project.faf") -> dict:
+    """Auto-detect project stack and generate/update a .faf file.
+    Scans for package.json, pyproject.toml, Cargo.toml, go.mod, and other
+    manifest files. Extracts language, framework, database, API type, and
+    build tools from actual dependencies — no hardcoded defaults.
+    Creates a new .faf if none exists, or fills empty slots in an existing one."""
+    try:
+        dir_path = Path(directory).resolve()
+        if not dir_path.is_dir():
+            return {"success": False, "error": f"Directory not found: {directory}"}
+
+        detected = _detect_stack(directory)
+
+        # Resolve path relative to directory
+        faf_path = Path(path)
+        if not faf_path.is_absolute():
+            faf_path = dir_path / faf_path
+        faf_path = faf_path.resolve()
+
+        created = not faf_path.exists()
+
+        if created:
+            # Generate new .faf from detections
+            name = dir_path.name or "my-project"
+            lang = detected.get("main_language", "unknown")
+            content = f"""faf_version: '2.5.0'
+project:
+  name: {name}
+  goal: Describe your project goal
+  main_language: {lang}
+stack:
+  frontend: {detected.get('framework') if detected.get('framework') in ('React', 'Vue', 'Svelte', 'Next.js') else 'null'}
+  backend: {detected.get('framework') if detected.get('framework') in ('FastAPI', 'Flask', 'Django', 'Express', 'FastMCP', 'Axum', 'Actix', 'Gin', 'Echo') else 'null'}
+  database: {detected.get('database', 'null')}
+  testing: {detected.get('testing', 'null')}
+human_context:
+  who: Developers
+  what: What problem does this solve?
+  why: Why does this project exist?
+ai_instructions:
+  priority: Read project.faf first
+  usage: Code-first, minimal explanations
+preferences:
+  quality_bar: zero_errors
+  commit_style: conventional
+state:
+  phase: development
+  version: 0.1.0
+  status: active
+"""
+            faf_path.parent.mkdir(parents=True, exist_ok=True)
+            faf_path.write_text(content)
+        else:
+            # Update existing: fill only empty/null slots
+            existing = faf_path.read_text()
+            updated = existing
+            # Fill null main_language
+            if detected.get("main_language") and ("main_language: null" in updated or "main_language: unknown" in updated):
+                updated = updated.replace("main_language: null", f"main_language: {detected['main_language']}")
+                updated = updated.replace("main_language: unknown", f"main_language: {detected['main_language']}")
+            # Fill null stack fields
+            for field, key in [("frontend", "framework"), ("backend", "framework"), ("database", "database"), ("testing", "testing")]:
+                val = detected.get(key)
+                if val and f"  {field}: null" in updated:
+                    # Only set frontend for frontend frameworks, backend for backend frameworks
+                    if field == "frontend" and val not in ("React", "Vue", "Svelte", "Next.js"):
+                        continue
+                    if field == "backend" and val not in ("FastAPI", "Flask", "Django", "Express", "FastMCP", "Axum", "Actix", "Gin", "Echo"):
+                        continue
+                    updated = updated.replace(f"  {field}: null", f"  {field}: {val}")
+            if updated != existing:
+                faf_path.write_text(updated)
+
+        # Validate and score
+        try:
+            faf = parse_file(str(faf_path))
+            result = validate(faf)
+            score = result.score
+            tier = _get_tier(score)
+        except Exception:
+            score = 0
+            tier = "White"
+
+        lang = detected.get("main_language", "unknown")
+        fw = detected.get("framework")
+        action = "Created" if created else "Updated"
+        msg_parts = [f"Detected {lang}"]
+        if fw:
+            msg_parts[0] += f"/{fw}"
+        msg_parts.append(f"{action} {faf_path.name} at {score}%.")
+
+        return {
+            "success": True,
+            "path": str(faf_path),
+            "created": created,
+            "detected": {
+                "main_language": detected.get("main_language"),
+                "package_manager": detected.get("package_manager"),
+                "build_tool": detected.get("build_tool"),
+                "framework": detected.get("framework"),
+                "api_type": detected.get("api_type"),
+                "database": detected.get("database"),
+            },
+            "score": score,
+            "tier": tier,
+            "message": " ".join(msg_parts),
+        }
+    except Exception as e:
+        return {"success": False, "error": str(e)}
 
 
 if __name__ == "__main__":

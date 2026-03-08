@@ -3,6 +3,23 @@
 All notable changes to gemini-faf-mcp are documented here.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
+## [2.1.0] - 2026-03-08
+
+### Added
+- **Tool #12: `faf_auto`** — Auto-detect project stack and generate/update .faf files
+  - Scans pyproject.toml, package.json, Cargo.toml, go.mod, requirements.txt, Gemfile, composer.json
+  - Detects language, framework, database, API type, build tools from actual dependencies
+  - Creates new .faf if none exists, fills empty slots in existing ones
+  - Priority rule: pyproject.toml/Cargo.toml/go.mod > package.json (matches faf-cli v5.0.2)
+  - No hardcoded defaults — null slot is better than a wrong slot
+- **`_detect_stack()` helper** — Python-native stack detection (no shelling out to faf-cli)
+- **15 faf_auto tests** across Tier 2 (Engine), Tier 3 (Aero), Tier 7 (Contract), Tier 8 (Roundtrip)
+
+### Tests
+- 183/183 passing (126 MCP server + 57 Cloud Run)
+
+---
+
 ## [2.0.1] - 2026-03-08
 
 ### Added
