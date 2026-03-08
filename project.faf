@@ -1,49 +1,134 @@
-# project.faf — Machine-readable project context for AI tools
-# https://github.com/Wolfe-Jam/gemini-faf-mcp
-# Spec: https://faf.dev | MIME: application/vnd.faf+yaml
-# Generated: npx faf-cli git Wolfe-Jam/gemini-faf-mcp
-
-faf_version: 2.5.0
+faf_version: 2.5.2
+generated: 2026-03-08T07:34:52.974Z
+ai_scoring_system: 2025-09-20
+ai_score: 100%
+ai_confidence: HIGH
+ai_value: 30_seconds_replaces_20_minutes_of_questions
+ai_tldr:
+  project: gemini-faf-mcp - MCP server for FAF project context (Gemini CLI)
+  stack: Python + FastMCP + faf-python-sdk + Cloud Run
+  quality_bar: production_ready
+  current_focus: Gemini Extensions Gallery listing
+  your_role: Build features with perfect context
+instant_context:
+  what_building: Native MCP server for FAF — 10 tools for Gemini CLI, plus Cloud Run REST API
+  tech_stack: Python + FastMCP + faf-python-sdk + Cloud Run
+  main_language: Python
+  key_files:
+    - server.py
+    - main.py
+    - pyproject.toml
+    - tests/test_fastmcp_server.py
+    - tests/test_gemini_faf_mcp.py
+context_quality:
+  slots_filled: 21/21 (100%)
+  ai_confidence: HIGH
+  handoff_ready: true
+  missing_context: null
 project:
   name: gemini-faf-mcp
-  description: Google Cloud Function for FAF (Foundational AI-context Format)
-    integration with Gemini
-  language: Python
-  type: application
-metadata:
-  repository: https://github.com/Wolfe-Jam/gemini-faf-mcp
-  owner: Wolfe-Jam
-  stars: "1"
-  topics:
-    - agents-md
-    - ai-context
-    - ai-readiness
-    - context-engineering
-    - crates-io
-    - developer-tools
-    - faf
-    - gemini
-    - gemini-cli
-    - gemini-cli-extension
-    - google-cloud
-    - iana
-    - mcp
-    - mcp-server
-    - model-context-protocol
-    - npm
-    - project-dna
-    - pypi
+  goal: MCP server for FAF — read, validate, score, and export IANA-registered .faf project DNA from Gemini CLI
+  main_language: Python
+  type: mcp-server
+ai_instructions:
+  priority_order:
+    - 1. Read THIS .faf file first
+    - 2. Check CLAUDE.md for session context
+    - 3. Review pyproject.toml for dependencies and version
+  working_style:
+    code_first: true
+    explanations: minimal
+    quality_bar: zero_errors
+    testing: required
+  warnings:
+    - All changes must pass 168 tests before commit
+    - faf-python-sdk handles parsing — server.py delegates
+    - Version must match in pyproject.toml, __init__.py, client.py, server.py, main.py
+stack:
+  backend: Python
+  main_language: Python
+  runtime: Python 3.10+
+  package_manager: pip
+  build_tool: setuptools
+  database: BigQuery
+  api_type: MCP (stdio) + HTTP/REST
+  connection: MCP (stdio) + HTTP/REST
+  testing: pytest + WJTTC 9-tier championship suite
+  hosting: Google Cloud Run
+  cicd: Cloud Build Triggers
+  target_user: developers
+  core_problem: AI tools lack structured project context
+  mission_purpose: Give any AI structured project context via IANA-registered .faf files
+  frameworks:
+    - FastMCP
+    - faf-python-sdk
+    - functions-framework
+preferences:
+  quality_bar: zero_errors
+  commit_style: conventional
+  response_style: concise_code_first
+  explanation_level: minimal
+  communication: direct
+  testing: required
+  documentation: as_needed
+state:
+  phase: production
+  version: 2.0.1
+  focus: Gemini Extensions Gallery listing
+  status: green_flag
+  next_milestone: gallery_listing
+  blockers: null
+scores:
+  faf_score: 100
+  slot_based_percentage: 100
+  total_slots: 21
+tags:
+  auto_generated:
+    - gemini-faf-mcp
     - python
-    - yaml
-  languages:
-    - Python (99.6%)
-    - Shell (0.4%)
-  default_branch: main
-context:
-  what: You are an expert developer assistant. Your primary "Source of Truth" is
-    the project.faf file.
-  how: pip install (see README)
-generated_by:
-  tool: faf-cli
-  version: 4.4.3
-  command: faf git Wolfe-Jam/gemini-faf-mcp
+    - mcp-server
+    - fastmcp
+    - gemini-cli
+  smart_defaults:
+    - .faf
+    - ai-ready
+    - "2026"
+    - iana-registered
+    - pypi
+  user_defined: null
+human_context:
+  who: Developers using Gemini CLI with FAF-enabled projects
+  what: MCP server providing 10 tools for reading, validating, scoring, and exporting .faf project DNA
+  why: Enable Gemini to understand any project instantly via structured IANA-registered context
+  where: Google Cloud Run (us-east1) + local MCP stdio
+  when: On-demand via Gemini CLI or direct MCP connection
+  how: Python + FastMCP + faf-python-sdk + Cloud Run REST API
+ai_scoring_details:
+  system_date: 2025-09-20
+  slot_based_percentage: 100
+  ai_score: 100
+  total_slots: 21
+  filled_slots: 21
+  scoring_method: Honest percentage - no fake minimums
+  trust_embedded: COUNT ONCE architecture - trust MY embedded scores
+claude_code:
+  detected: true
+  has_claude_md: true
+gemini:
+  cli_detected: true
+  context_bridge: true
+  agents_manifest: true
+  notes: Native Gemini CLI integration via FAF
+faf_dna:
+  birth_dna: 24
+  birth_certificate: FAF-2026-GEMINIFA-FY80
+  birth_date: 2026-03-08T07:34:47.984Z
+  current_score: 100
+stack_signature: python-fastmcp-cloudrun
+detected_frameworks:
+  - Claude Code
+  - FastMCP
+  - faf-python-sdk
+  - OpenAPI
+  - Python
+turbo_cat_intelligence: 275

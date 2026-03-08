@@ -816,7 +816,7 @@ class TestTier9Gallery:
         assert manifest["name"] == "gemini-faf-mcp"
 
     def test_manifest_has_version(self, manifest):
-        assert manifest["version"] == "2.0.0"
+        assert manifest["version"] == __version__
 
     def test_manifest_has_description(self, manifest):
         assert len(manifest["description"]) > 20
