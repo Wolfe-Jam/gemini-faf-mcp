@@ -5,7 +5,7 @@
 [![PyPI](https://img.shields.io/pypi/v/gemini-faf-mcp?style=for-the-badge&logo=pypi&logoColor=white)](https://pypi.org/project/gemini-faf-mcp/)
 [![.faf Status](https://img.shields.io/badge/.faf-100%25%20Trophy-orange?style=for-the-badge&logo=google-gemini)](https://github.com/Wolfe-Jam/gemini-faf-mcp)
 [![Security](https://img.shields.io/badge/Security-SW--02%20Locked-red?style=for-the-badge)](https://github.com/Wolfe-Jam/gemini-faf-mcp)
-[![Tests](https://img.shields.io/badge/Tests-57%2F57-brightgreen?style=for-the-badge)](https://github.com/Wolfe-Jam/gemini-faf-mcp)
+[![Tests](https://img.shields.io/badge/MCP_Tools-10-blue?style=for-the-badge)](https://github.com/Wolfe-Jam/gemini-faf-mcp)
 
 > **AI AGENT INSTRUCTIONS:** This repository utilizes the **.faf (Foundational AI-context Format)** v2.5.2 standard.
 > 1. **HANDSHAKE:** Locate `project.faf` in the root directory before processing context.
@@ -20,18 +20,52 @@
 
 Google Cloud Function for FAF (Foundational AI-context Format) integration with Gemini.
 
-**Version:** 1.1.0 | **Tests:** 57/57 (Championship Grade) | **PyPI:** [v1.1.0](https://pypi.org/project/gemini-faf-mcp/)
+**Version:** 2.0.0 | **MCP Tools:** 10 | **PyPI:** [v2.0.0](https://pypi.org/project/gemini-faf-mcp/)
 
 ## What This Does
 
-Provides a "Source of Truth" endpoint that Gemini can call to retrieve project DNA from `.faf` files.
+Native MCP server for FAF (Foundational AI-context Format). 10 tools powered by [faf-python-sdk](https://pypi.org/project/faf-python-sdk/). Read, validate, score, and generate project DNA. Plus a Cloud Run REST API for live badges, multi-agent handshake, and voice-to-FAF.
 
-**Live Endpoint:**
-```
-https://faf-source-of-truth-631316210911.us-east1.run.app
+## MCP Server (v2.0.0)
+
+### Install
+
+```bash
+# Gemini CLI — install from gallery
+gemini extensions install https://github.com/Wolfe-Jam/gemini-faf-mcp
+
+# Or install from PyPI and run directly
+pip install gemini-faf-mcp
+python server.py
+
+# Or use the console entry point
+gemini-faf-mcp
 ```
 
-## Installation (PyPI)
+### MCP Tools
+
+| # | Tool | What It Does |
+|---|------|-------------|
+| 1 | `faf_read` | Read & parse project.faf into structured DNA |
+| 2 | `faf_validate` | Validate .faf — score, tier, errors, warnings |
+| 3 | `faf_score` | Quick score check (0-100%) + tier |
+| 4 | `faf_discover` | Find .faf files in the project tree |
+| 5 | `faf_init` | Create a starter .faf file |
+| 6 | `faf_stringify` | Convert FAF data back to YAML |
+| 7 | `faf_context` | Get Gemini-optimized context from .faf |
+| 8 | `faf_gemini` | Export GEMINI.md from .faf |
+| 9 | `faf_agents` | Export AGENTS.md from .faf |
+| 10 | `faf_about` | FAF format info, IANA registration, version |
+
+### MCP Inspector
+
+```bash
+npx @modelcontextprotocol/inspector --command python3 server.py
+```
+
+---
+
+## Python SDK (PyPI)
 
 ```bash
 pip install gemini-faf-mcp
@@ -73,13 +107,20 @@ client = FAFClient(agent="claude")  # XML format
 client = FAFClient(agent="jules")   # minimal JSON
 ```
 
+## Cloud Run REST API
+
+**Live Endpoint:**
+```
+https://faf-source-of-truth-631316210911.us-east1.run.app
+```
+
 ## The FAF Ecosystem
 
 | Package | Platform | Registry | Status |
 |---------|----------|----------|--------|
 | [claude-faf-mcp](https://npmjs.com/package/claude-faf-mcp) | Anthropic | npm + MCP #2759 | v5.1.0 |
 | [grok-faf-mcp](https://npmjs.com/package/grok-faf-mcp) | xAI | npm | v1.0.2 |
-| **[gemini-faf-mcp](https://pypi.org/project/gemini-faf-mcp/)** | **Google** | **PyPI** | **v1.1.0** |
+| **[gemini-faf-mcp](https://pypi.org/project/gemini-faf-mcp/)** | **Google** | **PyPI** | **v2.0.0** |
 | [faf-cli](https://npmjs.com/package/faf-cli) | Universal | npm | v4.5.0 |
 
 ## Usage
@@ -134,7 +175,7 @@ curl -X POST https://faf-source-of-truth-631316210911.us-east1.run.app \
 Every response includes:
 ```
 X-FAF-Agent-Detected: <detected-agent>
-X-FAF-Version: 1.1.0
+X-FAF-Version: 2.0.0
 ```
 
 `X-FAF-Agent-Detected` confirms which dialect was applied. `X-FAF-Version` lets clients verify the endpoint version.

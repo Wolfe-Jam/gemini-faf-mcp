@@ -457,7 +457,7 @@ class TestTier6PyPI:
         """Package imports successfully."""
         import gemini_faf_mcp
         assert hasattr(gemini_faf_mcp, '__version__')
-        assert gemini_faf_mcp.__version__ == "1.1.0"
+        assert gemini_faf_mcp.__version__ == "2.0.0"
 
     def test_fafclient_import(self):
         """FAFClient class imports."""
@@ -645,8 +645,8 @@ class TestTier7Fixes:
         """All version strings match 1.1.0."""
         import gemini_faf_mcp
         from gemini_faf_mcp import client
-        assert gemini_faf_mcp.__version__ == "1.1.0"
-        assert client.__version__ == "1.1.0"
+        assert gemini_faf_mcp.__version__ == "2.0.0"
+        assert client.__version__ == "2.0.0"
 
 
 if __name__ == "__main__":

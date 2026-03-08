@@ -4,16 +4,18 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "gemini-faf-mcp"
-version = "1.1.0"
+version = "2.0.0"
 authors = [
   { name="wolfejam", email="james@wolfejam.dev" },
 ]
-description = "Universal Context Landing Pad for FAF (Foundational AI-context Format)"
+description = "FAF MCP Server for Gemini — Read, validate, and score IANA-registered .faf project DNA"
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.10"
 license = {text = "MIT"}
 classifiers = [
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
@@ -21,8 +23,10 @@ classifiers = [
     "Intended Audience :: Developers",
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
-keywords = ["faf", "mcp", "gemini", "ai-context", "model-context-protocol"]
+keywords = ["faf", "mcp", "gemini", "ai-context", "model-context-protocol", "fastmcp"]
 dependencies = [
+    "fastmcp>=3.0.0",
+    "faf-python-sdk>=1.0.2",
     "functions-framework>=3.0.0",
     "google-cloud-bigquery>=3.0.0",
     "google-cloud-secret-manager>=2.0.0",
@@ -30,9 +34,11 @@ dependencies = [
     "requests>=2.28.0",
 ]
 
+[project.scripts]
+gemini-faf-mcp = "server:mcp.run"
+
 [project.urls]
 "Homepage" = "https://github.com/Wolfe-Jam/gemini-faf-mcp"
-"Glory Wall" = "https://faf-landing.vercel.app/glory.html"
 "FAF Specification" = "https://faf.one"
 "IANA Registration" = "https://www.iana.org/assignments/media-types/application/vnd.faf+yaml"
 "Bug Tracker" = "https://github.com/Wolfe-Jam/gemini-faf-mcp/issues"
@@ -41,10 +47,16 @@ dependencies = [
 dev = [
     "pytest>=7.0.0",
     "pytest-cov>=4.0.0",
+    "pytest-asyncio>=0.21.0",
 ]
 
-[tool.setuptools.packages.find]
-where = ["src"]
+[tool.setuptools]
+py-modules = ["server"]
+packages = ["gemini_faf_mcp"]
+package-dir = {"gemini_faf_mcp" = "src/gemini_faf_mcp"}
 
 [tool.setuptools.package-data]
 "*" = ["*.yaml", "*.json"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"

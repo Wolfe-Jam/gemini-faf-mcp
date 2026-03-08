@@ -1,11 +1,11 @@
 {
   "name": "gemini-faf-mcp",
-  "version": "1.1.0",
-  "description": "FAF (Foundational AI-Context Format) - Universal project DNA for any AI. Read, validate, and score .faf files. IANA-registered format (application/vnd.faf+yaml). 33 tools including bi-sync, interop exports (AGENTS.md, .cursorrules, GEMINI.md), and tri-sync.",
+  "version": "2.0.0",
+  "description": "FAF — Universal AI context from IANA-registered .faf files. Read, validate, score, and generate project DNA for any AI.",
   "mcpServers": {
     "faf": {
-      "command": "npx",
-      "args": ["-y", "claude-faf-mcp@latest"]
+      "command": "python3",
+      "args": ["${extensionPath}/server.py"]
     }
   },
   "contextFileName": "GEMINI.md"

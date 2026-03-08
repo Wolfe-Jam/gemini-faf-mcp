@@ -1,78 +1,91 @@
 ---
 faf_score: 100%
-faf_slots: 14/14
 faf_tier: Trophy
 faf_version: 2.5.2
-last_sync: '2026-01-30T20:29:57.467467Z'
+server_version: 2.0.0
+last_sync: '2026-03-08'
 ---
 
-# Gemini Project DNA Alignment (FAF v2.5.2)
+# Gemini Project DNA — gemini-faf-mcp v2.0.0
 
-This project adheres to the .faf standard. Context is provided on-demand and validated via the **bucket-460122** automated pipeline.
+FAF MCP server for Gemini. 10 tools powered by faf-python-sdk. IANA-registered format (`application/vnd.faf+yaml`).
 
-## Project Status: Trophy
-- **Compliance Score**: 100% (All DNA slots verified)
-- **Distinction**: Pending (Big Orange requires AI/Peer recognition)
-- **Security**: SW-01 + SW-02 enforced
+## MCP Tools
 
-> *The Big Orange is not a score; it is the fingerprint of a human who cared enough to make the context true.*
+| Tool | What It Does |
+|------|-------------|
+| `faf_read` | Read & parse project.faf into structured DNA |
+| `faf_validate` | Validate .faf — score, tier, errors, warnings |
+| `faf_score` | Quick score check (0-100%) + tier |
+| `faf_discover` | Find .faf files in the project tree |
+| `faf_init` | Create a starter .faf file |
+| `faf_stringify` | Convert FAF data back to YAML |
+| `faf_context` | Get Gemini-optimized context from .faf |
+| `faf_gemini` | Export GEMINI.md from .faf |
+| `faf_agents` | Export AGENTS.md from .faf |
+| `faf_about` | FAF format info, IANA registration, version |
+
+## Usage with Gemini CLI
+
+```bash
+# Install from gallery
+gemini extensions install gemini-faf-mcp
+
+# Or manual
+pip install gemini-faf-mcp
+python server.py
+```
+
+Then in Gemini CLI:
+```
+> Read my project DNA
+> What's the FAF score for this project?
+> Create a starter .faf file for my project
+> Export a GEMINI.md from the .faf
+```
+
+## Score & Tier System
+
+| Score | Tier |
+|-------|------|
+| 100% | Trophy |
+| 99% | Gold |
+| 95% | Silver |
+| 85% | Bronze |
+| 70% | Green |
+| 55% | Yellow |
+| <55% | Red |
+| 0% | White |
+
+## Architecture
+
+```
+gemini-faf-mcp v2.0.0
+├── server.py          → FastMCP MCP server (10 tools)
+├── main.py            → Cloud Run REST API (GET/POST/PUT)
+└── src/gemini_faf_mcp → PyPI SDK (FAFClient, parser)
+```
+
+The MCP server uses `faf-python-sdk` for parsing, validation, and discovery. The Cloud Run API provides live badges, multi-agent handshake, and voice-to-FAF mutations.
 
 ## Source of Truth
 
-Gemini MUST call the endpoint before starting a session to ingest the latest DNA.
+The `project.faf` file is the single source of truth for project DNA.
 
-| Method | Endpoint | Purpose |
-|--------|----------|---------|
-| GET | `https://faf-source-of-truth-6wqmwwyfoq-ue.a.run.app` | Live SVG badge |
-| POST | `https://faf-source-of-truth-6wqmwwyfoq-ue.a.run.app` | Read DNA (agent-optimized) |
-| PUT | `https://faf-source-of-truth-6wqmwwyfoq-ue.a.run.app` | Voice-to-FAF mutations |
+- **Format:** YAML (IANA: `application/vnd.faf+yaml`)
+- **Spec:** https://faf.one
+- **Tools:** `faf_read` to parse, `faf_validate` to check, `faf_score` for quick status
 
-### Reading DNA
+## Ecosystem
 
-```bash
-curl -X POST https://faf-source-of-truth-6wqmwwyfoq-ue.a.run.app \
-  -H "X-FAF-Agent: gemini" \
-  -H "Content-Type: application/json"
-```
-
-### Voice-to-FAF (HIGH-VALUE MUTATION)
-
-**IMPORTANT:** Always verbally confirm changes with the user before executing.
-
-```bash
-curl -X PUT https://faf-source-of-truth-6wqmwwyfoq-ue.a.run.app \
-  -H "Content-Type: application/json" \
-  -H "X-FAF-Agent: gemini" \
-  -d '{"updates": {"state.focus": "new focus"}, "message": "voice update"}'
-```
-
-## Security Layer (v2.5.1)
-
-| Guard | Rule | Enforcement |
-|-------|------|-------------|
-| SW-01 | Temporal Integrity | Reject stale timestamps |
-| SW-02 | Scoring Guard | Big Orange requires 100% |
-
-All mutations logged to BigQuery: `bucket-460122.faf_telemetry.voice_mutations`
-
-## System Instructions
-
-1. **Initialize**: Call POST endpoint first to get DNA
-2. **Quality Check**: If score = 100%, proceed with full autonomy
-3. **Voice Updates**: Confirm verbally before PUT (HIGH-VALUE MUTATION)
-4. **Bi-Sync**: All output must align with current DNA
-
-## Gemini Live Tools
-
-Function declarations in `gemini-live-tools.json`:
-
-| Function | Description |
-|----------|-------------|
-| `read_project_dna` | Read current DNA from Source of Truth |
-| `update_project_dna` | HIGH-VALUE MUTATION - verbal confirm required |
+| Package | Platform | Registry |
+|---------|----------|----------|
+| claude-faf-mcp | Anthropic | npm + MCP #2759 |
+| **gemini-faf-mcp** | **Google** | **PyPI** |
+| grok-faf-mcp | xAI | npm |
+| rust-faf-mcp | Rust | crates.io |
+| faf-cli | Universal | npm |
 
 ---
 
 *Media Type: application/vnd.faf+yaml*
-*Pipeline: bucket-460122*
-*"Efficiency is the goal, but like the '77 Reds, we play for the Trophy, but revel in the glory. YNWA"*
