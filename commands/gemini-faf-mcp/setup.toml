@@ -1,114 +1,42 @@
-description = "Set up FAF project DNA — guided wizard that discovers, creates, scores, and exports your .faf file"
+description = "Set up FAF project DNA — discover or create a .faf file, score it, done"
 
 prompt = """
-You are running the FAF Setup Wizard for gemini-faf-mcp. Walk the user through setting up FAF project DNA step by step. Use the MCP tools available to you — do NOT use built-in file reading tools for .faf files.
+You are setting up FAF project DNA. Be fast and direct. Use FAF MCP tools only — never built-in file tools for .faf operations.
 
-## Step 1: Discover
+## Step 1: Check
 
-Use the `faf_discover` tool to check if a .faf file already exists in the current project.
+Use `faf_discover` to check if project.faf exists in the current directory.
 
-**If a .faf file is found:**
+**If found:** Use `faf_score` to get the score. Show it:
+```
+Found: {path}
+Score: {score}% ({tier})
+```
+If score < 85%, use `faf_validate` and list the errors/warnings. Done.
 
-1. Use `faf_read` to read the existing file
-2. Use `faf_score` to get the current score and tier
-3. Present the results clearly:
-
-   ```
-   Found: project.faf
-   Project: {name}
-   Score: {score}% ({tier})
-   ```
-
-4. Ask the user:
-   - If score is below 85% (Bronze): "Your project DNA scores {score}% ({tier}). Want me to suggest improvements to reach Bronze (85%)?"
-   - If score is 85%+: "Your project DNA scores {score}% ({tier}). Want to export it to GEMINI.md or AGENTS.md?"
-
-   If they want improvements, use `faf_validate` to get specific errors and warnings, then suggest fixes.
-
-5. Skip to Step 3 (Validate & Score) or Step 4 (Export) based on user response.
-
-**If no .faf file is found:**
-
-Continue to Step 2.
+**If NOT found:** Go to Step 2 immediately. Do not search other directories. Do not explore the filesystem.
 
 ## Step 2: Create
 
-No .faf file exists. Gather project info from the user with these questions (batch them efficiently):
-
-Ask the user these questions:
-1. **Project name** — What's the name of this project?
-2. **Main language** — What's the primary language? (e.g., Python, TypeScript, Rust, Go)
-3. **Project goal** — In one sentence, what does this project do?
-4. **Stack** — What frameworks, databases, or key tools does it use? (e.g., "FastAPI + PostgreSQL" or "React + Node")
-
-Once you have the answers, use `faf_init` to create the .faf file with:
-- `name`: their project name
-- `language`: their main language
-- `goal`: their project goal
-- `path`: "project.faf"
-
-Tell the user the file was created and show the path.
-
-## Step 3: Validate & Score
-
-Use `faf_validate` to check the file. Display:
+Run `faf_init` right now with the current directory name as the project name. Do not ask the user questions — just create it. FAF detects everything it needs.
 
 ```
+faf_init(name="{current_directory_name}", path="project.faf")
+```
+
+Then run `faf_score` on the new file and show the result:
+```
+Created: project.faf
 Score: {score}% ({tier})
-Valid: {yes/no}
-Errors: {count}
-Warnings: {count}
 ```
 
-If there are errors or warnings, list them clearly with suggestions for fixing each one.
-
-Explain what the tier means:
-- Trophy (100%): Perfect project DNA — full AI autonomy
-- Gold (99%): Exceptional — nearly complete context
-- Silver (95%): Top tier — very strong AI context
-- Bronze (85%): Production ready — AI can work confidently
-- Green (70%): Solid foundation — some gaps to fill
-- Yellow (55%): Needs improvement — AI will need to ask questions
-- Red (<55%): Major work needed — limited AI effectiveness
-- White (0%): Empty — no useful context
-
-## Step 4: Export
-
-Ask the user which format(s) they want to export:
-
-"Would you like to export your project DNA? Options:
-1. **GEMINI.md** — Context file for Gemini (auto-loaded by this extension)
-2. **AGENTS.md** — Universal agent context (works with any AI)
-3. **Both** — Export both files
-4. **Skip** — Done for now"
-
-Based on their choice:
-- For GEMINI.md: Use `faf_gemini` to generate content, then write it to `GEMINI.md` in the project root
-- For AGENTS.md: Use `faf_agents` to generate content, then write it to `AGENTS.md` in the project root
-- For Both: Run both exports
-
-## Step 5: Summary
-
-Show a clear summary of everything that was done:
-
-```
-Setup Complete!
-
-  File: project.faf
-  Score: {score}% ({tier})
-  Exports: {list of exported files, or "none"}
-
-Next steps:
-- Edit project.faf to add more detail (stack, preferences, instant_context)
-- Run /gemini-faf-mcp:score anytime to check your score
-- Run /gemini-faf-mcp:export to generate context files
-```
+Done. The user can edit project.faf to improve their score.
 
 ## Rules
 
-- Always use FAF MCP tools (faf_read, faf_discover, etc.) — never use built-in file tools for .faf operations
-- Be concise — don't over-explain FAF unless the user asks
-- If any tool returns an error, explain it clearly and suggest a fix
-- The .faf file is YAML format, IANA registered as application/vnd.faf+yaml
-- Keep the tone helpful and efficient — this is a setup wizard, not a lecture
+- Default to action. Create the file, don't ask permission.
+- Never explore the filesystem looking for .faf files in other directories.
+- Never ask the user what language, goal, or stack they use — faf_init handles defaults.
+- Use FAF MCP tools only (faf_discover, faf_init, faf_score, faf_validate).
+- One operation, one result. No menus, no wizards, no export prompts.
 """
