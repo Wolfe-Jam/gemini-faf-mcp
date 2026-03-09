@@ -2,7 +2,7 @@
 
 ## Project
 - **Name:** gemini-faf-mcp
-- **Version:** 2.1.0
+- **Version:** 2.1.1
 - **Purpose:** MCP server + Cloud Run API for FAF (Foundational AI-context Format)
 - **Stack:** Python 3.10+ / FastMCP / faf-python-sdk / Cloud Run
 - **Tests:** 183/183 passing (126 MCP server + 57 Cloud Function)
@@ -12,7 +12,7 @@
 ## Architecture
 
 ```
-gemini-faf-mcp v2.1.0
+gemini-faf-mcp v2.1.1
 ├── server.py              → FastMCP MCP server (12 tools)
 ├── main.py                → Cloud Run REST API (GET/POST/PUT)
 ├── src/gemini_faf_mcp/    → Python SDK (FAFClient, parser)

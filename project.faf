@@ -73,7 +73,7 @@ preferences:
   documentation: as_needed
 state:
   phase: production
-  version: 2.1.0
+  version: 2.1.1
   focus: Gemini Extensions Gallery listing
   status: green_flag
   next_milestone: gallery_listing
