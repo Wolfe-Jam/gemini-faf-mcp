@@ -73,7 +73,7 @@ preferences:
   documentation: as_needed
 state:
   phase: production
-  version: 2.1.1
+  version: 2.1.2
   focus: Gemini Extensions Gallery listing
   status: green_flag
   next_milestone: gallery_listing
@@ -83,19 +83,16 @@ scores:
   slot_based_percentage: 100
   total_slots: 21
 tags:
-  auto_generated:
-    - gemini-faf-mcp
-    - python
-    - mcp-server
-    - fastmcp
-    - gemini-cli
-  smart_defaults:
-    - .faf
-    - ai-ready
-    - "2026"
-    - iana-registered
-    - pypi
-  user_defined: null
+  - gemini-faf-mcp
+  - python
+  - mcp-server
+  - fastmcp
+  - gemini-cli
+  - .faf
+  - ai-ready
+  - "2026"
+  - iana-registered
+  - pypi
 human_context:
   who: Gemini CLI developers who want instant project context
   what: MCP server that reads, validates, scores, and exports .faf project DNA
