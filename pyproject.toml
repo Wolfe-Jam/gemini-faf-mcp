@@ -4,11 +4,11 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "gemini-faf-mcp"
-version = "2.1.1"
+version = "2.1.2"
 authors = [
   { name="wolfejam", email="james@wolfejam.dev" },
 ]
-description = "FAF MCP Server for Gemini — Read, validate, and score IANA-registered .faf project DNA"
+description = "Universal AI Project DNA — FAF MCP Server for Gemini. Unifies CLAUDE.md, GEMINI.md, and AGENTS.md into one IANA-registered format."
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "MIT"}
@@ -22,8 +22,10 @@ classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
     "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Software Development :: Build Tools",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
-keywords = ["faf", "mcp", "gemini", "ai-context", "model-context-protocol", "fastmcp"]
+keywords = ["faf", "mcp", "gemini", "ai-context", "model-context-protocol", "fastmcp", "claudemd", "geminimd", "agentsmd", "ai-agents", "context-management"]
 dependencies = [
     "fastmcp>=3.0.0",
     "faf-python-sdk>=1.0.2",

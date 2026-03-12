@@ -1,62 +1,59 @@
-# gemini-faf-mcp
+# gemini-faf-mcp 🧬
 
-> Your project, understood by AI — in one file. 12 MCP tools for Gemini CLI.
+> **Unify your AI project context.** One file to rule them all. 
+> Bridges `CLAUDE.md`, `GEMINI.md`, and `AGENTS.md` into a single, IANA-registered source of truth.
 
 <!-- mcp-name: io.github.Wolfe-Jam/gemini-faf-mcp -->
 
 [![PyPI](https://img.shields.io/pypi/v/gemini-faf-mcp?style=for-the-badge&logo=pypi&logoColor=white)](https://pypi.org/project/gemini-faf-mcp/)
+[![Downloads](https://img.shields.io/pypi/dm/gemini-faf-mcp?style=for-the-badge&color=blue)](https://pypi.org/project/gemini-faf-mcp/)
 [![Tests](https://img.shields.io/badge/Tests-183%20passing-brightgreen?style=for-the-badge)](https://github.com/Wolfe-Jam/gemini-faf-mcp)
-[![MCP Tools](https://img.shields.io/badge/MCP_Tools-12-blue?style=for-the-badge)](https://github.com/Wolfe-Jam/gemini-faf-mcp)
 [![IANA](https://img.shields.io/badge/IANA-registered-informational?style=for-the-badge)](https://www.iana.org/assignments/media-types/application/vnd.faf+yaml)
 
-MCP server for [FAF](https://faf.one) — the IANA-registered format for AI project context (`application/vnd.faf+yaml`). One `.faf` file gives Gemini full project understanding: stack, goals, conventions, quality bar. No re-explaining. No context drift.
+### Stop re-explaining your project to every new AI session.
 
-Built on [FastMCP](https://github.com/jlowin/fastmcp). Powered by [faf-python-sdk](https://pypi.org/project/faf-python-sdk/).
+Gemini, Claude, and OpenAI all have different ways of "learning" your project. FAF (Foundational AI-context Format) unifies them into one machine-readable `.faf` file. 
+
+**Result:** Zero context drift. Zero-minute onboarding. 100% project alignment.
+
+| Feature | `CLAUDE.md` | `GEMINI.md` | `AGENTS.md` | **`project.faf`** |
+|---------|-------------|-------------|-------------|-------------------|
+| **Format** | Markdown | Markdown | Markdown | **Structured YAML** |
+| **Schema** | Custom | Custom | Custom | **IANA Standard** |
+| **Scoring** | No | No | No | **Yes (0-100%)** |
+| **Auto-Detect** | No | No | No | **Yes (153+ files)** |
+| **Vendor Neutral**| No | No | No | **Yes** |
 
 ---
 
-## Quick Start
+## 🚀 One-Minute Setup
 
-### Gemini CLI (recommended)
-
-```bash
-gemini extensions install https://github.com/Wolfe-Jam/gemini-faf-mcp
-```
-
-Then in any project directory:
-
-```
-> Auto-detect my project and create a .faf file
-> What's the FAF score for this project?
-> Export a GEMINI.md for this project
-```
-
-### PyPI
+### 1. Install
 
 ```bash
 pip install gemini-faf-mcp
 ```
 
-### MCP Config (manual)
+### 2. Auto-Detect & Initialize
 
-```json
-{
-  "mcpServers": {
-    "faf": {
-      "command": "python3",
-      "args": ["-m", "server"]
-    }
-  }
-}
+Scan your existing project and create your DNA in one command:
+
+```bash
+# Detects Python (FastAPI/Django), JS/TS (React/Next.js), Rust (Axum), and Go (Gin)
+faf auto
+```
+
+### 3. Add to Gemini CLI
+
+```bash
+gemini extensions install https://github.com/Wolfe-Jam/gemini-faf-mcp
 ```
 
 ---
 
-## What FAF Does
+## 💎 The "One-File" Advantage
 
-Every new session, AI starts from zero. It guesses your stack, misses conventions, asks the same questions. FAF fixes this.
-
-A `.faf` file is structured YAML that captures your project DNA — language, framework, database, goals, quality standards, team context. Any AI reads it instantly instead of guessing.
+A `.faf` file is structured YAML that captures your project DNA. Every AI agent reads it once and knows exactly what you're building.
 
 ```yaml
 # project.faf — your project, machine-readable
