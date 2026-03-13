@@ -16,6 +16,10 @@ Gemini, Claude, and OpenAI all have different ways of "learning" your project. F
 
 **Result:** Zero context drift. Zero-minute onboarding. 100% project alignment.
 
+<a href="https://glama.ai/mcp/servers/Wolfe-Jam/gemini-faf-mcp">
+  <img width="380" height="200" src="https://glama.ai/mcp/servers/Wolfe-Jam/gemini-faf-mcp/badge" alt="gemini-faf-mcp MCP server" />
+</a>
+
 | Feature | `CLAUDE.md` | `GEMINI.md` | `AGENTS.md` | **`project.faf`** |
 |---------|-------------|-------------|-------------|-------------------|
 | **Format** | Markdown | Markdown | Markdown | **Structured YAML** |
