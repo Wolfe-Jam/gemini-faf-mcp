@@ -1,0 +1,17 @@
+__pycache__
+*.pyc
+.git
+.github
+.env
+.DS_Store
+*.md
+!README.md
+tests
+.pytest_cache
+.mypy_cache
+dist
+build
+*.egg-info
+.venv
+venv
+coverage
