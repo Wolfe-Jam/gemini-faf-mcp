@@ -100,7 +100,7 @@ human_context:
     "database": "BigQuery"
   },
   "score": 100,
-  "tier": "Trophy"
+  "tier": "\ud83c\udfc6"
 }
 ```
 
@@ -134,8 +134,8 @@ human_context:
 
 | Tool | What it does |
 |------|-------------|
-| `faf_validate` | Full validation — score, tier, errors, warnings |
-| `faf_score` | Quick score check (0-100%) with tier name |
+| `faf_validate` | Full Mk4 validation — score, tier, slot counts, errors, warnings |
+| `faf_score` | Quick Mk4 score — score, tier, populated/active/total slot counts |
 
 ### Read & Transform
 

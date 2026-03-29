@@ -3,6 +3,27 @@
 All notable changes to gemini-faf-mcp are documented here.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
+## [2.2.0] - 2026-03-29
+
+### Added
+- **Mk4 Championship Scoring Engine** — all 12 tools now use the same 21-slot scoring algorithm as Rust and TypeScript FAF engines
+- `faf_score` and `faf_validate` return slot-level detail: `populated`, `active`, `total`
+- 41 new WJTTC championship tests (parity, stress, security, contracts)
+- Requires `faf-python-sdk>=1.1.0` for Mk4 engine
+
+### Removed
+- `sync_faf.py` — dead bi-sync script (superseded by `faf bi-sync` in faf-cli)
+- `.github/workflows/faf-sync.yml` — its GitHub Action
+- `cloudbuild.yaml` Step 2 — sync step removed
+- `TIERS` list and `_get_tier()` helper — tier now comes from Mk4Result
+
+### Changed
+- Tiers now return emoji (`🏆`, `🥇`, `🥈`, `🥉`, `🟢`, `🟡`, `🔴`) instead of strings
+- `faf_score` error responses return `🔴` instead of `"White"`
+- 221 total tests (was 183)
+
+---
+
 ## [2.1.1] - 2026-03-08
 
 ### Fixed
