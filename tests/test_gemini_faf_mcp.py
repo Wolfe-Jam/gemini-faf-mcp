@@ -622,26 +622,6 @@ class TestTier7Fixes:
         assert not result["valid"]  # missing project + human_context
         assert any("project.name" in issue for issue in result["issues"])
 
-    # --- sync_faf score reading ---
-
-    def test_sync_get_faf_score_reads_from_scores(self):
-        """get_faf_score reads scores.faf_score when present."""
-        import sys, os
-        sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
-        from sync_faf import get_faf_score
-        data = {"scores": {"faf_score": 100}}
-        assert get_faf_score(data) == 100
-
-    def test_sync_get_faf_score_fallback(self):
-        """get_faf_score falls back to slot counting when no scores section."""
-        import sys, os
-        sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
-        from sync_faf import get_faf_score
-        data = {"faf_version": "2.5.0", "project": {"name": "test"}}
-        score = get_faf_score(data)
-        assert isinstance(score, int)
-        assert 0 <= score <= 100
-
     # --- Version consistency ---
 
     def test_version_consistency(self):

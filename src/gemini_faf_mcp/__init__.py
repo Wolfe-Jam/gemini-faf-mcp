@@ -22,7 +22,7 @@ Glory Wall:
     https://faf-landing.vercel.app/glory.html
 """
 
-__version__ = "2.1.1"
+__version__ = "2.2.0"
 __author__ = "wolfejam"
 
 from .client import FAFClient

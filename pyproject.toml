@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "gemini-faf-mcp"
-version = "2.1.2"
+version = "2.2.0"
 authors = [
   { name="wolfejam", email="james@wolfejam.dev" },
 ]
@@ -28,7 +28,7 @@ classifiers = [
 keywords = ["faf", "mcp", "gemini", "ai-context", "model-context-protocol", "fastmcp", "claudemd", "geminimd", "agentsmd", "ai-agents", "context-management"]
 dependencies = [
     "fastmcp>=3.0.0",
-    "faf-python-sdk>=1.0.2",
+    "faf-python-sdk>=1.1.0",
     "functions-framework>=3.0.0",
     "google-cloud-bigquery>=3.0.0",
     "google-cloud-secret-manager>=2.0.0",

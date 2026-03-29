@@ -30,6 +30,7 @@ project:
   goal: MCP server for FAF — read, validate, auto-detect, score, and export IANA-registered .faf project DNA from Gemini CLI
   main_language: Python
   type: mcp-server
+  framework: fastmcp
 ai_instructions:
   priority_order:
     - 1. Read THIS .faf file first
@@ -41,21 +42,25 @@ ai_instructions:
     quality_bar: zero_errors
     testing: required
   warnings:
-    - All changes must pass 183 tests before commit
+    - All changes must pass 221 tests before commit
     - faf-python-sdk handles parsing — server.py delegates
     - Version must match in pyproject.toml, __init__.py, client.py, server.py, main.py
 stack:
+  frontend: slotignored
+  css_framework: slotignored
+  ui_library: slotignored
+  state_management: slotignored
   backend: Python
   main_language: Python
   runtime: Python 3.10+
   package_manager: pip
-  build_tool: setuptools
+  build: setuptools
   database: BigQuery
   api_type: MCP (stdio) + HTTP/REST
   connection: MCP (stdio) + HTTP/REST
   testing: pytest + WJTTC 9-tier championship suite
   hosting: Google Cloud Run
-  cicd: Cloud Build Triggers
+  cicd: GitHub Actions
   target_user: developers
   core_problem: AI tools lack structured project context
   mission_purpose: Give any AI structured project context via IANA-registered .faf files
@@ -63,6 +68,12 @@ stack:
     - FastMCP
     - faf-python-sdk
     - functions-framework
+  monorepo_tool: slotignored
+  workspaces: slotignored
+  admin: slotignored
+  cache: slotignored
+  search: slotignored
+  storage: slotignored
 preferences:
   quality_bar: zero_errors
   commit_style: conventional
@@ -73,8 +84,8 @@ preferences:
   documentation: as_needed
 state:
   phase: production
-  version: 2.1.2
-  focus: Gemini Extensions Gallery listing
+  version: 2.2.0
+  focus: Mk4 Championship Scoring Engine parity
   status: green_flag
   next_milestone: gallery_listing
   blockers: null
@@ -129,3 +140,9 @@ detected_frameworks:
   - OpenAPI
   - Python
 turbo_cat_intelligence: 275
+monorepo:
+  packages_count: slotignored
+  build_orchestrator: slotignored
+  versioning_strategy: slotignored
+  shared_configs: slotignored
+  remote_cache: slotignored

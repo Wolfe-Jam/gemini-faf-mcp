@@ -22,7 +22,8 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from fastmcp.client import Client
-from server import mcp, _get_tier, __version__, TIERS
+from server import mcp, __version__
+from faf_sdk.mk4 import _score_to_tier
 
 
 # ---------------------------------------------------------------------------
@@ -222,7 +223,7 @@ class TestTier2Engine:
     async def test_validate_returns_tier(self, client, full_faf):
         result = await client.call_tool("faf_validate", {"path": full_faf})
         data = _parse(result)
-        valid_tiers = {"Trophy", "Gold", "Silver", "Bronze", "Green", "Yellow", "Red"}
+        valid_tiers = {"\U0001f3c6", "\U0001f947", "\U0001f948", "\U0001f949", "\U0001f7e2", "\U0001f7e1", "\U0001f534"}
         assert data["tier"] in valid_tiers
 
     async def test_validate_returns_lists(self, client, full_faf):
@@ -236,7 +237,7 @@ class TestTier2Engine:
         data = _parse(result)
         assert isinstance(data["score"], int)
         assert 0 <= data["score"] <= 100
-        assert data["valid"] is True
+        assert data["populated"] > 0
 
     async def test_score_matches_validate(self, client, full_faf):
         """faf_score and faf_validate return same score for same file."""
@@ -353,12 +354,12 @@ class TestTier3Aero:
     async def test_score_missing_returns_zero(self, client):
         data = _parse(await client.call_tool("faf_score", {"path": "/nonexistent.faf"}))
         assert data["score"] == 0
-        assert data["tier"] == "White"
+        assert data["tier"] == "\U0001f534"
 
     async def test_score_invalid_yaml(self, client, invalid_faf):
         data = _parse(await client.call_tool("faf_score", {"path": invalid_faf}))
         assert data["score"] == 0
-        assert data["tier"] == "White"
+        assert data["tier"] == "\U0001f534"
 
     async def test_discover_empty_dir(self, client, empty_dir):
         data = _parse(await client.call_tool("faf_discover", {"start_dir": empty_dir}))
@@ -409,64 +410,59 @@ class TestTier3Aero:
 # ===================================================================
 
 class TestTier4Scoring:
-    """Tier calculation must be mathematically correct."""
+    """Mk4 tier calculation must be mathematically correct."""
 
     def test_tier_100_is_trophy(self):
-        assert _get_tier(100) == "Trophy"
+        assert _score_to_tier(100) == "\U0001f3c6"
 
     def test_tier_99_is_gold(self):
-        assert _get_tier(99) == "Gold"
+        assert _score_to_tier(99) == "\U0001f947"
 
     def test_tier_95_is_silver(self):
-        assert _get_tier(95) == "Silver"
+        assert _score_to_tier(95) == "\U0001f948"
 
     def test_tier_85_is_bronze(self):
-        assert _get_tier(85) == "Bronze"
+        assert _score_to_tier(85) == "\U0001f949"
 
     def test_tier_70_is_green(self):
-        assert _get_tier(70) == "Green"
+        assert _score_to_tier(70) == "\U0001f7e2"
 
     def test_tier_55_is_yellow(self):
-        assert _get_tier(55) == "Yellow"
+        assert _score_to_tier(55) == "\U0001f7e1"
 
     def test_tier_0_is_red(self):
-        assert _get_tier(0) == "Red"
+        assert _score_to_tier(0) == "\U0001f534"
 
-    def test_tier_negative_is_white(self):
-        assert _get_tier(-1) == "White"
+    def test_tier_negative_is_red(self):
+        assert _score_to_tier(-1) == "\U0001f534"
 
     def test_tier_boundary_99_not_trophy(self):
         """99 is Gold, not Trophy — Trophy requires exactly 100."""
-        assert _get_tier(99) != "Trophy"
+        assert _score_to_tier(99) != "\U0001f3c6"
 
     def test_tier_boundary_95_not_gold(self):
-        assert _get_tier(95) != "Gold"
+        assert _score_to_tier(95) != "\U0001f947"
 
     def test_tier_boundary_85_not_silver(self):
-        assert _get_tier(85) != "Silver"
+        assert _score_to_tier(85) != "\U0001f948"
 
     def test_tier_boundary_70_not_bronze(self):
-        assert _get_tier(70) != "Bronze"
+        assert _score_to_tier(70) != "\U0001f949"
 
     def test_tier_boundary_55_not_green(self):
-        assert _get_tier(55) != "Green"
+        assert _score_to_tier(55) != "\U0001f7e2"
 
-    def test_tier_boundary_54_is_yellow(self):
+    def test_tier_boundary_54_is_red(self):
         """54 is below Yellow threshold — drops to Red."""
-        assert _get_tier(54) == "Red"
-
-    def test_tier_list_descending(self):
-        """TIERS list is in descending order (highest first)."""
-        thresholds = [t[0] for t in TIERS]
-        assert thresholds == sorted(thresholds, reverse=True)
+        assert _score_to_tier(54) == "\U0001f534"
 
     def test_score_and_validate_tier_agree(self, full_faf):
-        """faf_score and faf_validate produce same tier for same file."""
-        # This is a sync test using the internal function
-        from faf_sdk import parse_file, validate
-        faf = parse_file(full_faf)
-        result = validate(faf)
-        assert _get_tier(result.score) in {"Trophy", "Gold", "Silver", "Bronze", "Green", "Yellow", "Red"}
+        """faf_score uses Mk4 engine which produces valid tiers."""
+        from faf_sdk import score_faf
+        content = open(full_faf).read()
+        mk4 = score_faf(content)
+        valid_tiers = {"\U0001f3c6", "\U0001f947", "\U0001f948", "\U0001f949", "\U0001f7e2", "\U0001f7e1", "\U0001f534"}
+        assert mk4.tier in valid_tiers
 
     async def test_minimal_faf_scores_lower(self, client, tmp_path):
         """Full .faf scores higher than minimal .faf."""
@@ -504,7 +500,8 @@ class TestTier5Exports:
     async def test_gemini_score_matches_metadata(self, client, full_faf):
         data = _parse(await client.call_tool("faf_gemini", {"path": full_faf}))
         assert f"{data['score']}%" in data["content"]
-        assert data["tier"] in data["content"]
+        # Tier is now an emoji, check it appears in content
+        assert str(data["tier"]) in data["content"]
 
     async def test_gemini_high_score_autonomy(self, client, full_faf):
         """Score >= 85 should say 'full autonomy' in GEMINI.md."""
@@ -615,12 +612,12 @@ class TestTier7Contract:
 
     async def test_validate_success_schema(self, client, full_faf):
         data = _parse(await client.call_tool("faf_validate", {"path": full_faf}))
-        expected_keys = {"success", "valid", "score", "tier", "errors", "warnings"}
+        expected_keys = {"success", "valid", "score", "tier", "populated", "active", "total", "errors", "warnings"}
         assert set(data.keys()) == expected_keys
 
     async def test_score_success_schema(self, client, full_faf):
         data = _parse(await client.call_tool("faf_score", {"path": full_faf}))
-        assert set(data.keys()) == {"score", "tier", "valid"}
+        assert set(data.keys()) == {"score", "tier", "populated", "active", "total"}
 
     async def test_score_error_schema(self, client):
         data = _parse(await client.call_tool("faf_score", {"path": "/x.faf"}))
@@ -722,7 +719,7 @@ class TestTier8Roundtrip:
         })
         data = _parse(await client.call_tool("faf_score", {"path": target}))
         assert data["score"] > 0
-        assert data["tier"] != "White"
+        assert data["score"] > 0
 
     async def test_init_then_stringify(self, client, tmp_path):
         target = str(tmp_path / "rt.faf")

@@ -1,21 +1,22 @@
 """
-gemini-faf-mcp v2.0.1 — FastMCP Server
+gemini-faf-mcp v2.2.0 — FastMCP Server
 
 Native MCP server for FAF (Foundational AI-context Format).
-Powered by faf-python-sdk. Built for Gemini Extensions Gallery.
+Powered by faf-python-sdk with Mk4 Championship Scoring Engine.
+Built for Gemini Extensions Gallery.
 
 Media Type: application/vnd.faf+yaml
 Spec: https://faf.one
 """
 
 from fastmcp import FastMCP
-from faf_sdk import parse_file, parse, validate, find_faf_file, stringify
+from faf_sdk import parse_file, parse, validate, find_faf_file, stringify, score_faf
 from faf_sdk.parser import FafParseError
 from models import get_model, list_models
 import os
 from pathlib import Path
 
-__version__ = "2.1.2"
+__version__ = "2.2.0"
 
 mcp = FastMCP(
     "gemini-faf-mcp",
@@ -23,24 +24,13 @@ mcp = FastMCP(
     instructions="FAF — Universal AI context from IANA-registered .faf files",
 )
 
-# --- Tier calculation (mirrors CLAUDE.md tier system) ---
-
-TIERS = [
-    (100, "Trophy"),
-    (99, "Gold"),
-    (95, "Silver"),
-    (85, "Bronze"),
-    (70, "Green"),
-    (55, "Yellow"),
-    (0, "Red"),
-]
+# --- Mk4 scoring helper ---
 
 
-def _get_tier(score: int) -> str:
-    for threshold, name in TIERS:
-        if score >= threshold:
-            return name
-    return "White"
+def _mk4_score_file(path: str):
+    """Read a .faf file and return Mk4Result."""
+    content = Path(path).read_text()
+    return score_faf(content)
 
 
 # --- Tools ---
@@ -68,12 +58,15 @@ def faf_validate(path: str = "project.faf") -> dict:
     try:
         faf = parse_file(path)
         result = validate(faf)
-        score = result.score
+        mk4 = _mk4_score_file(path)
         return {
             "success": True,
             "valid": result.valid,
-            "score": score,
-            "tier": _get_tier(score),
+            "score": mk4.score,
+            "tier": mk4.tier,
+            "populated": mk4.populated,
+            "active": mk4.active,
+            "total": mk4.total,
             "errors": result.errors,
             "warnings": result.warnings,
         }
@@ -85,22 +78,22 @@ def faf_validate(path: str = "project.faf") -> dict:
 
 @mcp.tool()
 def faf_score(path: str = "project.faf") -> dict:
-    """Quick score check — returns score (0-100%) and tier.
-    Faster than faf_validate when you only need the number and tier name.
+    """Quick Mk4 score check — returns score (0-100%), tier, and slot counts.
+    Uses the Mk4 Championship 21-slot scoring engine for universal parity.
     Use this for status checks; use faf_validate when you need error details."""
     try:
-        faf = parse_file(path)
-        result = validate(faf)
-        score = result.score
+        mk4 = _mk4_score_file(path)
         return {
-            "score": score,
-            "tier": _get_tier(score),
-            "valid": result.valid,
+            "score": mk4.score,
+            "tier": mk4.tier,
+            "populated": mk4.populated,
+            "active": mk4.active,
+            "total": mk4.total,
         }
     except FileNotFoundError:
-        return {"score": 0, "tier": "White", "error": f"File not found: {path}"}
-    except FafParseError as e:
-        return {"score": 0, "tier": "White", "error": str(e)}
+        return {"score": 0, "tier": "\U0001f534", "error": f"File not found: {path}"}
+    except Exception as e:
+        return {"score": 0, "tier": "\U0001f534", "error": str(e)}
 
 
 @mcp.tool()
@@ -179,7 +172,7 @@ def faf_context(path: str = "project.faf") -> dict:
     try:
         faf = parse_file(path)
         data = faf.data
-        result = validate(faf)
+        mk4 = _mk4_score_file(path)
 
         context = {
             "project": {
@@ -187,8 +180,8 @@ def faf_context(path: str = "project.faf") -> dict:
                 "goal": data.project.goal,
                 "language": data.project.main_language,
             },
-            "score": result.score,
-            "tier": _get_tier(result.score),
+            "score": mk4.score,
+            "tier": mk4.tier,
         }
 
         if data.instant_context:
@@ -235,9 +228,9 @@ def faf_gemini(path: str = "project.faf") -> dict:
     try:
         faf = parse_file(path)
         data = faf.data
-        result = validate(faf)
-        score = result.score
-        tier = _get_tier(score)
+        mk4 = _mk4_score_file(path)
+        score = mk4.score
+        tier = mk4.tier
 
         md = f"""---
 faf_score: {score}%
@@ -275,7 +268,7 @@ def faf_agents(path: str = "project.faf") -> dict:
     try:
         faf = parse_file(path)
         data = faf.data
-        result = validate(faf)
+        mk4 = _mk4_score_file(path)
 
         md = f"""# AGENTS.md — {data.project.name}
 
@@ -283,7 +276,7 @@ def faf_agents(path: str = "project.faf") -> dict:
 - **Name:** {data.project.name}
 - **Goal:** {data.project.goal or 'Not specified'}
 - **Language:** {data.project.main_language or 'Not specified'}
-- **FAF Score:** {result.score}%
+- **FAF Score:** {mk4.score}%
 
 ## Instructions for AI Agents
 - This project uses FAF (Foundational AI-context Format)
@@ -530,6 +523,31 @@ def _detect_stack(directory: str) -> dict:
     if has_tsconfig and detected.get("main_language") == "JavaScript":
         detected["main_language"] = "TypeScript"
 
+    # --- Metadata Extraction (Name, Version, Goal) ---
+    try:
+        if has_pyproject:
+            import tomllib
+            data = tomllib.loads((dir_path / "pyproject.toml").read_text())
+            if "project" in data:
+                detected["name"] = data["project"].get("name")
+                detected["version"] = data["project"].get("version")
+                detected["goal"] = data["project"].get("description")
+        elif has_package_json:
+            import json as _json
+            data = _json.loads((dir_path / "package.json").read_text())
+            detected["name"] = data.get("name")
+            detected["version"] = data.get("version")
+            detected["goal"] = data.get("description")
+        elif has_cargo:
+            content = (dir_path / "Cargo.toml").read_text()
+            import re
+            name_match = re.search(r'^name\s*=\s*"(.*)"', content, re.MULTILINE)
+            version_match = re.search(r'^version\s*=\s*"(.*)"', content, re.MULTILINE)
+            if name_match: detected["name"] = name_match.group(1)
+            if version_match: detected["version"] = version_match.group(1)
+    except Exception:
+        pass
+
     return detected
 
 
@@ -557,12 +575,14 @@ def faf_auto(directory: str = ".", path: str = "project.faf") -> dict:
 
         if created:
             # Generate new .faf from detections
-            name = dir_path.name or "my-project"
+            name = detected.get("name") or dir_path.name or "my-project"
             lang = detected.get("main_language", "unknown")
+            goal = detected.get("goal") or "Describe your project goal"
+            version = detected.get("version") or "0.1.0"
             content = f"""faf_version: '2.5.0'
 project:
   name: {name}
-  goal: Describe your project goal
+  goal: {goal}
   main_language: {lang}
 stack:
   frontend: {detected.get('framework') if detected.get('framework') in ('React', 'Vue', 'Svelte', 'Next.js') else 'null'}
@@ -571,7 +591,7 @@ stack:
   testing: {detected.get('testing', 'null')}
 human_context:
   who: Developers
-  what: What problem does this solve?
+  what: {goal}
   why: Why does this project exist?
 ai_instructions:
   priority: Read project.faf first
@@ -581,7 +601,7 @@ preferences:
   commit_style: conventional
 state:
   phase: development
-  version: 0.1.0
+  version: {version}
   status: active
 """
             faf_path.parent.mkdir(parents=True, exist_ok=True)
@@ -594,6 +614,15 @@ state:
             if detected.get("main_language") and ("main_language: null" in updated or "main_language: unknown" in updated):
                 updated = updated.replace("main_language: null", f"main_language: {detected['main_language']}")
                 updated = updated.replace("main_language: unknown", f"main_language: {detected['main_language']}")
+            
+            # Fill metadata if missing
+            for field, key in [("name", "name"), ("goal", "goal"), ("version", "version")]:
+                val = detected.get(key)
+                if val and f"{field}: null" in updated:
+                    updated = updated.replace(f"{field}: null", f"{field}: {val}")
+                if val and field == "goal" and "Describe your project goal" in updated:
+                    updated = updated.replace("Describe your project goal", val)
+
             # Fill null stack fields
             for field, key in [("frontend", "framework"), ("backend", "framework"), ("database", "database"), ("testing", "testing")]:
                 val = detected.get(key)
@@ -607,15 +636,14 @@ state:
             if updated != existing:
                 faf_path.write_text(updated)
 
-        # Validate and score
+        # Score with Mk4 engine
         try:
-            faf = parse_file(str(faf_path))
-            result = validate(faf)
-            score = result.score
-            tier = _get_tier(score)
+            mk4 = _mk4_score_file(str(faf_path))
+            score = mk4.score
+            tier = mk4.tier
         except Exception:
             score = 0
-            tier = "White"
+            tier = "\U0001f534"
 
         lang = detected.get("main_language", "unknown")
         fw = detected.get("framework")

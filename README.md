@@ -1,14 +1,19 @@
 # gemini-faf-mcp 🧬
 
-> **Unify your AI project context.** One file to rule them all. 
-> Bridges `CLAUDE.md`, `GEMINI.md`, and `AGENTS.md` into a single, IANA-registered source of truth.
+> **Unify your AI project context.** One file to define them all. 
+> Bridges `CLAUDE.md`, `GEMINI.md`, `AGENTS.md`, and `GROK.md` into a single, IANA-registered source of truth.
+
 
 <!-- mcp-name: io.github.Wolfe-Jam/gemini-faf-mcp -->
 
 [![PyPI](https://img.shields.io/pypi/v/gemini-faf-mcp?style=for-the-badge&logo=pypi&logoColor=white)](https://pypi.org/project/gemini-faf-mcp/)
 [![Downloads](https://img.shields.io/pypi/dm/gemini-faf-mcp?style=for-the-badge&color=blue)](https://pypi.org/project/gemini-faf-mcp/)
-[![Tests](https://img.shields.io/badge/Tests-183%20passing-brightgreen?style=for-the-badge)](https://github.com/Wolfe-Jam/gemini-faf-mcp)
+[![Tests](https://img.shields.io/badge/Tests-221%20passing-brightgreen?style=for-the-badge)](https://github.com/Wolfe-Jam/gemini-faf-mcp)
 [![IANA](https://img.shields.io/badge/IANA-registered-informational?style=for-the-badge)](https://www.iana.org/assignments/media-types/application/vnd.faf+yaml)
+
+### What's New in v2.2.0
+
+**Mk4 Championship Scoring Engine** — all 12 tools now use the same scoring algorithm as the Rust compiler and TypeScript CLI. `faf_score` and `faf_validate` return slot-level detail (`populated`, `active`, `total`). Scores match across every FAF tool in every language. 221 tests, 41 new WJTTC championship tests. Dead code removed (`sync_faf.py`).
 
 ### Stop re-explaining your project to every new AI session.
 
@@ -16,13 +21,13 @@ Gemini, Claude, and OpenAI all have different ways of "learning" your project. F
 
 **Result:** Zero context drift. Zero-minute onboarding. 100% project alignment.
 
-| Feature | `CLAUDE.md` | `GEMINI.md` | `AGENTS.md` | **`project.faf`** |
-|---------|-------------|-------------|-------------|-------------------|
-| **Format** | Markdown | Markdown | Markdown | **Structured YAML** |
-| **Schema** | Custom | Custom | Custom | **IANA Standard** |
-| **Scoring** | No | No | No | **Yes (0-100%)** |
-| **Auto-Detect** | No | No | No | **Yes (153+ files)** |
-| **Vendor Neutral**| No | No | No | **Yes** |
+| Feature | `CLAUDE.md` | `GEMINI.md` | `AGENTS.md` | `GROK.md` | **`project.faf`** |
+|---------|-------------|-------------|-------------|-----------|-------------------|
+| **Format** | Markdown | Markdown | Markdown | Markdown | **Structured YAML** |
+| **Schema** | Custom | Custom | Custom | Custom | **IANA Standard** |
+| **Scoring** | No | No | No | No | **Yes (0-100%)** |
+| **Auto-Detect** | No | No | No | No | **Yes (153+ files)** |
+| **Vendor Neutral**| No | No | No | No | **Yes** |
 
 ---
 
@@ -36,11 +41,11 @@ pip install gemini-faf-mcp
 
 ### 2. Auto-Detect & Initialize
 
-Scan your existing project and create your DNA in one command:
+Scan your existing project and create your DNA in seconds (Zero install):
 
 ```bash
-# Detects Python (FastAPI/Django), JS/TS (React/Next.js), Rust (Axum), and Go (Gin)
-faf auto
+# Detects Python, JS/TS, Rust, Go, Ruby, and PHP manifests
+bunx faf-cli auto
 ```
 
 ### 3. Add to Gemini CLI
@@ -193,14 +198,14 @@ Your `.faf` file is scored on completeness — how many slots are filled with re
 ## Architecture
 
 ```
-gemini-faf-mcp v2.1.0
-├── server.py              → FastMCP MCP server (12 tools)
+gemini-faf-mcp v2.2.0
+├── server.py              → FastMCP MCP server (12 tools, Mk4 scoring)
 ├── main.py                → Cloud Run REST API (GET/POST/PUT)
 ├── models.py              → 15 project type examples
 └── src/gemini_faf_mcp/    → Python SDK (FAFClient, parser)
 ```
 
-The MCP server delegates to `faf-python-sdk` for parsing, validation, and discovery. Stack detection in `faf_auto` is Python-native — no external CLI dependencies.
+The MCP server delegates to `faf-python-sdk` for parsing, validation, and Mk4 scoring. Stack detection in `faf_auto` is Python-native — no external CLI dependencies.
 
 ---
 
@@ -211,7 +216,7 @@ pip install -e ".[dev]"
 python -m pytest tests/ -v
 ```
 
-183 tests passing across 9 WJTTC tiers (126 MCP server + 57 Cloud Function). Championship-grade test coverage — [WJTTC certified](https://github.com/Wolfe-Jam/WJTTC).
+221 tests passing across 9 WJTTC tiers (125 MCP server + 55 Cloud Function + 41 Mk4 WJTTC championship). Championship-grade test coverage — [WJTTC certified](https://github.com/Wolfe-Jam/WJTTC).
 
 ---
 
@@ -263,6 +268,10 @@ Supports agent-optimized responses (Gemini, Claude, Grok, Jules, Codex/Copilot/C
 
 ---
 
+If `gemini-faf-mcp` has been useful, consider starring the repo — it helps others find it.
+
+---
+
 ## Links
 
 - [FAF Specification](https://faf.one)
@@ -278,3 +287,15 @@ MIT
 ---
 
 Built by [@wolfe_jam](https://x.com/wolfe_jam) | [wolfejam.dev](https://wolfejam.dev)
+
+---
+
+### Get the CLI
+
+> **faf-cli** — The original AI-Context CLI. A must-have for every builder.
+
+```bash
+npx faf-cli auto
+```
+
+**Anthropic MCP [#2759](https://github.com/modelcontextprotocol/servers/pull/2759)** · **IANA Registered:** `application/vnd.faf+yaml` · [faf.one](https://faf.one) · [npm](https://www.npmjs.com/package/faf-cli)
