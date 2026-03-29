@@ -223,7 +223,7 @@ class TestTier2Engine:
     async def test_validate_returns_tier(self, client, full_faf):
         result = await client.call_tool("faf_validate", {"path": full_faf})
         data = _parse(result)
-        valid_tiers = {"\U0001f3c6", "\U0001f947", "\U0001f948", "\U0001f949", "\U0001f7e2", "\U0001f7e1", "\U0001f534"}
+        valid_tiers = {"TROPHY", "GOLD", "SILVER", "BRONZE", "GREEN", "YELLOW", "RED", "WHITE"}
         assert data["tier"] in valid_tiers
 
     async def test_validate_returns_lists(self, client, full_faf):
@@ -354,12 +354,12 @@ class TestTier3Aero:
     async def test_score_missing_returns_zero(self, client):
         data = _parse(await client.call_tool("faf_score", {"path": "/nonexistent.faf"}))
         assert data["score"] == 0
-        assert data["tier"] == "\U0001f534"
+        assert data["tier"] == "WHITE"
 
     async def test_score_invalid_yaml(self, client, invalid_faf):
         data = _parse(await client.call_tool("faf_score", {"path": invalid_faf}))
         assert data["score"] == 0
-        assert data["tier"] == "\U0001f534"
+        assert data["tier"] == "WHITE"
 
     async def test_discover_empty_dir(self, client, empty_dir):
         data = _parse(await client.call_tool("faf_discover", {"start_dir": empty_dir}))
@@ -413,55 +413,55 @@ class TestTier4Scoring:
     """Mk4 tier calculation must be mathematically correct."""
 
     def test_tier_100_is_trophy(self):
-        assert _score_to_tier(100) == "\U0001f3c6"
+        assert _score_to_tier(100) == "TROPHY"
 
     def test_tier_99_is_gold(self):
-        assert _score_to_tier(99) == "\U0001f947"
+        assert _score_to_tier(99) == "GOLD"
 
     def test_tier_95_is_silver(self):
-        assert _score_to_tier(95) == "\U0001f948"
+        assert _score_to_tier(95) == "SILVER"
 
     def test_tier_85_is_bronze(self):
-        assert _score_to_tier(85) == "\U0001f949"
+        assert _score_to_tier(85) == "BRONZE"
 
     def test_tier_70_is_green(self):
-        assert _score_to_tier(70) == "\U0001f7e2"
+        assert _score_to_tier(70) == "GREEN"
 
     def test_tier_55_is_yellow(self):
-        assert _score_to_tier(55) == "\U0001f7e1"
+        assert _score_to_tier(55) == "YELLOW"
 
-    def test_tier_0_is_red(self):
-        assert _score_to_tier(0) == "\U0001f534"
+    def test_tier_0_is_white(self):
+        assert _score_to_tier(0) == "WHITE"
 
-    def test_tier_negative_is_red(self):
-        assert _score_to_tier(-1) == "\U0001f534"
+    def test_tier_negative_is_white(self):
+        assert _score_to_tier(-1) == "WHITE"
 
     def test_tier_boundary_99_not_trophy(self):
         """99 is Gold, not Trophy — Trophy requires exactly 100."""
-        assert _score_to_tier(99) != "\U0001f3c6"
+        assert _score_to_tier(99) != "TROPHY"
 
     def test_tier_boundary_95_not_gold(self):
-        assert _score_to_tier(95) != "\U0001f947"
+        assert _score_to_tier(95) != "GOLD"
 
     def test_tier_boundary_85_not_silver(self):
-        assert _score_to_tier(85) != "\U0001f948"
+        assert _score_to_tier(85) != "SILVER"
 
     def test_tier_boundary_70_not_bronze(self):
-        assert _score_to_tier(70) != "\U0001f949"
+        assert _score_to_tier(70) != "BRONZE"
 
     def test_tier_boundary_55_not_green(self):
-        assert _score_to_tier(55) != "\U0001f7e2"
+        assert _score_to_tier(55) != "GREEN"
 
     def test_tier_boundary_54_is_red(self):
         """54 is below Yellow threshold — drops to Red."""
-        assert _score_to_tier(54) == "\U0001f534"
+        assert _score_to_tier(54) == "RED"
 
     def test_score_and_validate_tier_agree(self, full_faf):
         """faf_score uses Mk4 engine which produces valid tiers."""
         from faf_sdk import score_faf
         content = open(full_faf).read()
         mk4 = score_faf(content)
-        valid_tiers = {"\U0001f3c6", "\U0001f947", "\U0001f948", "\U0001f949", "\U0001f7e2", "\U0001f7e1", "\U0001f534"}
+        valid_tiers = {"TROPHY", "GOLD", "SILVER", "BRONZE", "GREEN", "YELLOW", "RED", "WHITE"}
         assert mk4.tier in valid_tiers
 
     async def test_minimal_faf_scores_lower(self, client, tmp_path):

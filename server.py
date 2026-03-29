@@ -91,9 +91,9 @@ def faf_score(path: str = "project.faf") -> dict:
             "total": mk4.total,
         }
     except FileNotFoundError:
-        return {"score": 0, "tier": "\U0001f534", "error": f"File not found: {path}"}
+        return {"score": 0, "tier": "WHITE", "error": f"File not found: {path}"}
     except Exception as e:
-        return {"score": 0, "tier": "\U0001f534", "error": str(e)}
+        return {"score": 0, "tier": "WHITE", "error": str(e)}
 
 
 @mcp.tool()
@@ -643,7 +643,7 @@ state:
             tier = mk4.tier
         except Exception:
             score = 0
-            tier = "\U0001f534"
+            tier = "RED"
 
         lang = detected.get("main_language", "unknown")
         fw = detected.get("framework")

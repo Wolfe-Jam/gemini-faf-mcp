@@ -159,7 +159,7 @@ class TestWJTTCTier1Brake:
     async def test_faf_score_trophy_is_100(self, client, trophy_faf):
         data = _parse(await client.call_tool("faf_score", {"path": trophy_faf}))
         assert data["score"] == 100
-        assert data["tier"] == "\U0001f3c6"
+        assert data["tier"] == "TROPHY"
         assert data["populated"] == 21
         assert data["active"] == 21
         assert data["total"] == 21
@@ -190,7 +190,7 @@ class TestWJTTCTier1Brake:
     async def test_mk4_score_file_helper_works(self, trophy_faf):
         result = _mk4_score_file(trophy_faf)
         assert result.score == 100
-        assert result.tier == "\U0001f3c6"
+        assert result.tier == "TROPHY"
 
 
 # ===================================================================
@@ -204,7 +204,7 @@ class TestWJTTCTier2Engine:
     async def test_faf_context_has_mk4_score(self, client, trophy_faf):
         data = _parse(await client.call_tool("faf_context", {"path": trophy_faf}))
         assert data["context"]["score"] == 100
-        assert data["context"]["tier"] == "\U0001f3c6"
+        assert data["context"]["tier"] == "TROPHY"
 
     async def test_faf_gemini_has_mk4_score(self, client, trophy_faf):
         data = _parse(await client.call_tool("faf_gemini", {"path": trophy_faf}))
@@ -458,8 +458,7 @@ class TestWJTTCTier6Contract:
 
     async def test_all_tier_emojis_valid(self):
         """Every possible tier must be a known emoji."""
-        valid = {"\U0001f3c6", "\U0001f947", "\U0001f948", "\U0001f949",
-                 "\U0001f7e2", "\U0001f7e1", "\U0001f534"}
+        valid = {"TROPHY", "GOLD", "SILVER", "BRONZE", "GREEN", "YELLOW", "RED", "WHITE"}
         for score in range(101):
             tier = _score_to_tier(score)
             assert tier in valid, f"Score {score} produced invalid tier: {tier}"
