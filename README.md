@@ -168,13 +168,13 @@ Your `.faf` file is scored on completeness — how many slots are filled with re
 | Score | Tier | Meaning |
 |-------|------|---------|
 | 100% | TROPHY | AI has full context for your project |
-| 99% | 🥇 Gold | Exceptional |
-| 95% | 🥈 Silver | Top tier |
-| 85% | 🥉 Bronze | Production ready — AI can work confidently |
-| 70% | 🟢 Green | Solid foundation |
-| 55% | 🟡 Yellow | Needs improvement |
-| <55% | 🔴 Red | Major gaps — AI will guess |
-| 0% | ⚪ White | Empty |
+| 99% | GOLD | Exceptional |
+| 95% | SILVER | Top tier |
+| 85% | BRONZE | Minimum recommended — AI can work from here |
+| 70% | GREEN | Solid foundation |
+| 55% | YELLOW | Needs improvement |
+| <55% | RED | Major gaps — AI will guess |
+| 0% | WHITE | Empty |
 
 **Aim for Bronze (85%+).** That's where AI stops guessing and starts knowing.
 
