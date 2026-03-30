@@ -170,7 +170,7 @@ Your `.faf` file is scored on completeness — how many slots are filled with re
 | 100% | TROPHY | AI has full context for your project |
 | 99% | GOLD | Exceptional |
 | 95% | SILVER | Top tier |
-| 85% | BRONZE | Minimum recommended — AI can work from here |
+| 85% | BRONZE | Minimum recommended — AI can build from here |
 | 70% | GREEN | Solid foundation |
 | 55% | YELLOW | Needs improvement |
 | <55% | RED | Major gaps — AI will guess |
