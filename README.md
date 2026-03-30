@@ -167,7 +167,7 @@ Your `.faf` file is scored on completeness — how many slots are filled with re
 
 | Score | Tier | Meaning |
 |-------|------|---------|
-| 100% | TROPHY | Perfect — AI is fully optimized for your project |
+| 100% | TROPHY | AI is fully optimized for your project |
 | 99% | 🥇 Gold | Exceptional |
 | 95% | 🥈 Silver | Top tier |
 | 85% | 🥉 Bronze | Production ready — AI can work confidently |
