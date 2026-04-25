@@ -90,7 +90,7 @@ Trusted Publisher (OIDC) — tag + GitHub Release triggers `pypi.yml` workflow. 
 - Python 3.10+ (FastMCP minimum)
 ---
 
-**STATUS: BI-SYNC ACTIVE 🔗 - Synchronized with .faf context!**
+**STATUS: BI-SYNC ACTIVE - Synchronized with .faf context!**
 
 *Last Sync: 2026-03-08T21:48:02.000Z*
 *Sync Engine: F1-Inspired Software Engineering*

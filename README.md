@@ -1,6 +1,6 @@
-# gemini-faf-mcp 🧬
+# gemini-faf-mcp
 
-> **Unify your AI project context.** One file to define them all. 
+> **Unify your AI project context.** One file to define them all.
 > Bridges `CLAUDE.md`, `GEMINI.md`, `AGENTS.md`, and `GROK.md` into a single, IANA-registered source of truth.
 
 
@@ -17,7 +17,7 @@
 
 ### Stop re-explaining your project to every new AI session.
 
-Gemini, Claude, and OpenAI all have different ways of "learning" your project. FAF (Foundational AI-context Format) unifies them into one machine-readable `.faf` file. 
+Gemini, Claude, and OpenAI all have different ways of "learning" your project. FAF (Foundational AI-context Format) unifies them into one machine-readable `.faf` file.
 
 **Result:** Zero context drift. Zero-minute onboarding. 100% project alignment.
 
@@ -31,7 +31,7 @@ Gemini, Claude, and OpenAI all have different ways of "learning" your project. F
 
 ---
 
-## 🚀 One-Minute Setup
+## One-Minute Setup
 
 ### 1. Install
 
@@ -56,7 +56,7 @@ gemini extensions install https://github.com/Wolfe-Jam/gemini-faf-mcp
 
 ---
 
-## 💎 The "One-File" Advantage
+## The "One-File" Advantage
 
 A `.faf` file is structured YAML that captures your project DNA. Every AI agent reads it once and knows exactly what you're building.
 
