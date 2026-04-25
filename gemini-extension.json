@@ -1,7 +1,7 @@
 {
   "name": "gemini-faf-mcp",
   "version": "2.2.0",
-  "description": "Project DNA for AI. Install, run /gemini-faf-mcp:setup, get instant project context.",
+  "description": "Persistent project context for Gemini. Run /gemini-faf-mcp:setup after install.",
   "mcpServers": {
     "faf": {
       "command": "${extensionPath}/run.sh",
