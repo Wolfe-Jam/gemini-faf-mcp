@@ -5,10 +5,10 @@ faf_version: 2.5.2
 last_sync: 2026-03-08 07:34:52.974000+00:00
 ---
 
-# Gemini Project DNA (gemini-faf-mcp)
+# Persistent project context for Google Gemini (gemini-faf-mcp)
 
 ## Project: gemini-faf-mcp
-- **Goal:** MCP server for FAF — read, validate, auto-detect, score, and export IANA-registered .faf project DNA from Gemini CLI
+- **Goal:** MCP server for FAF — read, validate, auto-detect, score, and export IANA-registered .faf persistent project context from Gemini CLI
 - **Language:** Python
 - **Score:** 100% (Trophy)
 

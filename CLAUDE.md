@@ -47,7 +47,7 @@ gemini-faf-mcp v2.1.1
 | `pyproject.toml` | Package config, deps, version |
 | `gemini-extension.json` | Gemini Extensions Gallery manifest |
 | `GEMINI.md` | Gemini AI context |
-| `project.faf` | Project DNA |
+| `project.faf` | Persistent project context |
 | `src/gemini_faf_mcp/` | PyPI SDK (FAFClient, parser) |
 
 ## Commands
