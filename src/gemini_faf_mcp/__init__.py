@@ -1,8 +1,8 @@
 """
-gemini-faf-mcp - Universal Context Landing Pad for FAF
+gemini-faf-mcp — Persistent project context for Google Gemini
 
 The "Source of Truth" for FAF (Foundational AI-context Format)
-integration with Google Gemini.
+in the Google Gemini ecosystem.
 
 Part of the FAF ecosystem:
 - claude-faf-mcp (#2759) - Anthropic
@@ -22,7 +22,7 @@ Glory Wall:
     https://faf-landing.vercel.app/glory.html
 """
 
-__version__ = "2.2.0"
+__version__ = "2.2.1"
 __author__ = "wolfejam"
 
 from .client import FAFClient

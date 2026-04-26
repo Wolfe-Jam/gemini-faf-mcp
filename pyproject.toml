@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "gemini-faf-mcp"
-version = "2.2.0"
+version = "2.2.1"
 authors = [
   { name="wolfejam", email="james@wolfejam.dev" },
 ]
@@ -50,6 +50,9 @@ dev = [
     "pytest>=7.0.0",
     "pytest-cov>=4.0.0",
     "pytest-asyncio>=0.21.0",
+    "mypy>=1.10",
+    "types-PyYAML",
+    "types-requests",
 ]
 
 [tool.setuptools]

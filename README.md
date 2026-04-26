@@ -1,8 +1,8 @@
 # gemini-faf-mcp
 
-> **Unify your AI project context.** One file to define them all.
-> Bridges `CLAUDE.md`, `GEMINI.md`, `AGENTS.md`, and `GROK.md` into a single, IANA-registered source of truth.
+**Stop re-explaining your project to every new Gemini session.**
 
+Every Gemini conversation starts cold. You re-state your stack, your goals, your conventions — every single time. `.faf` is one structured file that captures all of it. This package is the MCP server that lets Gemini read it.
 
 <!-- mcp-name: io.github.Wolfe-Jam/gemini-faf-mcp -->
 
@@ -11,23 +11,27 @@
 [![Tests](https://img.shields.io/badge/Tests-221%20passing-brightgreen?style=for-the-badge)](https://github.com/Wolfe-Jam/gemini-faf-mcp)
 [![IANA](https://img.shields.io/badge/IANA-registered-informational?style=for-the-badge)](https://www.iana.org/assignments/media-types/application/vnd.faf+yaml)
 
+### Before and after
+
+```
+Without FAF                           With FAF (.faf at 85%+ Bronze)
+─────────────────────────             ─────────────────────────
+You: "I'm using FastAPI with...       You: "Add a /users/me endpoint"
+      PostgreSQL, pytest, and..."     Gemini: [generates correct code,
+Gemini: "Got it. What's the              uses your auth pattern,
+        codebase like?"                  matches your test style]
+You: "It's a REST API for..."
+[5 minutes of re-explaining]
+Gemini: [now ready to help]
+```
+
+`.faf` is read once at session start. Every tool call lands on a Gemini that already knows your project.
+
 ### What's New in v2.2.0
 
 **Mk4 Championship Scoring Engine** — all 12 tools now use the same scoring algorithm as the Rust compiler and TypeScript CLI. `faf_score` and `faf_validate` return slot-level detail (`populated`, `active`, `total`). Scores match across every FAF tool in every language. 221 tests, 41 new WJTTC championship tests. Dead code removed (`sync_faf.py`).
 
-### Stop re-explaining your project to every new AI session.
-
-Gemini, Claude, and OpenAI all have different ways of "learning" your project. FAF (Foundational AI-context Format) unifies them into one machine-readable `.faf` file.
-
-**Result:** Zero context drift. Zero-minute onboarding. 100% project alignment.
-
-| Feature | `CLAUDE.md` | `GEMINI.md` | `AGENTS.md` | `GROK.md` | **`project.faf`** |
-|---------|-------------|-------------|-------------|-----------|-------------------|
-| **Format** | Markdown | Markdown | Markdown | Markdown | **Structured YAML** |
-| **Schema** | Custom | Custom | Custom | Custom | **IANA Standard** |
-| **Scoring** | No | No | No | No | **Yes (0-100%)** |
-| **Auto-Detect** | No | No | No | No | **Yes (153+ files)** |
-| **Vendor Neutral**| No | No | No | No | **Yes** |
+> **v2.2.1** is a patch release — package description aligned with the canonical "Persistent project context for Google Gemini" wording across PyPI, the Gemini Extensions Gallery, and the MCP Registry. No code changes.
 
 ---
 
@@ -39,20 +43,23 @@ Gemini, Claude, and OpenAI all have different ways of "learning" your project. F
 pip install gemini-faf-mcp
 ```
 
-### 2. Auto-Detect & Initialize
-
-Scan your existing project and create your DNA in seconds (Zero install):
-
-```bash
-# Detects Python, JS/TS, Rust, Go, Ruby, and PHP manifests
-bunx faf-cli auto
-```
-
-### 3. Add to Gemini CLI
+### 2. Add to Gemini CLI
 
 ```bash
 gemini extensions install https://github.com/Wolfe-Jam/gemini-faf-mcp
 ```
+
+### 3. Generate your project context
+
+In your Gemini CLI:
+
+```
+> /gemini-faf-mcp:setup
+```
+
+You should see: `Created project.faf — Score: 85% (BRONZE)`. From this point, every Gemini session in this project reads it automatically.
+
+> **Tip:** A score of 85% (BRONZE) is the minimum where Gemini stops guessing. Run `/gemini-faf-mcp:score` to see what's missing and how to push to 100% (TROPHY).
 
 ---
 
@@ -78,6 +85,19 @@ human_context:
 ```
 
 **Result:** Gemini reads this once and knows your project. No 20-minute onboarding. No wrong assumptions. Every session starts aligned.
+
+> **FAF defines. MD instructs. AI codes.**
+
+### What about my `GEMINI.md`?
+
+You don't replace it. `.faf` **generates** it. Run `faf_gemini` and you get a fresh `GEMINI.md` with the structured project data baked in as YAML frontmatter — the same `GEMINI.md` Gemini CLI already reads, but generated from a single source of truth instead of hand-maintained.
+
+```bash
+> /gemini-faf-mcp:export
+# Generates GEMINI.md from project.faf
+```
+
+`.faf` is the source. `GEMINI.md` is one of its outputs. Same logic for `AGENTS.md` (OpenAI Codex), `.cursorrules`, `CLAUDE.md`, and others — write once, render everywhere.
 
 ---
 
@@ -198,7 +218,7 @@ Your `.faf` file is scored on completeness — how many slots are filled with re
 ## Architecture
 
 ```
-gemini-faf-mcp v2.2.0
+gemini-faf-mcp v2.2.1
 ├── server.py              → FastMCP MCP server (12 tools, Mk4 scoring)
 ├── main.py                → Cloud Run REST API (GET/POST/PUT)
 ├── models.py              → 15 project type examples

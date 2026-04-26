@@ -3,6 +3,18 @@
 All notable changes to gemini-faf-mcp are documented here.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
+## [2.2.1] - 2026-04-26
+
+### Changed
+- Package description aligned with the canonical "Persistent project context for Google Gemini" framing on PyPI catalog, GitHub repo metadata, `gemini-extension.json` (Gemini Extensions Gallery), and `server.json` (MCP Registry).
+- `server.json` version corrected from 2.1.2 to 2.2.1 to track the published PyPI version going forward.
+
+### Added
+- `[dev]` extras now include `mypy>=1.10`, `types-PyYAML`, and `types-requests` so type checking runs clean out-of-the-box (zero stub-missing warnings).
+
+### Notes
+No runtime code changes. Patch release to surface the description alignment in the PyPI catalog (the catalog only updates on a new publish) and tighten dev tooling.
+
 ## [2.2.0] - 2026-03-29
 
 ### Added
@@ -18,8 +30,8 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 - `TIERS` list and `_get_tier()` helper — tier now comes from Mk4Result
 
 ### Changed
-- Tiers now return emoji (`🏆`, `🥇`, `🥈`, `🥉`, `🟢`, `🟡`, `🔴`) instead of strings
-- `faf_score` error responses return `🔴` instead of `"White"`
+- Tier names normalized to uppercase (`TROPHY`, `GOLD`, `SILVER`, `BRONZE`, `GREEN`, `YELLOW`, `RED`) — returned as plain strings from `faf_score` and `faf_validate`
+- `faf_score` error responses return `RED` for unscorable inputs
 - 221 total tests (was 183)
 
 ---

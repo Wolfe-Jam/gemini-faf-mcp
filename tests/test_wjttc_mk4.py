@@ -1,5 +1,5 @@
 """
-WJTTC Championship Test Suite: gemini-faf-mcp v2.2.0 — Mk4 Integration
+WJTTC Championship Test Suite: gemini-faf-mcp v2.2.1 — Mk4 Integration
 ========================================================================
 When brakes must work flawlessly, so must our MCP server.
 
@@ -185,7 +185,7 @@ class TestWJTTCTier1Brake:
 
     async def test_server_version_is_2_2_0(self, client):
         data = _parse(await client.call_tool("faf_about", {}))
-        assert data["server_version"] == "2.2.0"
+        assert data["server_version"] == "2.2.1"
 
     async def test_mk4_score_file_helper_works(self, trophy_faf):
         result = _mk4_score_file(trophy_faf)
