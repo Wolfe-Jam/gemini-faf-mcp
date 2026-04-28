@@ -8,7 +8,7 @@ version = "2.2.1"
 authors = [
   { name="wolfejam", email="james@wolfejam.dev" },
 ]
-description = "Persistent project context for Google Gemini — FAF MCP server. Unifies CLAUDE.md, GEMINI.md, and AGENTS.md into one IANA-registered format."
+description = "Persistent Project Context for Google Gemini. IANA-registered .faf format, MCP server + Cloud Run REST API, unifies CLAUDE.md, GEMINI.md, AGENTS.md."
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "MIT"}

@@ -1,8 +1,10 @@
 # gemini-faf-mcp
 
-**Stop re-explaining your project to every new Gemini session.**
+**Persistent Project Context for Google Gemini. Define once. Sync everywhere.**
 
-Every Gemini conversation starts cold. You re-state your stack, your goals, your conventions — every single time. `.faf` is one structured file that captures all of it. This package is the MCP server that lets Gemini read it.
+**FAF defines. MD instructs. AI codes.**
+
+Stop re-explaining your project to every new Gemini session. Every Gemini conversation starts cold — you re-state your stack, your goals, your conventions every single time. `.faf` is one structured file that captures all of it. This package is the MCP server that lets Gemini read it.
 
 <!-- mcp-name: io.github.Wolfe-Jam/gemini-faf-mcp -->
 
