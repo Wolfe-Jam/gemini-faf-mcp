@@ -1,3 +1,6 @@
+<!-- faf: gemini-faf-mcp | Python | mcp-server | FAF MCP server for Google Gemini — persistent project context via PyPI -->
+<!-- faf: doc=readme | canonical=project.faf | score=100 | family=FAF -->
+
 # gemini-faf-mcp
 
 **Persistent Project Context for Google Gemini. Define once. Sync everywhere.**

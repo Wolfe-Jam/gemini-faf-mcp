@@ -1,3 +1,6 @@
+<!-- faf: gemini-faf-mcp | Python | mcp-server | FAF MCP server for Google Gemini — persistent project context via PyPI -->
+<!-- faf: claim=project.faf | score=100 | family=FAF | siblings=README.md,CHANGELOG.md,server.json -->
+
 # CLAUDE.md — gemini-faf-mcp
 
 ## Project

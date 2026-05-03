@@ -1,3 +1,6 @@
+<!-- faf: gemini-faf-mcp | Python | mcp-server | FAF MCP server for Google Gemini — persistent project context via PyPI -->
+<!-- faf: doc=contributing | canonical=project.faf | family=FAF -->
+
 # Welcome to the Terrace
 
 > We build in public because context shouldn't be a black box.
