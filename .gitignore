@@ -29,3 +29,7 @@ dist/
 # Testing & Benchmarks (added by repo-maintainer)
 .pytest_cache/
 .benchmarks/
+
+# FAF auto-generated artifacts
+.faf-dna
+.well-known/
