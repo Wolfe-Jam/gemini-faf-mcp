@@ -11,6 +11,7 @@ Stop re-explaining your project to every new Gemini session. Every Gemini conver
 
 <!-- mcp-name: io.github.Wolfe-Jam/gemini-faf-mcp -->
 
+[![FAF](https://mcpaas.live/badge/Wolfe-Jam/gemini-faf-mcp.svg)](https://builder.faf.one)
 [![PyPI](https://img.shields.io/pypi/v/gemini-faf-mcp?style=for-the-badge&logo=pypi&logoColor=white)](https://pypi.org/project/gemini-faf-mcp/)
 [![Downloads](https://img.shields.io/pypi/dm/gemini-faf-mcp?style=for-the-badge&color=blue)](https://pypi.org/project/gemini-faf-mcp/)
 [![Tests](https://img.shields.io/badge/Tests-221%20passing-brightgreen?style=for-the-badge)](https://github.com/Wolfe-Jam/gemini-faf-mcp)
