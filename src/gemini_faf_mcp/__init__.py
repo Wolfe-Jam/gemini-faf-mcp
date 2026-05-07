@@ -19,10 +19,10 @@ Live Endpoint:
     https://faf-source-of-truth-631316210911.us-east1.run.app
 
 Glory Wall:
-    https://faf-landing.vercel.app/glory.html
+    https://faf.one/glory
 """
 
-__version__ = "2.2.1"
+__version__ = "2.2.2"
 __author__ = "wolfejam"
 
 from .client import FAFClient

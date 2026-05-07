@@ -1,10 +1,15 @@
 <!-- faf: gemini-faf-mcp | Python | mcp-server | FAF MCP server for Google Gemini — persistent project context via PyPI -->
-<!-- faf: doc=changelog | latest=v2.2.1 | canonical=project.faf | family=FAF -->
+<!-- faf: doc=changelog | latest=v2.2.2 | canonical=project.faf | family=FAF -->
 
 # Changelog
 
 All notable changes to gemini-faf-mcp are documented here.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
+
+## [2.2.2] - 2026-05-07
+
+### Changed
+- **Glory Wall URL** in module docstring: `faf-landing.vercel.app/glory.html` → `faf.one/glory`. The Glory Wall has been rehomed to the canonical brand domain (Cloudflare-hosted SvelteKit at faf.one). Cards on the new home are now clickable to each project's GitHub. The old Vercel-hosted `faf-landing` slot is being retired.
 
 ## [2.2.1] - 2026-04-26
 
