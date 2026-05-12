@@ -1,10 +1,23 @@
 <!-- faf: gemini-faf-mcp | Python | mcp-server | FAF MCP server for Google Gemini — persistent project context via PyPI -->
-<!-- faf: doc=changelog | latest=v2.2.2 | canonical=project.faf | family=FAF -->
+<!-- faf: doc=changelog | latest=v2.2.5 | canonical=project.faf | family=FAF -->
 
 # Changelog
 
 All notable changes to gemini-faf-mcp are documented here.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
+
+## [2.2.5] - 2026-05-12
+
+### Fixed
+- **Version-string sync across three source locations.** Prior 2.2.x line had `__version__ = "2.2.1"` hardcoded in `server.py` while `pyproject.toml` advanced independently — installed users would see "version 2.2.2" in PyPI but a running server banner reading "2.2.1." Now all three locations (pyproject.toml, src/gemini_faf_mcp/client.py, server.py) bump together.
+- `tests/test_wjttc_mk4.py` no longer hardcodes the version assertion — it reads `__version__` from `client.py` so the version-drift bug class fails the test suite at build time instead of materializing post-publish.
+
+### Changed
+- Publish pipeline: TestPyPI staging is now mandatory via OIDC Trusted Publisher. `git push origin v*` fires `.github/workflows/testpypi.yml` → uploads to test.pypi.org. Production publish via `gh release create` → `.github/workflows/pypi.yml`. No tokens used in either stage.
+
+### Notes
+- 2.2.3 + 2.2.4 are burned on TestPyPI (test artifacts from the staging-gate setup arc on 2026-05-11). They never shipped to production PyPI. 2.2.5 is the first production release after the discipline rebuild.
+- Structural cleanup — moving `server.py`, `models.py`, `main.py` from repo root into `src/gemini_faf_mcp/` to stop polluting downstream users' global site-packages — deferred to v2.3.0.
 
 ## [2.2.2] - 2026-05-07
 

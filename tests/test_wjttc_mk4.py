@@ -183,9 +183,14 @@ class TestWJTTCTier1Brake:
         assert score_data["score"] == validate_data["score"]
         assert score_data["tier"] == validate_data["tier"]
 
-    async def test_server_version_is_2_2_0(self, client):
+    async def test_server_version_is_current(self, client):
+        """Server reports the current __version__ (sourced from client.py)."""
+        from gemini_faf_mcp.client import __version__ as expected_version
         data = _parse(await client.call_tool("faf_about", {}))
-        assert data["server_version"] == "2.2.1"
+        assert data["server_version"] == expected_version, (
+            f"server_version drift: tool reports {data['server_version']!r}, "
+            f"client.__version__ is {expected_version!r}. Version sync broken."
+        )
 
     async def test_mk4_score_file_helper_works(self, trophy_faf):
         result = _mk4_score_file(trophy_faf)
