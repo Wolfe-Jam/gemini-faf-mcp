@@ -1,0 +1,45 @@
+name: Publish to TestPyPI
+
+# Fires on every version tag push (e.g. `git push origin v0.1.5`).
+# Stage 1 of the publish flow: stage to TestPyPI for verification BEFORE
+# creating a GitHub Release (which then fires pypi.yml for production).
+#
+# Flow:
+#   1. git tag v0.1.5 && git push origin v0.1.5     → this workflow runs
+#   2. verify install from TestPyPI                  → manual / via verify_install.py
+#   3. gh release create v0.1.5                     → triggers pypi.yml (production)
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:  # Manual trigger
+
+jobs:
+  publish-testpypi:
+    name: Publish to TestPyPI
+    runs-on: ubuntu-latest
+    environment: testpypi
+    permissions:
+      id-token: write  # Required for OIDC trusted publishing
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Install build tools
+        run: pip install build
+
+      - name: Build package
+        run: python -m build
+
+      - name: Publish to TestPyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
+        # No token — uses OIDC trusted publisher configured at
+        # https://test.pypi.org/manage/project/gemini-faf-mcp/settings/publishing/
