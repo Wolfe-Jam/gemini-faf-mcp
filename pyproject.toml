@@ -27,7 +27,7 @@ classifiers = [
 ]
 keywords = ["faf", "mcp", "gemini", "ai-context", "model-context-protocol", "fastmcp", "claudemd", "geminimd", "agentsmd", "ai-agents", "context-management"]
 dependencies = [
-    "fastmcp>=3.0.0",
+    "fastmcp>=3.4.0",
     "faf-python-sdk>=1.1.0",
     "functions-framework>=3.0.0",
     "google-cloud-bigquery>=3.0.0",

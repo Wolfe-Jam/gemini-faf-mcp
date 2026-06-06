@@ -674,4 +674,12 @@ state:
 
 
 if __name__ == "__main__":
-    mcp.run()
+    # Published `uvx gemini-faf-mcp` keeps running stdio (unchanged).
+    # When PORT is set (Cloud Run) or MCP_TRANSPORT=http, serve modern
+    # Streamable HTTP instead — same tools, just a hosted transport.
+    _port = os.environ.get("PORT")
+    _transport = os.environ.get("MCP_TRANSPORT", "http" if _port else "stdio")
+    if _transport == "stdio":
+        mcp.run()
+    else:
+        mcp.run(transport=_transport, host="0.0.0.0", port=int(_port or 8080))
