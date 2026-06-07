@@ -1,10 +1,18 @@
 <!-- faf: gemini-faf-mcp | Python | mcp-server | FAF MCP server for Google Gemini — persistent project context via PyPI -->
-<!-- faf: doc=changelog | latest=v2.3.0 | canonical=project.faf | family=FAF -->
+<!-- faf: doc=changelog | latest=v2.4.0 | canonical=project.faf | family=FAF -->
 
 # Changelog
 
 All notable changes to gemini-faf-mcp are documented here.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
+
+## [2.4.0] - 2026-06-07
+
+### Added
+- **Unified dual-transport entry point.** One command — `gemini-faf-mcp` (or `uvx gemini-faf-mcp`) — auto-selects its transport: **stdio** locally (the CLI / MCP-client path) and **Streamable HTTP** on Cloud Run (when `PORT` is set, or `MCP_TRANSPORT=http`). Same binary, same 12 tools, zero config. The console script and `python server.py` now share one `main()` entry, so both paths behave identically.
+
+### Fixed
+- **stdio handshake compatibility with standard MCP SDK clients.** The console entry now passes `transport="stdio"` explicitly instead of relying on FastMCP's default (entry point `server:mcp.run` → `server:main`). A strict MCP SDK stdio client that previously hung mid-handshake against the implicit-default entry now connects cleanly (initialize + tools/list + tools/call). Also future-proofs against any change to FastMCP's default transport — `uvx` users can never be silently flipped off stdio.
 
 ## [2.3.0] - 2026-06-07
 

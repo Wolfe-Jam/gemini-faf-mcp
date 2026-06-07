@@ -1,5 +1,5 @@
 """
-gemini-faf-mcp v2.3.0 — FastMCP Server
+gemini-faf-mcp v2.4.0 — FastMCP Server
 
 Native MCP server for FAF (Foundational AI-context Format).
 Powered by faf-python-sdk with Mk4 Championship Scoring Engine.
@@ -16,7 +16,7 @@ from models import get_model, list_models
 import os
 from pathlib import Path
 
-__version__ = "2.3.0"
+__version__ = "2.4.0"
 
 mcp = FastMCP(
     "gemini-faf-mcp",
@@ -673,13 +673,27 @@ state:
         return {"success": False, "error": str(e)}
 
 
-if __name__ == "__main__":
-    # Published `uvx gemini-faf-mcp` keeps running stdio (unchanged).
-    # When PORT is set (Cloud Run) or MCP_TRANSPORT=http, serve modern
-    # Streamable HTTP instead — same tools, just a hosted transport.
+def main() -> None:
+    """Single entry for both the console script (`gemini-faf-mcp`, via
+    pyproject [project.scripts]) and `python server.py`.
+
+    Transports are passed EXPLICITLY — never rely on FastMCP's default. The
+    console script previously pointed at `server:mcp.run`, which left the
+    transport to FastMCP's default; a future FastMCP changing that default
+    would silently flip `uvx gemini-faf-mcp` users off stdio and break every
+    MCP client. Being explicit makes the contract bulletproof.
+
+    Default = stdio (the `uvx`/CLI path). When PORT is set (Cloud Run) or
+    MCP_TRANSPORT=http, serve modern Streamable HTTP instead — same tools,
+    just a hosted transport.
+    """
     _port = os.environ.get("PORT")
     _transport = os.environ.get("MCP_TRANSPORT", "http" if _port else "stdio")
     if _transport == "stdio":
-        mcp.run()
+        mcp.run(transport="stdio")
     else:
         mcp.run(transport=_transport, host="0.0.0.0", port=int(_port or 8080))
+
+
+if __name__ == "__main__":
+    main()

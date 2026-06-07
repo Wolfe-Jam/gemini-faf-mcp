@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "gemini-faf-mcp"
-version = "2.3.0"
+version = "2.4.0"
 authors = [
   { name="wolfejam", email="james@wolfejam.dev" },
 ]
@@ -37,7 +37,7 @@ dependencies = [
 ]
 
 [project.scripts]
-gemini-faf-mcp = "server:mcp.run"
+gemini-faf-mcp = "server:main"
 
 [project.urls]
 "Homepage" = "https://github.com/Wolfe-Jam/gemini-faf-mcp"
