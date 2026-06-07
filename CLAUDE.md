@@ -1,100 +1,40 @@
-<!-- faf: gemini-faf-mcp | Python | mcp-server | FAF MCP server for Google Gemini — persistent project context via PyPI -->
-<!-- faf: claim=project.faf | score=100 | family=FAF | siblings=README.md,CHANGELOG.md,server.json -->
+<!-- faf: gemini-faf-mcp | Python | mcp-server | MCP server for FAF — read, validate, auto-detect, score, and export IANA-registered .faf project DNA from Gemini CLI -->
+<!-- faf: claim=project.faf | family=FAF -->
 
 # CLAUDE.md — gemini-faf-mcp
 
-## Project
-- **Name:** gemini-faf-mcp
-- **Version:** 2.1.1
-- **Purpose:** MCP server + Cloud Run API for FAF (Foundational AI-context Format)
-- **Stack:** Python 3.10+ / FastMCP / faf-python-sdk / Cloud Run
-- **Tests:** 183/183 passing (126 MCP server + 57 Cloud Function)
-- **Registry:** PyPI
-- **Format:** IANA `application/vnd.faf+yaml`
+## What This Is
 
-## Architecture
+MCP server for FAF — read, validate, auto-detect, score, and export IANA-registered .faf project DNA from Gemini CLI
 
-```
-gemini-faf-mcp v2.1.1
-├── server.py              → FastMCP MCP server (12 tools)
-├── main.py                → Cloud Run REST API (GET/POST/PUT)
-├── src/gemini_faf_mcp/    → Python SDK (FAFClient, parser)
-└── tests/
-    ├── test_fastmcp_server.py  → 126 tests (WJTTC 9-tier)
-    └── test_gemini_faf_mcp.py  → 57 tests (7 tiers + integration)
-```
+## Stack
 
-## MCP Tools (12)
+- **Language:** Python
+- **Backend:** Python
+- **Main Language:** Python
+- **Runtime:** Python 3.10+
+- **Package Manager:** pip
+- **Build:** setuptools
+- **Database:** BigQuery
+- **Api Type:** MCP (stdio) + HTTP/REST
+- **Connection:** MCP (stdio) + HTTP/REST
+- **Testing:** pytest + WJTTC 9-tier championship suite
+- **Hosting:** Google Cloud Run
+- **Cicd:** GitHub Actions
+- **Target User:** developers
+- **Core Problem:** AI tools lack structured project context
+- **Mission Purpose:** Give any AI structured project context via IANA-registered .faf files
+- **Frameworks:** FastMCP,faf-python-sdk,functions-framework
 
-| Tool | Source |
-|------|--------|
-| `faf_read` | `faf_sdk.parse_file()` |
-| `faf_validate` | `faf_sdk.validate()` |
-| `faf_score` | `faf_sdk.validate()` |
-| `faf_discover` | `faf_sdk.find_faf_file()` |
-| `faf_init` | Custom |
-| `faf_auto` | Custom (stack detection) |
-| `faf_stringify` | `faf_sdk.stringify()` |
-| `faf_context` | Custom |
-| `faf_gemini` | Custom |
-| `faf_agents` | Custom |
-| `faf_about` | Static |
-| `faf_model` | `models.py` (15 project types) |
+## Context
 
-## Key Files
+- **Who:** Gemini CLI developers who want instant project context
+- **What:** MCP server that reads, validates, scores, and exports .faf project DNA
+- **Why:** Eliminate re-explaining your project every Gemini session
+- **Where:** Gemini CLI via Extensions Gallery, local MCP server
+- **When:** Every coding session — context loads automatically via GEMINI.md
+- **How:** Install extension, run /gemini-faf-mcp:setup, project DNA flows to Gemini
 
-| File | Purpose |
-|------|---------|
-| `server.py` | FastMCP MCP server (entry point) |
-| `main.py` | Cloud Run REST API |
-| `pyproject.toml` | Package config, deps, version |
-| `gemini-extension.json` | Gemini Extensions Gallery manifest |
-| `GEMINI.md` | Gemini AI context |
-| `project.faf` | Persistent project context |
-| `src/gemini_faf_mcp/` | PyPI SDK (FAFClient, parser) |
-
-## Commands
-
-```bash
-# MCP server
-python server.py
-
-# Tests
-pip install -e ".[dev]"
-python -m pytest tests/ -v
-
-# Build
-python -m build
-twine check dist/*
-
-# MCP Inspector
-npx @modelcontextprotocol/inspector --command python3 server.py
-```
-
-## Ecosystem
-
-| Package | Platform | Registry |
-|---------|----------|----------|
-| claude-faf-mcp | Anthropic | npm + MCP #2759 |
-| **gemini-faf-mcp** | **Google** | **PyPI** |
-| grok-faf-mcp | xAI | npm |
-| rust-faf-mcp | Rust | crates.io |
-| faf-cli | Universal | npm |
-
-## Publish
-
-Trusted Publisher (OIDC) — tag + GitHub Release triggers `pypi.yml` workflow. No tokens.
-
-## Notes
-
-- `faf-python-sdk` handles all parsing/validation — server.py delegates
-- Cloud Run API stays for badges, multi-agent handshake, voice-to-FAF
-- Version tests read from pyproject.toml dynamically
-- Python 3.10+ (FastMCP minimum)
 ---
 
-**STATUS: BI-SYNC ACTIVE - Synchronized with .faf context!**
-
-*Last Sync: 2026-03-08T21:48:02.000Z*
-*Sync Engine: F1-Inspired Software Engineering*
-*🏎️⚡️_championship_sync*
+*STATUS: BI-SYNC ACTIVE — 2026-06-07T16:12:30.365Z*

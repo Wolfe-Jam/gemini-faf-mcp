@@ -1,10 +1,25 @@
 <!-- faf: gemini-faf-mcp | Python | mcp-server | FAF MCP server for Google Gemini — persistent project context via PyPI -->
-<!-- faf: doc=changelog | latest=v2.2.5 | canonical=project.faf | family=FAF -->
+<!-- faf: doc=changelog | latest=v2.3.0 | canonical=project.faf | family=FAF -->
 
 # Changelog
 
 All notable changes to gemini-faf-mcp are documented here.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
+
+## [2.3.0] - 2026-06-07
+
+### Added
+- **Streamable HTTP transport for Cloud Run.** When `PORT` is set (or `MCP_TRANSPORT=http`), `server.py` now serves modern **Streamable HTTP** — stateless + JSON (`FASTMCP_STATELESS_HTTP` / `FASTMCP_JSON_RESPONSE`), no SSE, no session handshake. The mcpaas.live RC edge fronts this as a tool executor, forwarding `tools/list` + `tools/call` as plain JSON-RPC POSTs. The same dual-transport pattern every FAF MCP can adopt.
+- Dockerfile updated for the Cloud Run / Streamable-HTTP path (`MCP_TRANSPORT=http`, stateless+JSON env, `EXPOSE 8080`).
+- FAF Trophy badge + `v#` repo badge in README/docs (ecosystem badge rollout).
+
+### Changed
+- **Off deprecated SSE onto the current transport.** `uvx gemini-faf-mcp` / `pip install` stay **stdio — unchanged**; only the hosted path moves. Zero regression for CLI users (the hard gate).
+- FastMCP floor raised to `>=3.4.0`; dev-dep `mypy` to `>=1.20.2`.
+
+### Verified
+- stdio regression: 221/221 tests green under fastmcp 3.4.0.
+- HTTP local + Docker container + **staging Cloud Run (Linux)**: all 12 tools execute over Streamable HTTP.
 
 ## [2.2.5] - 2026-05-12
 
