@@ -12,11 +12,12 @@ Stop re-explaining your project to every new Gemini session. Every Gemini conver
 <!-- mcp-name: io.github.Wolfe-Jam/gemini-faf-mcp -->
 
 [![FAF Trophy 100%](https://img.shields.io/badge/FAF-%F0%9F%8F%86%20100%25-000000?labelColor=FF6B35)](https://faf.one)
-[![FAF](https://mcpaas.live/badge/Wolfe-Jam/gemini-faf-mcp.svg)](https://builder.faf.one)
 [![PyPI](https://img.shields.io/pypi/v/gemini-faf-mcp?style=for-the-badge&logo=pypi&logoColor=white)](https://pypi.org/project/gemini-faf-mcp/)
-[![Downloads](https://img.shields.io/pypi/dm/gemini-faf-mcp?style=for-the-badge&color=blue)](https://pypi.org/project/gemini-faf-mcp/)
 [![Tests](https://img.shields.io/badge/Tests-221%20passing-brightgreen?style=for-the-badge)](https://github.com/Wolfe-Jam/gemini-faf-mcp)
-[![IANA](https://img.shields.io/badge/IANA-registered-informational?style=for-the-badge)](https://www.iana.org/assignments/media-types/application/vnd.faf+yaml)
+[![IANA: vnd.faf+yaml](https://img.shields.io/badge/IANA-vnd.faf%2Byaml-00D4D4?style=for-the-badge)](https://www.iana.org/assignments/media-types/application/vnd.faf+yaml)
+[![IANA: vnd.fafm+yaml](https://img.shields.io/badge/IANA-vnd.fafm%2Byaml-00D4D4?style=for-the-badge)](https://www.iana.org/assignments/media-types/application/vnd.fafm+yaml)
+[![DOI: Context paper](https://img.shields.io/badge/DOI-Context%20paper-FF6B35?style=for-the-badge)](https://doi.org/10.5281/zenodo.18251362)
+[![DOI: Memory paper](https://img.shields.io/badge/DOI-Memory%20paper-FF6B35?style=for-the-badge)](https://doi.org/10.5281/zenodo.20348942)
 
 ### Before and after
 
