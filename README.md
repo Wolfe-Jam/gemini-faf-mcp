@@ -34,11 +34,11 @@ Gemini: [now ready to help]
 
 `.faf` is read once at session start. Every tool call lands on a Gemini that already knows your project.
 
-### What's New in v2.2.0
+### What's New in v2.4.0 — The Chameleon Edition
 
-**Mk4 Championship Scoring Engine** — all 12 tools now use the same scoring algorithm as the Rust compiler and TypeScript CLI. `faf_score` and `faf_validate` return slot-level detail (`populated`, `active`, `total`). Scores match across every FAF tool in every language. 221 tests, 41 new WJTTC championship tests. Dead code removed (`sync_faf.py`).
+**One command, both modes.** `gemini-faf-mcp` auto-selects its transport: **stdio** locally, **Streamable HTTP** on Cloud Run. Same binary, 12 tools, zero config — and a clean stdio handshake for every MCP client. One binary that's a local MCP server and a hosted one, decided by its environment.
 
-> **v2.2.1** is a patch release — package description aligned with the canonical "Persistent project context for Google Gemini" wording across PyPI, the Gemini Extensions Gallery, and the MCP Registry. No code changes.
+> **v2.3.0** moved the hosted path off deprecated SSE onto Streamable HTTP (stateless + JSON) for Cloud Run. **v2.2.0** brought the Mk4 Championship Scoring Engine — all 12 tools share the same scoring algorithm as the Rust compiler and TypeScript CLI (slot-level `populated`/`active`/`total`); 221 tests.
 
 ---
 
@@ -225,8 +225,8 @@ Your `.faf` file is scored on completeness — how many slots are filled with re
 ## Architecture
 
 ```
-gemini-faf-mcp v2.2.1
-├── server.py              → FastMCP MCP server (12 tools, Mk4 scoring)
+gemini-faf-mcp v2.4.0
+├── server.py              → FastMCP MCP server (12 tools, dual-transport, Mk4 scoring)
 ├── main.py                → Cloud Run REST API (GET/POST/PUT)
 ├── models.py              → 15 project type examples
 └── src/gemini_faf_mcp/    → Python SDK (FAFClient, parser)

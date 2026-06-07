@@ -6,7 +6,9 @@
 All notable changes to gemini-faf-mcp are documented here.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
-## [2.4.0] - 2026-06-07
+## [2.4.0] - 2026-06-07 — The Chameleon Edition
+
+**One command, both modes.** gemini-faf-mcp now auto-selects its transport: **stdio** locally, **Streamable HTTP** on Cloud Run. Same binary, 12 tools, zero config — and a clean stdio handshake for every MCP client. One binary that's a local MCP server and a hosted one, decided by its environment.
 
 ### Added
 - **Unified dual-transport entry point.** One command — `gemini-faf-mcp` (or `uvx gemini-faf-mcp`) — auto-selects its transport: **stdio** locally (the CLI / MCP-client path) and **Streamable HTTP** on Cloud Run (when `PORT` is set, or `MCP_TRANSPORT=http`). Same binary, same 12 tools, zero config. The console script and `python server.py` now share one `main()` entry, so both paths behave identically.
