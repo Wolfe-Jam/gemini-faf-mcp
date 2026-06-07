@@ -62,12 +62,12 @@ gemini extensions install https://github.com/Wolfe-Jam/gemini-faf-mcp
 In your Gemini CLI:
 
 ```
-> /gemini-faf-mcp:setup
+> /faf:setup
 ```
 
 You should see: `Created project.faf — Score: 85% (BRONZE)`. From this point, every Gemini session in this project reads it automatically.
 
-> **Tip:** A score of 85% (BRONZE) is the minimum where Gemini stops guessing. Run `/gemini-faf-mcp:score` to see what's missing and how to push to 100% (TROPHY).
+> **Tip:** A score of 85% (BRONZE) is the minimum where Gemini stops guessing. Run `/faf:score` to see what's missing and how to push to 100% (TROPHY).
 
 ---
 
@@ -101,7 +101,7 @@ human_context:
 You don't replace it. `.faf` **generates** it. Run `faf_gemini` and you get a fresh `GEMINI.md` with the structured project data baked in as YAML frontmatter — the same `GEMINI.md` Gemini CLI already reads, but generated from a single source of truth instead of hand-maintained.
 
 ```bash
-> /gemini-faf-mcp:export
+> /faf:export
 # Generates GEMINI.md from project.faf
 ```
 

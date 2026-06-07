@@ -1,11 +1,12 @@
 {
   "name": "gemini-faf-mcp",
   "version": "2.4.1",
-  "description": "Persistent project context for Gemini. Run /gemini-faf-mcp:setup after install.",
+  "description": "IANA-registered .faf project context for Gemini, with a deterministic AI-readiness score. Read, validate, score, and sync one source across GEMINI.md / CLAUDE.md / AGENTS.md. Run /faf:setup after install.",
   "mcpServers": {
     "faf": {
-      "command": "${extensionPath}/run.sh",
-      "args": []
+      "command": "uvx",
+      "args": ["gemini-faf-mcp"],
+      "timeout": 30000
     }
   },
   "contextFileName": "GEMINI.md"
