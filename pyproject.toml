@@ -50,7 +50,7 @@ dev = [
     "pytest>=7.0.0",
     "pytest-cov>=4.0.0",
     "pytest-asyncio>=0.21.0",
-    "mypy>=1.10",
+    "mypy>=1.20.2",
     "types-PyYAML",
     "types-requests",
 ]
