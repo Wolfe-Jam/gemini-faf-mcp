@@ -1,6 +1,6 @@
 {
   "name": "gemini-faf-mcp",
-  "version": "2.4.0",
+  "version": "2.4.1",
   "description": "Persistent project context for Gemini. Run /gemini-faf-mcp:setup after install.",
   "mcpServers": {
     "faf": {

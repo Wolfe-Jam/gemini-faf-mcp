@@ -1,10 +1,15 @@
 <!-- faf: gemini-faf-mcp | Python | mcp-server | FAF MCP server for Google Gemini — persistent project context via PyPI -->
-<!-- faf: doc=changelog | latest=v2.4.0 | canonical=project.faf | family=FAF -->
+<!-- faf: doc=changelog | latest=v2.4.1 | canonical=project.faf | family=FAF -->
 
 # Changelog
 
 All notable changes to gemini-faf-mcp are documented here.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
+
+## [2.4.1] - 2026-06-07
+
+### Docs
+- README badges cleaned up (refreshes the README rendered on PyPI — no code changes): removed the duplicate FAF trophy badge (kept the 🏆 100%) and the rate-limited PyPI downloads badge; added both IANA media types (`vnd.faf+yaml`, `vnd.fafm+yaml`) and both Zenodo paper DOIs (Context #18251362, Memory #20348942). docs/index.html mirror bumped + Chameleon Edition social-card thumbnail added. Still The Chameleon Edition.
 
 ## [2.4.0] - 2026-06-07 — The Chameleon Edition
 
