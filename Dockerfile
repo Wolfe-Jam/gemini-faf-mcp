@@ -2,11 +2,20 @@ FROM python:3.12-slim
 
 WORKDIR /app
 
-COPY pyproject.toml README.md ./
+# server.py + models.py ARE the MCP server (py-modules in pyproject.toml).
+# Copy them before install so `pip install .` packages them with their deps.
+COPY pyproject.toml README.md server.py models.py ./
 COPY src ./src
 
 RUN pip install --no-cache-dir .
 
-EXPOSE 3001
+# Cloud Run injects $PORT (8080); server.py reads it and serves Streamable HTTP.
+# Stateless + JSON responses: the mcpaas.live RC edge fronts this as the tool
+# executor, forwarding tools/list + tools/call as plain JSON-RPC POSTs — no
+# session handshake, no SSE. The edge owns the MCP protocol (2026-07-28).
+ENV MCP_TRANSPORT=http
+ENV FASTMCP_STATELESS_HTTP=true
+ENV FASTMCP_JSON_RESPONSE=true
+EXPOSE 8080
 
-CMD ["python", "-m", "gemini_faf_mcp", "--transport", "sse", "--port", "3001"]
+CMD ["python", "server.py"]
