@@ -41,6 +41,24 @@ jobs:
       - name: Validate server.json
         run: ./mcp-publisher validate
 
+      # GATE: server.json must match the release tag (release events only).
+      # Without this, a stale server.json publishes the OLD version under a new
+      # release — exactly what happened on v2.4.2 (2026-06-11): server.json
+      # lagged at 2.4.1, so the registry's latest became the version the GHSA
+      # had just disclosed, and the v2.4.3 run green-skipped via the
+      # idempotency check below. Fail loudly instead.
+      - name: Verify server.json version matches release tag
+        if: github.event_name == 'release'
+        run: |
+          set -euo pipefail
+          TAG="${GITHUB_REF_NAME#v}"
+          MANIFEST_VERSION=$(jq -r .version server.json)
+          if [ "$MANIFEST_VERSION" != "$TAG" ]; then
+            echo "::error::server.json version ($MANIFEST_VERSION) does not match release tag ($TAG). Bump server.json before tagging."
+            exit 1
+          fi
+          echo "✓ server.json v$MANIFEST_VERSION matches release tag v$TAG"
+
       - name: Check if this version is already published (idempotent)
         id: ver
         run: |
