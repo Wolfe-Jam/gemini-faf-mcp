@@ -4,7 +4,7 @@ WORKDIR /app
 
 # server.py + models.py + safe_path.py ARE the MCP server (py-modules in
 # pyproject.toml). Copy them before install so `pip install .` packages them.
-COPY pyproject.toml README.md server.py models.py safe_path.py ./
+COPY pyproject.toml README.md server.py models.py safe_path.py inject.py ./
 COPY src ./src
 
 RUN pip install --no-cache-dir .
