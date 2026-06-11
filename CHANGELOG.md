@@ -1,12 +1,12 @@
 <!-- faf: gemini-faf-mcp | Python | mcp-server | FAF MCP server for Google Gemini — persistent project context via PyPI -->
-<!-- faf: doc=changelog | latest=v2.4.2 | canonical=project.faf | family=FAF -->
+<!-- faf: doc=changelog | latest=v2.4.3 | canonical=project.faf | family=FAF -->
 
 # Changelog
 
 All notable changes to gemini-faf-mcp are documented here.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
-## [Unreleased]
+## [2.4.3] - 2026-06-11
 
 **`faf_agents` and `faf_gemini` now enhance your files.** The same solid, structured `.faf` data is prefixed to the top of AGENTS.md / GEMINI.md for rapid AI consumption upfront — and your Markdown stays in the instruction lane.
 

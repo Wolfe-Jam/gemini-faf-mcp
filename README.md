@@ -35,11 +35,11 @@ Gemini: [now ready to help]
 
 `.faf` is read once at session start. Every tool call lands on a Gemini that already knows your project.
 
-### What's New in v2.4.2 — The Confinement Edition
+### What's New in v2.4.3
 
-**Security release.** Caller-supplied `path` arguments are now confined: read tools open only `.faf` / `.fafm` context files, and `faf_init` writes only inside the project root (override with `FAF_ALLOWED_ROOTS`). Closes a path-traversal / arbitrary local-file read — and an arbitrary file write via `faf_init`. Reported via coordinated disclosure. See the [CHANGELOG](CHANGELOG.md#242---2026-06-11--the-confinement-edition).
+**`faf_agents` and `faf_gemini` now enhance your files.** The structured `.faf` block is prefixed to the top of AGENTS.md / GEMINI.md for instant AI context, and your Markdown stays in the instruction lane. Re-runs update the block in place — everything you've written below is preserved.
 
-> **v2.4.0 — The Chameleon Edition:** one command, both modes — `gemini-faf-mcp` auto-selects its transport: **stdio** locally, **Streamable HTTP** on Cloud Run. Same binary, 12 tools, zero config. **v2.3.0** moved the hosted path off deprecated SSE onto Streamable HTTP (stateless + JSON) for Cloud Run.
+> **v2.4.2 — The Confinement Edition** confined every caller `path` argument (security: reads restricted to `.faf`/`.fafm`, writes to the project root — closes an arbitrary local-file read + `faf_init` write). **v2.4.0 — The Chameleon Edition** auto-selects its transport: **stdio** locally, **Streamable HTTP** on Cloud Run. Same binary, 12 tools, zero config.
 
 ---
 

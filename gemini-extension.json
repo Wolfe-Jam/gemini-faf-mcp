@@ -1,6 +1,6 @@
 {
   "name": "gemini-faf-mcp",
-  "version": "2.4.2",
+  "version": "2.4.3",
   "description": "IANA-registered .faf project context for Gemini, with a deterministic AI-readiness score. Read, validate, score, and sync one source across GEMINI.md / CLAUDE.md / AGENTS.md. Run /faf:setup after install.",
   "mcpServers": {
     "faf": {
