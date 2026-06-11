@@ -6,6 +6,14 @@
 All notable changes to gemini-faf-mcp are documented here.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
+## [Unreleased]
+
+**`faf_agents` and `faf_gemini` now enhance your files.** The same solid, structured `.faf` data is prefixed to the top of AGENTS.md / GEMINI.md for rapid AI consumption upfront — and your Markdown stays in the instruction lane.
+
+### Changed
+
+- **Non-destructive export.** `faf_agents` and `faf_gemini` now write AGENTS.md / GEMINI.md by injecting a structured `.faf` block and preserving everything you've written below. Re-runs update the block in place (idempotent); existing faf-generated files upgrade cleanly in one pass.
+
 ## [2.4.2] - 2026-06-11 — The Confinement Edition
 
 **Security release.** Caller-supplied `path` arguments are now confined: read tools open only `.faf` / `.fafm` context files, and `faf_init` writes only inside the project root (override with `FAF_ALLOWED_ROOTS`). Closes a path-traversal / arbitrary local-file read — and an arbitrary file write via `faf_init`.
