@@ -56,7 +56,7 @@ dev = [
 ]
 
 [tool.setuptools]
-py-modules = ["server", "models"]
+py-modules = ["server", "models", "safe_path"]
 packages = ["gemini_faf_mcp"]
 package-dir = {"gemini_faf_mcp" = "src/gemini_faf_mcp"}
 

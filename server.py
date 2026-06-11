@@ -13,10 +13,29 @@ from fastmcp import FastMCP
 from faf_sdk import parse_file, parse, validate, find_faf_file, stringify, score_faf
 from faf_sdk.parser import FafParseError
 from models import get_model, list_models
+from safe_path import confine_path, confine_file_op, PathConfinementError
+import functools
 import os
 from pathlib import Path
 
 __version__ = "2.4.1"
+
+
+def _confined(fn):
+    """Wrap a tool so a path-confinement violation returns a clean error dict
+    instead of leaking a file or raising (CWE-22/73/200)."""
+    @functools.wraps(fn)
+    def wrapper(*args, **kwargs):
+        try:
+            return fn(*args, **kwargs)
+        except PathConfinementError as e:
+            return {"success": False, "error": f"Security error: {e}"}
+    return wrapper
+
+
+def _parse_faf(path: str):
+    """Confine a caller path to a .faf/.fafm context file, then parse it."""
+    return parse_file(str(confine_path(path)))
 
 mcp = FastMCP(
     "gemini-faf-mcp",
@@ -28,8 +47,10 @@ mcp = FastMCP(
 
 
 def _mk4_score_file(path: str):
-    """Read a .faf file and return Mk4Result."""
-    content = Path(path).read_text()
+    """Read a .faf file and return Mk4Result. Path is confined to a .faf/.fafm
+    context file (raises PathConfinementError otherwise)."""
+    safe = confine_path(path)
+    content = Path(safe).read_text()
     return score_faf(content)
 
 
@@ -37,12 +58,13 @@ def _mk4_score_file(path: str):
 
 
 @mcp.tool()
+@_confined
 def faf_read(path: str = "project.faf") -> dict:
     """Read project DNA from a .faf file. Returns the full parsed structure
     including project info, stack, preferences, and scoring data.
     Use this as the first step to understand any FAF-enabled project."""
     try:
-        faf = parse_file(path)
+        faf = _parse_faf(path)
         return {"success": True, "path": path, "data": faf.raw}
     except FileNotFoundError:
         return {"success": False, "error": f"File not found: {path}"}
@@ -51,12 +73,13 @@ def faf_read(path: str = "project.faf") -> dict:
 
 
 @mcp.tool()
+@_confined
 def faf_validate(path: str = "project.faf") -> dict:
     """Validate a .faf file and return score, tier, and issues.
     Returns errors (must fix) and warnings (should fix) with specific messages.
     Use after faf_init or when checking if a .faf file meets quality standards."""
     try:
-        faf = parse_file(path)
+        faf = _parse_faf(path)
         result = validate(faf)
         mk4 = _mk4_score_file(path)
         return {
@@ -77,6 +100,7 @@ def faf_validate(path: str = "project.faf") -> dict:
 
 
 @mcp.tool()
+@_confined
 def faf_score(path: str = "project.faf") -> dict:
     """Quick Mk4 score check — returns score (0-100%), tier, and slot counts.
     Uses the Mk4 Championship 21-slot scoring engine for universal parity.
@@ -108,6 +132,7 @@ def faf_discover(start_dir: str = ".") -> dict:
 
 
 @mcp.tool()
+@_confined
 def faf_init(
     name: str = "my-project",
     goal: str = "",
@@ -116,8 +141,12 @@ def faf_init(
 ) -> dict:
     """Create a starter .faf file with project name, goal, and language.
     Generates a valid FAF YAML file with all required sections.
-    Will not overwrite an existing file — use faf_discover first to check."""
-    if os.path.exists(path):
+    Will not overwrite an existing file — use faf_discover first to check.
+    The path is confined to the project root (cwd / FAF_ALLOWED_ROOTS)."""
+    # Confine the write target — no arbitrary file write outside the project
+    # (e.g. overwriting ~/.bashrc). CWE-22.
+    safe = confine_file_op(path)
+    if safe.exists():
         return {"success": False, "error": f"File already exists: {path}"}
 
     content = f"""faf_version: '2.5.0'
@@ -145,17 +174,18 @@ state:
   version: 0.1.0
   status: active
 """
-    Path(path).write_text(content)
-    return {"success": True, "path": os.path.abspath(path), "message": f"Created {path} — edit to match your project"}
+    safe.write_text(content)
+    return {"success": True, "path": str(safe), "message": f"Created {path} — edit to match your project"}
 
 
 @mcp.tool()
+@_confined
 def faf_stringify(path: str = "project.faf") -> dict:
     """Convert parsed FAF data back to YAML string.
     Useful for displaying the raw .faf content or preparing it for editing.
     Reads the file, parses it, then re-serializes to clean YAML."""
     try:
-        faf = parse_file(path)
+        faf = _parse_faf(path)
         yaml_str = stringify(faf)
         return {"success": True, "yaml": yaml_str}
     except FileNotFoundError:
@@ -165,12 +195,13 @@ def faf_stringify(path: str = "project.faf") -> dict:
 
 
 @mcp.tool()
+@_confined
 def faf_context(path: str = "project.faf") -> dict:
     """Get Gemini-optimized context from a .faf file.
     Returns the key sections an AI needs: project info, stack, instructions, and score.
     Use this to quickly understand a project without reading the full .faf structure."""
     try:
-        faf = parse_file(path)
+        faf = _parse_faf(path)
         data = faf.data
         mk4 = _mk4_score_file(path)
 
@@ -221,12 +252,13 @@ def faf_context(path: str = "project.faf") -> dict:
 
 
 @mcp.tool()
+@_confined
 def faf_gemini(path: str = "project.faf") -> dict:
     """Export GEMINI.md content from a .faf file.
     Generates a Markdown file with YAML frontmatter optimized for Gemini CLI.
     The output should be written to GEMINI.md in the project root for auto-loading."""
     try:
-        faf = parse_file(path)
+        faf = _parse_faf(path)
         data = faf.data
         mk4 = _mk4_score_file(path)
         score = mk4.score
@@ -261,12 +293,13 @@ Media Type: application/vnd.faf+yaml (IANA registered)
 
 
 @mcp.tool()
+@_confined
 def faf_agents(path: str = "project.faf") -> dict:
     """Export AGENTS.md content from a .faf file.
     Generates a universal agent context file compatible with OpenAI Codex, Cursor, and other AI tools.
     Write the output to AGENTS.md in the project root."""
     try:
-        faf = parse_file(path)
+        faf = _parse_faf(path)
         data = faf.data
         mk4 = _mk4_score_file(path)
 
@@ -552,6 +585,7 @@ def _detect_stack(directory: str) -> dict:
 
 
 @mcp.tool()
+@_confined
 def faf_auto(directory: str = ".", path: str = "project.faf") -> dict:
     """Auto-detect project stack and generate/update a .faf file.
     Scans for package.json, pyproject.toml, Cargo.toml, go.mod, and other

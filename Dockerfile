@@ -2,9 +2,9 @@ FROM python:3.12-slim
 
 WORKDIR /app
 
-# server.py + models.py ARE the MCP server (py-modules in pyproject.toml).
-# Copy them before install so `pip install .` packages them with their deps.
-COPY pyproject.toml README.md server.py models.py ./
+# server.py + models.py + safe_path.py ARE the MCP server (py-modules in
+# pyproject.toml). Copy them before install so `pip install .` packages them.
+COPY pyproject.toml README.md server.py models.py safe_path.py ./
 COPY src ./src
 
 RUN pip install --no-cache-dir .
