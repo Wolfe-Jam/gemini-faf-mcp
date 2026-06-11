@@ -1,10 +1,21 @@
 <!-- faf: gemini-faf-mcp | Python | mcp-server | FAF MCP server for Google Gemini — persistent project context via PyPI -->
-<!-- faf: doc=changelog | latest=v2.4.1 | canonical=project.faf | family=FAF -->
+<!-- faf: doc=changelog | latest=v2.4.2 | canonical=project.faf | family=FAF -->
 
 # Changelog
 
 All notable changes to gemini-faf-mcp are documented here.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
+
+## [2.4.2] - 2026-06-11 — The Confinement Edition
+
+**Security release.** Caller-supplied `path` arguments are now confined: read tools open only `.faf` / `.fafm` context files, and `faf_init` writes only inside the project root (override with `FAF_ALLOWED_ROOTS`). Closes a path-traversal / arbitrary local-file read — and an arbitrary file write via `faf_init`.
+
+### Security
+- **Path confinement on every `path` argument (CWE-22 / CWE-73 / CWE-200).** `faf_read`, `faf_validate`, `faf_score`, `faf_stringify`, `faf_context`, `faf_gemini`, and `faf_agents` previously passed a caller path straight into `Path(path).read_text()` with no confinement, and `faf_init` into `Path(path).write_text()` — so an absolute path or `../` traversal could read any file the server uid could read (e.g. `/etc/passwd`, `/proc/self/environ`, `~/.ssh/id_rsa`) or write outside the project. New `safe_path.py` confines reads to `.faf`/`.fafm` files and writes to the project root (cwd + system temp; override via `FAF_ALLOWED_ROOTS`), canonicalizes through symlinks (closing the symlink bypass), and rejects traversal/absolute escapes. Reported via coordinated disclosure; full credit in the security advisory.
+
+### Tests
+- Added `tests/test_security_path_confinement.py` — reproduces the disclosed vectors (incl. symlink bypass and arbitrary write) as a permanent regression.
+- Fixed a stale Gallery manifest test (`test_manifest_uses_uvx`) to track the intentional `run.sh` → `uvx` migration (2f6d7d8).
 
 ## [2.4.1] - 2026-06-07
 

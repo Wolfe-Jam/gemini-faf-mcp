@@ -35,11 +35,11 @@ Gemini: [now ready to help]
 
 `.faf` is read once at session start. Every tool call lands on a Gemini that already knows your project.
 
-### What's New in v2.4.0 — The Chameleon Edition
+### What's New in v2.4.2 — The Confinement Edition
 
-**One command, both modes.** `gemini-faf-mcp` auto-selects its transport: **stdio** locally, **Streamable HTTP** on Cloud Run. Same binary, 12 tools, zero config — and a clean stdio handshake for every MCP client. One binary that's a local MCP server and a hosted one, decided by its environment.
+**Security release.** Caller-supplied `path` arguments are now confined: read tools open only `.faf` / `.fafm` context files, and `faf_init` writes only inside the project root (override with `FAF_ALLOWED_ROOTS`). Closes a path-traversal / arbitrary local-file read — and an arbitrary file write via `faf_init`. Reported via coordinated disclosure. See the [CHANGELOG](CHANGELOG.md#242---2026-06-11--the-confinement-edition).
 
-> **v2.3.0** moved the hosted path off deprecated SSE onto Streamable HTTP (stateless + JSON) for Cloud Run. **v2.2.0** brought the Mk4 Championship Scoring Engine — all 12 tools share the same scoring algorithm as the Rust compiler and TypeScript CLI (slot-level `populated`/`active`/`total`); 221 tests.
+> **v2.4.0 — The Chameleon Edition:** one command, both modes — `gemini-faf-mcp` auto-selects its transport: **stdio** locally, **Streamable HTTP** on Cloud Run. Same binary, 12 tools, zero config. **v2.3.0** moved the hosted path off deprecated SSE onto Streamable HTTP (stateless + JSON) for Cloud Run.
 
 ---
 
@@ -226,8 +226,9 @@ Your `.faf` file is scored on completeness — how many slots are filled with re
 ## Architecture
 
 ```
-gemini-faf-mcp v2.4.0
+gemini-faf-mcp v2.4.2
 ├── server.py              → FastMCP MCP server (12 tools, dual-transport, Mk4 scoring)
+├── safe_path.py           → path confinement for caller-supplied `path` args
 ├── main.py                → Cloud Run REST API (GET/POST/PUT)
 ├── models.py              → 15 project type examples
 └── src/gemini_faf_mcp/    → Python SDK (FAFClient, parser)

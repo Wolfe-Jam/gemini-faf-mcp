@@ -999,10 +999,13 @@ class TestTier9Gallery:
         assert "mcpServers" in manifest
         assert "faf" in manifest["mcpServers"]
 
-    def test_manifest_uses_run_sh(self, manifest):
-        """Extension runs via run.sh bootstrap script."""
+    def test_manifest_uses_uvx(self, manifest):
+        """Extension runs via uvx (PyPI-distributed entry point).
+        Migrated from the run.sh bootstrap in 2f6d7d8 (uvx-based Gemini CLI
+        extension); this test tracks that intentional change."""
         server = manifest["mcpServers"]["faf"]
-        assert server["command"] == "${extensionPath}/run.sh"
+        assert server["command"] == "uvx"
+        assert server["args"] == ["gemini-faf-mcp"]
 
     def test_manifest_run_sh_exists(self):
         """run.sh exists at repo root."""
