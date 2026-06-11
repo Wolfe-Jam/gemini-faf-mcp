@@ -656,12 +656,41 @@ class TestTier7Contract:
         assert "tier" in data["context"]
 
     async def test_gemini_success_schema(self, client, full_faf):
+        # tool now writes GEMINI.md non-destructively and returns where + what
         data = _parse(await client.call_tool("faf_gemini", {"path": full_faf}))
-        assert set(data.keys()) == {"success", "content", "score", "tier"}
+        assert set(data.keys()) == {"success", "path", "content", "score", "tier", "message"}
 
     async def test_agents_success_schema(self, client, full_faf):
+        # tool now writes AGENTS.md non-destructively and returns where + what
         data = _parse(await client.call_tool("faf_agents", {"path": full_faf}))
-        assert set(data.keys()) == {"success", "content"}
+        assert set(data.keys()) == {"success", "path", "content", "message"}
+
+    async def test_agents_preserves_existing_content(self, client, full_faf):
+        # Regression (the wipe bug): faf_agents must ENHANCE an existing AGENTS.md, never replace it.
+        from pathlib import Path
+        d = Path(full_faf).parent
+        mark = "## HAND-WRITTEN — MUST SURVIVE"
+        (d / "AGENTS.md").write_text(f"# My File\n{mark}\nnotes\n")
+        await client.call_tool("faf_agents", {"path": full_faf})
+        out = (d / "AGENTS.md").read_text()
+        assert mark in out                            # user content preserved
+        assert out.count("<!-- faf:start -->") == 1   # exactly one faf block
+        # idempotent: re-running keeps one block and the user content
+        await client.call_tool("faf_agents", {"path": full_faf})
+        out2 = (d / "AGENTS.md").read_text()
+        assert mark in out2
+        assert out2.count("<!-- faf:start -->") == 1
+
+    async def test_gemini_preserves_existing_content(self, client, full_faf):
+        # Regression (the wipe bug): faf_gemini must ENHANCE an existing GEMINI.md, never replace it.
+        from pathlib import Path
+        d = Path(full_faf).parent
+        mark = "## HAND-WRITTEN — MUST SURVIVE"
+        (d / "GEMINI.md").write_text(f"# My File\n{mark}\nnotes\n")
+        await client.call_tool("faf_gemini", {"path": full_faf})
+        out = (d / "GEMINI.md").read_text()
+        assert mark in out
+        assert out.count("<!-- faf:start -->") == 1
 
     async def test_about_schema(self, client):
         data = _parse(await client.call_tool("faf_about", {}))

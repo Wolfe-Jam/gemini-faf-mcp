@@ -14,6 +14,7 @@ from faf_sdk import parse_file, parse, validate, find_faf_file, stringify, score
 from faf_sdk.parser import FafParseError
 from models import get_model, list_models
 from safe_path import confine_path, confine_file_op, PathConfinementError
+from inject import inject_faf_block
 import functools
 import os
 from pathlib import Path
@@ -254,9 +255,10 @@ def faf_context(path: str = "project.faf") -> dict:
 @mcp.tool()
 @_confined
 def faf_gemini(path: str = "project.faf") -> dict:
-    """Export GEMINI.md content from a .faf file.
-    Generates a Markdown file with YAML frontmatter optimized for Gemini CLI.
-    The output should be written to GEMINI.md in the project root for auto-loading."""
+    """Export and write GEMINI.md from a .faf file (non-destructive).
+    Generates Markdown with YAML frontmatter for Gemini CLI and injects it into
+    GEMINI.md as a faf-managed block, preserving any existing content. Re-running
+    updates the block in place — it never overwrites your file."""
     try:
         faf = _parse_faf(path)
         data = faf.data
@@ -285,7 +287,16 @@ faf_version: {data.faf_version}
 The .faf file is the single source of truth for project DNA.
 Media Type: application/vnd.faf+yaml (IANA registered)
 """
-        return {"success": True, "content": md, "score": score, "tier": tier}
+        target = confine_file_op(str(Path(path).parent / "GEMINI.md"))
+        inject_faf_block(target, md)
+        return {
+            "success": True,
+            "path": str(target),
+            "content": md,
+            "score": score,
+            "tier": tier,
+            "message": "GEMINI.md updated — faf block injected, existing content preserved",
+        }
     except FileNotFoundError:
         return {"success": False, "error": f"File not found: {path}"}
     except FafParseError as e:
@@ -295,9 +306,10 @@ Media Type: application/vnd.faf+yaml (IANA registered)
 @mcp.tool()
 @_confined
 def faf_agents(path: str = "project.faf") -> dict:
-    """Export AGENTS.md content from a .faf file.
-    Generates a universal agent context file compatible with OpenAI Codex, Cursor, and other AI tools.
-    Write the output to AGENTS.md in the project root."""
+    """Export and write AGENTS.md from a .faf file (non-destructive).
+    Generates a universal agent context file (OpenAI Codex, Cursor, etc.) and
+    injects it into AGENTS.md as a faf-managed block, preserving any existing
+    content. Re-running updates the block in place — it never overwrites your file."""
     try:
         faf = _parse_faf(path)
         data = faf.data
@@ -333,7 +345,14 @@ def faf_agents(path: str = "project.faf") -> dict:
 - **Database:** {data.stack.database or 'N/A'}
 - **Testing:** {data.stack.testing or 'N/A'}
 """
-        return {"success": True, "content": md}
+        target = confine_file_op(str(Path(path).parent / "AGENTS.md"))
+        inject_faf_block(target, md)
+        return {
+            "success": True,
+            "path": str(target),
+            "content": md,
+            "message": "AGENTS.md updated — faf block injected, existing content preserved",
+        }
     except FileNotFoundError:
         return {"success": False, "error": f"File not found: {path}"}
     except FafParseError as e:
