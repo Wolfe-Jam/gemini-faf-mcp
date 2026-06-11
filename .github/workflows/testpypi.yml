@@ -41,5 +41,6 @@ jobs:
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           repository-url: https://test.pypi.org/legacy/
+          skip-existing: true   # tag re-pushes (e.g. a doc fix) must not fail on an already-staged version
         # No token — uses OIDC trusted publisher configured at
         # https://test.pypi.org/manage/project/gemini-faf-mcp/settings/publishing/
