@@ -50,7 +50,8 @@ Detects Dart/Flutter from a `pubspec.yaml` — Flutter app vs package · Dart MC
 ### 1. Install
 
 ```bash
-pip install gemini-faf-mcp
+uvx gemini-faf-mcp          # zero-install run via uvx (fetched from PyPI)
+# or: pip3 install gemini-faf-mcp
 ```
 
 ### 2. Add to Gemini CLI
@@ -243,7 +244,7 @@ The MCP server delegates to `faf-python-sdk` for parsing, validation, and Mk4 sc
 ## Testing
 
 ```bash
-pip install -e ".[dev]"
+pip3 install -e ".[dev]"
 python -m pytest tests/ -v
 ```
 
