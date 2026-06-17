@@ -1,4 +1,3 @@
-<!-- faf:start -->
 <!-- faf: gemini-faf-mcp | Python | mcp-server | MCP server for FAF — read, validate, auto-detect, score, and export IANA-registered .faf project DNA from Gemini CLI -->
 <!-- faf: claim=project.faf | family=FAF -->
 
@@ -38,5 +37,4 @@ MCP server for FAF — read, validate, auto-detect, score, and export IANA-regis
 
 ---
 
-*STATUS: BI-SYNC ACTIVE — 2026-06-11T12:54:44.479Z*
-<!-- faf:end -->
+*STATUS: BI-SYNC ACTIVE — 2026-06-17T01:28:16.851Z*

@@ -1,5 +1,5 @@
 """
-gemini-faf-mcp v2.4.3 — FastMCP Server
+gemini-faf-mcp v2.5.0 — FastMCP Server
 
 Native MCP server for FAF (Foundational AI-context Format).
 Powered by faf-python-sdk with Mk4 Championship Scoring Engine.
@@ -10,7 +10,7 @@ Spec: https://faf.one
 """
 
 from fastmcp import FastMCP
-from faf_sdk import parse_file, parse, validate, find_faf_file, stringify, score_faf
+from faf_sdk import parse_file, parse, validate, find_faf_file, stringify, score_faf, detect_dart_project
 from faf_sdk.parser import FafParseError
 from models import get_model, list_models
 from safe_path import confine_path, confine_file_op, PathConfinementError
@@ -19,7 +19,16 @@ import functools
 import os
 from pathlib import Path
 
-__version__ = "2.4.3"
+__version__ = "2.5.0"
+
+# Stack framework buckets — which detected framework lands in which .faf slot.
+# Includes Dart/Flutter (Flutter = frontend/UI; Dart servers = backend) so the
+# SDK's Dart detection (faf_sdk.detect_dart_project) flows into the generated .faf.
+FRONTEND_FRAMEWORKS = ("React", "Vue", "Svelte", "Next.js", "Flutter")
+BACKEND_FRAMEWORKS = (
+    "FastAPI", "Flask", "Django", "Express", "FastMCP", "Axum", "Actix", "Gin", "Echo",
+    "Serverpod", "Dart Frog", "Shelf", "Conduit", "Angel3", "Alfred",
+)
 
 
 def _confined(fn):
@@ -439,8 +448,9 @@ def _detect_stack(directory: str) -> dict:
     has_gemfile = (dir_path / "Gemfile").is_file()
     has_composer = (dir_path / "composer.json").is_file()
     has_tsconfig = (dir_path / "tsconfig.json").is_file()
+    has_pubspec = (dir_path / "pubspec.yaml").is_file()
 
-    # Priority: pyproject.toml / Cargo.toml / go.mod > package.json
+    # Priority: pyproject.toml / Cargo.toml / go.mod / pubspec.yaml > package.json
     if has_pyproject:
         detected["main_language"] = "Python"
         try:
@@ -522,6 +532,23 @@ def _detect_stack(directory: str) -> dict:
         except Exception:
             pass
 
+    elif has_pubspec:
+        # Dart/Flutter — DELEGATE to the SDK detector (the shared Truth, A+B hybrid).
+        # NEVER fork pubspec parsing here: faf_sdk.detect_dart_project is the one brain
+        # (faf-cli src/detect/dart.ts <-> faf_sdk/detect.py, byte-identical spec, parity-tested).
+        detected["main_language"] = "Dart"
+        detected["package_manager"] = "pub"
+        dart = detect_dart_project(str(dir_path))
+        if dart:
+            if dart.framework:
+                detected["framework"] = dart.framework
+            if dart.testing:
+                detected["testing"] = dart.testing
+            if dart.app_type == "mcp":
+                detected["api_type"] = "MCP"
+            elif dart.app_type == "backend":
+                detected["api_type"] = "REST"
+
     elif has_package_json:
         detected["main_language"] = "TypeScript" if has_tsconfig else "JavaScript"
         detected["package_manager"] = "npm"
@@ -597,6 +624,20 @@ def _detect_stack(directory: str) -> dict:
             version_match = re.search(r'^version\s*=\s*"(.*)"', content, re.MULTILINE)
             if name_match: detected["name"] = name_match.group(1)
             if version_match: detected["version"] = version_match.group(1)
+        elif has_pubspec:
+            import re
+            content = (dir_path / "pubspec.yaml").read_text()
+            name_match = re.search(r'^name:\s*(.+)$', content, re.MULTILINE)
+            version_match = re.search(r'^version:\s*(.+)$', content, re.MULTILINE)
+            desc_match = re.search(r'^description:\s*(.+)$', content, re.MULTILINE)
+            if name_match:
+                detected["name"] = name_match.group(1).strip()
+            if version_match:
+                detected["version"] = version_match.group(1).strip().strip('"\'')
+            if desc_match:
+                desc = desc_match.group(1).strip()
+                if desc not in (">", "|", ">-", "|-"):  # skip folded/literal block headers
+                    detected["goal"] = desc
     except Exception:
         pass
 
@@ -638,8 +679,8 @@ project:
   goal: {goal}
   main_language: {lang}
 stack:
-  frontend: {detected.get('framework') if detected.get('framework') in ('React', 'Vue', 'Svelte', 'Next.js') else 'null'}
-  backend: {detected.get('framework') if detected.get('framework') in ('FastAPI', 'Flask', 'Django', 'Express', 'FastMCP', 'Axum', 'Actix', 'Gin', 'Echo') else 'null'}
+  frontend: {detected.get('framework') if detected.get('framework') in FRONTEND_FRAMEWORKS else 'null'}
+  backend: {detected.get('framework') if detected.get('framework') in BACKEND_FRAMEWORKS else 'null'}
   database: {detected.get('database', 'null')}
   testing: {detected.get('testing', 'null')}
 human_context:
@@ -681,9 +722,9 @@ state:
                 val = detected.get(key)
                 if val and f"  {field}: null" in updated:
                     # Only set frontend for frontend frameworks, backend for backend frameworks
-                    if field == "frontend" and val not in ("React", "Vue", "Svelte", "Next.js"):
+                    if field == "frontend" and val not in FRONTEND_FRAMEWORKS:
                         continue
-                    if field == "backend" and val not in ("FastAPI", "Flask", "Django", "Express", "FastMCP", "Axum", "Actix", "Gin", "Echo"):
+                    if field == "backend" and val not in BACKEND_FRAMEWORKS:
                         continue
                     updated = updated.replace(f"  {field}: null", f"  {field}: {val}")
             if updated != existing:
