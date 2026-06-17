@@ -1,10 +1,22 @@
 <!-- faf: gemini-faf-mcp | Python | mcp-server | FAF MCP server for Google Gemini — persistent project context via PyPI -->
-<!-- faf: doc=changelog | latest=v2.4.3 | canonical=project.faf | family=FAF -->
+<!-- faf: doc=changelog | latest=v2.5.0 | canonical=project.faf | family=FAF -->
 
 # Changelog
 
 All notable changes to gemini-faf-mcp are documented here.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
+
+## [2.5.0] - 2026-06-16 — The Dart Edition
+
+**gemini-faf-mcp now understands Dart and Flutter projects.**
+
+Detects Dart/Flutter from a `pubspec.yaml` — Flutter app vs package · Dart MCP / backend / CLI / library — by composing faf-python-sdk's detector, the shared engine, not a fork. Zero-Config, 12 exact tools.
+
+### Added
+- **Dart/Flutter detection in `faf_auto`.** Pointed at a Dart or Flutter project, `faf_auto` fills the stack from `pubspec.yaml` — `main_language: Dart`, plus Flutter (frontend) / Dart backend (Serverpod, Dart Frog, Shelf, …) / Dart MCP (`api_type: MCP`) / CLI / library — instead of leaving the language slot unset.
+
+### Changed
+- **Composed, not forked.** The pubspec brain is `faf_sdk.detect_dart_project` (the single source, mirrored from faf-cli), reached via `faf-python-sdk>=1.2.0`. gemini delegates detection; it carries no Dart parser of its own.
 
 ## [2.4.3] - 2026-06-11
 

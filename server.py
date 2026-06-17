@@ -1,5 +1,5 @@
 """
-gemini-faf-mcp v2.4.3 — FastMCP Server
+gemini-faf-mcp v2.5.0 — FastMCP Server
 
 Native MCP server for FAF (Foundational AI-context Format).
 Powered by faf-python-sdk with Mk4 Championship Scoring Engine.
@@ -19,7 +19,7 @@ import functools
 import os
 from pathlib import Path
 
-__version__ = "2.4.3"
+__version__ = "2.5.0"
 
 # Stack framework buckets — which detected framework lands in which .faf slot.
 # Includes Dart/Flutter (Flutter = frontend/UI; Dart servers = backend) so the

@@ -1,7 +1,7 @@
 <!-- faf: gemini-faf-mcp | Python | mcp-server | FAF MCP server for Google Gemini — persistent project context via PyPI -->
 <!-- faf: doc=readme | canonical=project.faf | score=100 | family=FAF -->
 
-# gemini-faf-mcp — The Chameleon Edition
+# gemini-faf-mcp — The Dart Edition
 
 **Persistent Project Context for Google Gemini. Define once. Sync everywhere.**
 
@@ -13,7 +13,7 @@ Stop re-explaining your project to every new Gemini session. Every Gemini conver
 
 [![PyPI](https://img.shields.io/pypi/v/gemini-faf-mcp?style=for-the-badge&logo=pypi&logoColor=white)](https://pypi.org/project/gemini-faf-mcp/)
 [![FAF Trophy 100%](https://img.shields.io/badge/FAF-%F0%9F%8F%86%20100%25-000000?labelColor=FF6B35)](https://faf.one)
-[![Tests](https://img.shields.io/badge/Tests-233%20passing-brightgreen?style=for-the-badge)](https://github.com/Wolfe-Jam/gemini-faf-mcp)
+[![Tests](https://img.shields.io/badge/Tests-243%20passing-brightgreen?style=for-the-badge)](https://github.com/Wolfe-Jam/gemini-faf-mcp)
 [![IANA: vnd.faf+yaml](https://img.shields.io/badge/IANA-vnd.faf%2Byaml-00D4D4?style=for-the-badge)](https://www.iana.org/assignments/media-types/application/vnd.faf+yaml)
 [![IANA: vnd.fafm+yaml](https://img.shields.io/badge/IANA-vnd.fafm%2Byaml-00D4D4?style=for-the-badge)](https://www.iana.org/assignments/media-types/application/vnd.fafm+yaml)
 [![DOI: Context paper](https://img.shields.io/badge/DOI-Context%20paper-FF6B35?style=for-the-badge)](https://doi.org/10.5281/zenodo.18251362)
@@ -35,11 +35,13 @@ Gemini: [now ready to help]
 
 `.faf` is read once at session start. Every tool call lands on a Gemini that already knows your project.
 
-### What's New in v2.4.3
+### What's New in v2.5.0 — The Dart Edition
 
-**`faf_agents` and `faf_gemini` now enhance your files.** The structured `.faf` block is prefixed to the top of AGENTS.md / GEMINI.md for instant AI context, and your Markdown stays in the instruction lane. Re-runs update the block in place — everything you've written below is preserved.
+**gemini-faf-mcp now understands Dart and Flutter projects.**
 
-> **v2.4.2 — The Confinement Edition** confined every caller `path` argument (security: reads restricted to `.faf`/`.fafm`, writes to the project root — closes an arbitrary local-file read + `faf_init` write). **v2.4.0 — The Chameleon Edition** auto-selects its transport: **stdio** locally, **Streamable HTTP** on Cloud Run. Same binary, 12 tools, zero config.
+Detects Dart/Flutter from a `pubspec.yaml` — Flutter app vs package · Dart MCP / backend / CLI / library — by composing faf-python-sdk's detector, the shared engine, not a fork. Zero-Config, 12 exact tools.
+
+> **v2.4.3** made `faf_agents` / `faf_gemini` non-destructive (inject a structured `.faf` block, preserve your Markdown below). **v2.4.2 — The Confinement Edition** confined every caller `path` argument (security). **v2.4.0 — The Chameleon Edition** auto-selects its transport: stdio locally, Streamable HTTP on Cloud Run. 12 tools, zero config.
 
 ---
 
