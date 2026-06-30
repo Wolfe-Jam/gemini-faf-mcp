@@ -146,3 +146,15 @@ monorepo:
   versioning_strategy: slotignored
   shared_configs: slotignored
   remote_cache: slotignored
+surfaces:
+  # Distribution map — the machine-checkable form of human_context.where. Score-neutral.
+  auto:                      # derived from manifests; regenerate with `faf surface --sync`
+    - { type: pypi,         id: gemini-faf-mcp,           source: "pyproject.toml#name" }
+    - { type: github,       id: Wolfe-Jam/gemini-faf-mcp, source: "repository" }
+    - { type: mcp-registry, id: io.github.Wolfe-Jam/gemini-faf-mcp, state: active, source: "server.json#name" }
+  declared:                  # hand-authored: surfaces the manifests don't carry + targets
+    - { type: mcpaas,       id: gemini, url: "https://mcpaas.live/gemini/mcp/v1", transport: streamable-http, status: live }
+    - { type: mcp-registry, id: one.faf/gemini-faf-mcp, status: pending }   # migration target — see runbook
+    - { type: pulsemcp,            id: gemini-faf-mcp, status: pending }
+    - { type: glama,               id: gemini-faf-mcp, status: pending }
+    - { type: awesome-mcp-servers, id: gemini-faf-mcp, status: pending }
