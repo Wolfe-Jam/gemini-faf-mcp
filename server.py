@@ -19,7 +19,7 @@ import functools
 import os
 from pathlib import Path
 
-__version__ = "2.5.0"
+__version__ = "2.5.1"
 
 # Stack framework buckets — which detected framework lands in which .faf slot.
 # Includes Dart/Flutter (Flutter = frontend/UI; Dart servers = backend) so the
