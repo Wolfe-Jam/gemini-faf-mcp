@@ -37,6 +37,8 @@ Gemini: [now ready to help]
 
 ### What's New in v2.5.0 — The Dart Edition
 
+> **v2.5.1** — **one.faf namespace migration:** gemini joins the fleet on `one.faf/gemini-faf-mcp` (registry publish now DNS-authenticated). No tool or behaviour changes.
+
 **gemini-faf-mcp now understands Dart and Flutter projects.**
 
 Detects Dart/Flutter from a `pubspec.yaml` — Flutter app vs package · Dart MCP / backend / CLI / library — by composing faf-python-sdk's detector, the shared engine, not a fork. Zero-Config, 12 exact tools.

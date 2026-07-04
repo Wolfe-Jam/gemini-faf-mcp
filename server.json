@@ -38,12 +38,12 @@
     "source": "github"
   },
   "websiteUrl": "https://faf.one",
-  "version": "2.5.0",
+  "version": "2.5.1",
   "packages": [
     {
       "registryType": "pypi",
       "identifier": "gemini-faf-mcp",
-      "version": "2.5.0",
+      "version": "2.5.1",
       "transport": {
         "type": "stdio"
       }

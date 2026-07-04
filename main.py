@@ -18,7 +18,7 @@ Security (v2.5.1):
 - YAML round-trip: validate before commit
 """
 
-__version__ = "2.0.1"
+__version__ = "2.5.1"
 
 import functions_framework
 import yaml

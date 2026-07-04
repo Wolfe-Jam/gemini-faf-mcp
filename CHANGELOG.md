@@ -1,10 +1,19 @@
 <!-- faf: gemini-faf-mcp | Python | mcp-server | FAF MCP server for Google Gemini — persistent project context via PyPI -->
-<!-- faf: doc=changelog | latest=v2.5.0 | canonical=project.faf | family=FAF -->
+<!-- faf: doc=changelog | latest=v2.5.1 | canonical=project.faf | family=FAF -->
 
 # Changelog
 
 All notable changes to gemini-faf-mcp are documented here.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
+
+## [2.5.1] - 2026-07-04
+
+**one.faf namespace migration — gemini joins the fleet on `one.faf/gemini-faf-mcp`.**
+
+- **Namespace:** `io.github.Wolfe-Jam/gemini-faf-mcp` → `one.faf/gemini-faf-mcp` — server.json `name` + emitter `_meta` (publisher-provided, carrying the `one.faf/context` FAF/IANA receipt), and the PyPI README `mcp-name:` ownership marker. The MCP-registry entry now publishes via **DNS auth** (faf.one) instead of GitHub-OIDC.
+- **Fixes:** `main.py` version drift corrected (2.0.1 → 2.5.1, back in lockstep with the rest); `docs/index.html` version-badge fallback refreshed.
+- **CI:** `actions/checkout` → v7 across workflows; stranded branches consolidated into `main`.
+- No tool or behaviour changes — pure identity + housekeeping.
 
 ## [2.5.0] - 2026-06-16 — The Dart Edition
 
