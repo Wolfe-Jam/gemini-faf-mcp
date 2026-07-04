@@ -1,3 +1,4 @@
+<!-- faf:start -->
 <!-- faf: gemini-faf-mcp | Python | mcp-server | MCP server for FAF — read, validate, auto-detect, score, and export IANA-registered .faf project DNA from Gemini CLI -->
 <!-- faf: claim=project.faf | family=FAF -->
 
@@ -16,11 +17,11 @@ MCP server for FAF — read, validate, auto-detect, score, and export IANA-regis
 - **Package Manager:** pip
 - **Build:** setuptools
 - **Database:** BigQuery
-- **Api Type:** MCP (stdio) + HTTP/REST
+- **API:** MCP (stdio) + HTTP/REST
 - **Connection:** MCP (stdio) + HTTP/REST
 - **Testing:** pytest + WJTTC 9-tier championship suite
 - **Hosting:** Google Cloud Run
-- **Cicd:** GitHub Actions
+- **CI/CD:** GitHub Actions
 - **Target User:** developers
 - **Core Problem:** AI tools lack structured project context
 - **Mission Purpose:** Give any AI structured project context via IANA-registered .faf files
@@ -37,4 +38,5 @@ MCP server for FAF — read, validate, auto-detect, score, and export IANA-regis
 
 ---
 
-*STATUS: BI-SYNC ACTIVE — 2026-06-17T01:28:16.851Z*
+*STATUS: BI-SYNC ACTIVE — 2026-07-04T19:21:51.873Z*
+<!-- faf:end -->

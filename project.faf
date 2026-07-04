@@ -27,6 +27,7 @@ context_quality:
   missing_context: null
 project:
   name: gemini-faf-mcp
+  homepage: https://faf.one
   goal: MCP server for FAF — read, validate, auto-detect, score, and export IANA-registered .faf project DNA from Gemini CLI
   main_language: Python
   type: mcp-server
