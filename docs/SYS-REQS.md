@@ -124,7 +124,7 @@ gemini-faf-mcp is a Gemini Extensions Gallery MCP server that gives Gemini CLI n
 
 ### FR-010: Export GEMINI.md
 **Priority:** MUST
-**Description:** `faf_gemini` generates Markdown with YAML frontmatter for Gemini CLI auto-loading.
+**Description:** `faf_gemini` authors Markdown with YAML frontmatter for Gemini CLI auto-loading.
 **Acceptance Criteria:**
 - [ ] Content starts with `---` YAML frontmatter
 - [ ] Frontmatter includes faf_score, faf_tier
@@ -134,7 +134,7 @@ gemini-faf-mcp is a Gemini Extensions Gallery MCP server that gives Gemini CLI n
 
 ### FR-011: Export AGENTS.md
 **Priority:** MUST
-**Description:** `faf_agents` generates universal agent context compatible with OpenAI Codex, Cursor, etc.
+**Description:** `faf_agents` authors universal agent context compatible with OpenAI Codex, Cursor, etc.
 **Acceptance Criteria:**
 - [ ] Content includes `# AGENTS.md` header and `## Project` section
 - [ ] Includes IANA reference

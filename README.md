@@ -62,7 +62,7 @@ uvx gemini-faf-mcp          # zero-install run via uvx (fetched from PyPI)
 gemini extensions install https://github.com/Wolfe-Jam/gemini-faf-mcp
 ```
 
-### 3. Generate your project context
+### 3. Author your project context
 
 In your Gemini CLI:
 
@@ -103,7 +103,7 @@ human_context:
 
 ### What about my `GEMINI.md`?
 
-You don't replace it. `.faf` **generates** it. Run `faf_gemini` and you get a fresh `GEMINI.md` with the structured project data baked in as YAML frontmatter — the same `GEMINI.md` Gemini CLI already reads, but generated from a single source of truth instead of hand-maintained.
+You don't replace it. `.faf` **authors** it. Run `faf_gemini` and you get a fresh `GEMINI.md` with the structured project data baked in as YAML frontmatter — the same `GEMINI.md` Gemini CLI already reads, but authored from a single source of truth instead of hand-maintained.
 
 ```bash
 > /faf:export
@@ -116,7 +116,7 @@ You don't replace it. `.faf` **generates** it. Run `faf_gemini` and you get a fr
 
 ## Auto-Detect Your Stack
 
-`faf_auto` scans your project's manifest files and generates a `.faf` with accurate slot values. No manual entry needed.
+`faf_auto` scans your project's manifest files and authors a `.faf` with accurate slot values. No manual entry needed.
 
 ```
 > Auto-detect my project stack
@@ -160,7 +160,7 @@ You don't replace it. `.faf` **generates** it. Run `faf_gemini` and you get a fr
 | Tool | What it does |
 |------|-------------|
 | `faf_init` | Create a starter `.faf` file with project name, goal, and language |
-| `faf_auto` | Auto-detect stack from manifest files and generate/update `.faf` |
+| `faf_auto` | Auto-detect stack from manifest files and author/update `.faf` |
 | `faf_discover` | Find `.faf` files in the project tree |
 
 ### Validate & Score

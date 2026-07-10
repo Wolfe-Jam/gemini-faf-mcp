@@ -33,7 +33,7 @@ Detects Dart/Flutter from a `pubspec.yaml` — Flutter app vs package · Dart MC
 
 ### Changed
 
-- **Non-destructive export.** `faf_agents` and `faf_gemini` now write AGENTS.md / GEMINI.md by injecting a structured `.faf` block and preserving everything you've written below. Re-runs update the block in place (idempotent); existing faf-generated files upgrade cleanly in one pass.
+- **Non-destructive export.** `faf_agents` and `faf_gemini` now write AGENTS.md / GEMINI.md by injecting a structured `.faf` block and preserving everything you've written below. Re-runs update the block in place (idempotent); existing faf-authored files upgrade cleanly in one pass.
 
 ## [2.4.2] - 2026-06-11 — The Confinement Edition
 
@@ -137,7 +137,7 @@ No runtime code changes. Patch release to surface the description alignment in t
 ## [2.1.0] - 2026-03-08
 
 ### Added
-- **Tool #12: `faf_auto`** — Auto-detect project stack and generate/update .faf files
+- **Tool #12: `faf_auto`** — Auto-detect project stack and author/update .faf files
   - Scans pyproject.toml, package.json, Cargo.toml, go.mod, requirements.txt, Gemfile, composer.json
   - Detects language, framework, database, API type, build tools from actual dependencies
   - Creates new .faf if none exists, fills empty slots in existing ones
