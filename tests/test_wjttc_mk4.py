@@ -11,18 +11,20 @@ Tier 5: SECURITY (Hardening) - Path traversal, template injection, input validat
 Tier 6: CONTRACT (Parity)    - Mk4 scores match across SDK and server
 """
 
-import os
-import sys
 import json
-import pytest
+import sys
 from pathlib import Path
+
+import pytest
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from fastmcp.client import Client
-from server import mcp, __version__, _mk4_score_file
-from faf_sdk.mk4 import score_faf, _score_to_tier, LicenseTier
+import tempfile
 
+from faf_sdk.mk4 import _score_to_tier, score_faf
+from fastmcp.client import Client
+
+from server import _mk4_score_file, mcp
 
 # ---------------------------------------------------------------------------
 # Fixtures
@@ -470,7 +472,7 @@ class TestWJTTCTier6Contract:
 
     async def test_math_identity_from_server(self, client, trophy_faf):
         """populated + empty + ignored = total, always."""
-        for faf_content, path_fixture in [
+        for faf_content, _path_fixture in [
             (TROPHY_FAF, "trophy_faf"),
             (MINIMAL_FAF, "minimal_faf"),
             (SLOTIGNORED_FAF, "slotignored_faf"),
@@ -483,5 +485,3 @@ class TestWJTTCTier6Contract:
             f.unlink()
 
 
-# Need tempfile for the last test
-import tempfile

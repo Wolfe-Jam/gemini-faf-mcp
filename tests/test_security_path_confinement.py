@@ -11,13 +11,12 @@ context files; faf_init is confined to the project root(s). Escapes are refused.
 """
 import json
 import os
-import tempfile
 
 import pytest
 from fastmcp import Client
 
+from safe_path import PathConfinementError, confine_file_op, confine_path, is_faf_context_file
 from server import mcp
-from safe_path import confine_path, confine_file_op, PathConfinementError, is_faf_context_file
 
 
 def _parse(result):

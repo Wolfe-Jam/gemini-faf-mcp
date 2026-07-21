@@ -53,6 +53,7 @@ dev = [
     "mypy>=1.20.2",
     "types-PyYAML",
     "types-requests",
+    "ruff>=0.1.0",
 ]
 
 [tool.setuptools]
@@ -65,3 +66,28 @@ package-dir = {"gemini_faf_mcp" = "src/gemini_faf_mcp"}
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = false
+exclude = ["dist/", "build/", "gemini_faf_mcp.egg-info/", ".venv/"]
+
+[[tool.mypy.overrides]]
+module = ["functions_framework.*", "google.*"]
+ignore_missing_imports = true
+
+[tool.ruff]
+target-version = "py310"
+line-length = 120
+exclude = ["dist", "build", ".venv", "gemini_faf_mcp.egg-info"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+ignore = ["E501"]  # line length handled separately; keep noise down for first pass
+
+[[tool.mypy.overrides]]
+module = "tomllib"
+disable_error_code = ["import-untyped"]
+

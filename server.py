@@ -9,15 +9,17 @@ Media Type: application/vnd.faf+yaml
 Spec: https://faf.one
 """
 
-from fastmcp import FastMCP
-from faf_sdk import parse_file, parse, validate, find_faf_file, stringify, score_faf, detect_dart_project
-from faf_sdk.parser import FafParseError
-from models import get_model, list_models
-from safe_path import confine_path, confine_file_op, PathConfinementError
-from inject import inject_faf_block
 import functools
 import os
 from pathlib import Path
+
+from faf_sdk import detect_dart_project, find_faf_file, parse_file, score_faf, stringify, validate
+from faf_sdk.parser import FafParseError
+from fastmcp import FastMCP
+
+from inject import inject_faf_block
+from models import get_model, list_models
+from safe_path import PathConfinementError, confine_file_op, confine_path
 
 __version__ = "2.5.1"
 
@@ -605,7 +607,7 @@ def _detect_stack(directory: str) -> dict:
     # --- Metadata Extraction (Name, Version, Goal) ---
     try:
         if has_pyproject:
-            import tomllib
+            import tomllib  # type: ignore[import-untyped]
             data = tomllib.loads((dir_path / "pyproject.toml").read_text())
             if "project" in data:
                 detected["name"] = data["project"].get("name")
@@ -622,8 +624,10 @@ def _detect_stack(directory: str) -> dict:
             import re
             name_match = re.search(r'^name\s*=\s*"(.*)"', content, re.MULTILINE)
             version_match = re.search(r'^version\s*=\s*"(.*)"', content, re.MULTILINE)
-            if name_match: detected["name"] = name_match.group(1)
-            if version_match: detected["version"] = version_match.group(1)
+            if name_match:
+                detected["name"] = name_match.group(1)
+            if version_match:
+                detected["version"] = version_match.group(1)
         elif has_pubspec:
             import re
             content = (dir_path / "pubspec.yaml").read_text()
@@ -782,11 +786,17 @@ def main() -> None:
     just a hosted transport.
     """
     _port = os.environ.get("PORT")
-    _transport = os.environ.get("MCP_TRANSPORT", "http" if _port else "stdio")
-    if _transport == "stdio":
+    _raw = os.environ.get("MCP_TRANSPORT", "http" if _port else "stdio")
+    if _raw == "stdio":
         mcp.run(transport="stdio")
+    elif _raw in ("http", "sse", "streamable-http"):
+        from typing import Literal, cast
+
+        _t = cast(Literal["http", "sse", "streamable-http"], _raw)
+        mcp.run(transport=_t, host="0.0.0.0", port=int(_port or 8080))
     else:
-        mcp.run(transport=_transport, host="0.0.0.0", port=int(_port or 8080))
+        # Unknown MCP_TRANSPORT → safe hosted default
+        mcp.run(transport="http", host="0.0.0.0", port=int(_port or 8080))
 
 
 if __name__ == "__main__":

@@ -5,10 +5,10 @@ Remote-first client that can hit the Cloud Run endpoint
 or parse .faf files locally.
 """
 
-import requests
-from typing import Optional, Dict, Any
-from pathlib import Path
 import os
+from typing import Any
+
+import requests
 
 # Live endpoint - the "Source of Truth"
 DEFAULT_ENDPOINT = "https://faf-source-of-truth-631316210911.us-east1.run.app"
@@ -63,7 +63,7 @@ class FAFClient:
         self.local = local
         _send_handshake()  # Glory Wall telemetry
 
-    def get_project_dna(self, path: str = "project.faf") -> Dict[str, Any]:
+    def get_project_dna(self, path: str = "project.faf") -> dict[str, Any]:
         """
         Retrieve project DNA from .faf file.
 
@@ -79,7 +79,7 @@ class FAFClient:
 
         return self._fetch_remote(path)
 
-    def _fetch_remote(self, path: str) -> Dict[str, Any]:
+    def _fetch_remote(self, path: str) -> dict[str, Any]:
         """Fetch DNA from Cloud Run endpoint."""
         headers = {
             "Content-Type": "application/json",
@@ -94,13 +94,14 @@ class FAFClient:
             timeout=30
         )
         response.raise_for_status()
-        return response.json()
+        data: dict[str, Any] = response.json()
+        return data
 
     def update_dna(
         self,
-        updates: Dict[str, Any],
+        updates: dict[str, Any],
         message: str = "faf-client: DNA update"
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Update project DNA via Voice-to-FAF endpoint.
 
@@ -127,12 +128,15 @@ class FAFClient:
             timeout=30
         )
         response.raise_for_status()
-        return response.json()
+        data: dict[str, Any] = response.json()
+        return data
 
     def get_score(self) -> int:
         """Get the current FAF score (0-100)."""
         dna = self.get_project_dna()
-        return dna.get("scores", {}).get("faf_score", 0)
+        scores = dna.get("scores") or {}
+        raw = scores.get("faf_score", 0)
+        return int(raw) if raw is not None else 0
 
     def is_elite(self) -> bool:
         """Check if project has Elite status (100% score)."""

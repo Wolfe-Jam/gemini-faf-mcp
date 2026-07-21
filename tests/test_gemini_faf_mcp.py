@@ -9,9 +9,9 @@ Tier 4: VOICE (New!) - Voice-to-FAF specific
 Tier 5: SECURITY (v2.5.1) - SW-01, SW-02, Telemetry
 """
 
+
 import pytest
 import requests
-import json
 
 # Live endpoint
 BASE_URL = "https://us-east1-bucket-460122.cloudfunctions.net/faf-source-of-truth"
@@ -238,7 +238,7 @@ class TestTier4Voice:
         )
         assert r.status_code == 200
         data = r.json()
-        assert data.get("dry_run") == True
+        assert data.get("dry_run") is True
 
     def test_voice_response_fields(self):
         """PUT dry_run response contains expected fields."""
@@ -360,7 +360,7 @@ class TestTier5Security:
         )
         assert r.status_code == 200
         data = r.json()
-        assert data.get("dry_run") == True
+        assert data.get("dry_run") is True
         preview = data.get("preview", {})
         assert preview.get("security", {}).get("sw01") == "passed"
         assert preview.get("security", {}).get("sw02") == "passed"
@@ -455,7 +455,8 @@ class TestTier6PyPI:
 
     def test_package_import(self):
         """Package imports successfully."""
-        import tomllib
+        import tomllib  # type: ignore[import-untyped]
+
         import gemini_faf_mcp
         assert hasattr(gemini_faf_mcp, '__version__')
         with open("pyproject.toml", "rb") as f:
@@ -479,8 +480,9 @@ class TestTier6PyPI:
 
     def test_local_parse_project_faf(self):
         """Local parse of project.faf works."""
-        from gemini_faf_mcp import parse_faf
         import os
+
+        from gemini_faf_mcp import parse_faf
 
         # Find project.faf relative to this test
         test_dir = os.path.dirname(__file__)
@@ -494,8 +496,9 @@ class TestTier6PyPI:
 
     def test_validate_faf_scoring(self):
         """FAF validation returns score and tier."""
-        from gemini_faf_mcp import parse_faf, validate_faf
         import os
+
+        from gemini_faf_mcp import parse_faf, validate_faf
 
         test_dir = os.path.dirname(__file__)
         project_root = os.path.dirname(test_dir)
@@ -531,7 +534,7 @@ class TestTier7Fixes:
 
     def test_input_validation_rejects_too_many_updates(self):
         """Reject payloads with > MAX_UPDATES keys."""
-        from main import validate_input_limits, MAX_UPDATES
+        from main import MAX_UPDATES, validate_input_limits
         big_updates = {f"key_{i}": f"val_{i}" for i in range(MAX_UPDATES + 1)}
         valid, error = validate_input_limits(big_updates)
         assert not valid
@@ -539,7 +542,7 @@ class TestTier7Fixes:
 
     def test_input_validation_rejects_long_key(self):
         """Reject keys longer than MAX_KEY_LENGTH."""
-        from main import validate_input_limits, MAX_KEY_LENGTH
+        from main import MAX_KEY_LENGTH, validate_input_limits
         updates = {"x" * (MAX_KEY_LENGTH + 1): "value"}
         valid, error = validate_input_limits(updates)
         assert not valid
@@ -547,7 +550,7 @@ class TestTier7Fixes:
 
     def test_input_validation_rejects_long_value(self):
         """Reject values longer than MAX_VALUE_LENGTH."""
-        from main import validate_input_limits, MAX_VALUE_LENGTH
+        from main import MAX_VALUE_LENGTH, validate_input_limits
         updates = {"key": "x" * (MAX_VALUE_LENGTH + 1)}
         valid, error = validate_input_limits(updates)
         assert not valid
@@ -582,8 +585,9 @@ class TestTier7Fixes:
 
     def test_find_faf_file_discovers_project_faf(self):
         """find_faf_file discovers project.faf in repo root."""
-        from gemini_faf_mcp import find_faf_file
         import os
+
+        from gemini_faf_mcp import find_faf_file
         test_dir = os.path.dirname(__file__)
         project_root = os.path.dirname(test_dir)
         result = find_faf_file(project_root)
@@ -592,8 +596,9 @@ class TestTier7Fixes:
 
     def test_find_faf_file_returns_none_for_empty_dir(self):
         """find_faf_file returns None when no .faf exists."""
-        from gemini_faf_mcp import find_faf_file
         import tempfile
+
+        from gemini_faf_mcp import find_faf_file
         with tempfile.TemporaryDirectory() as tmpdir:
             result = find_faf_file(tmpdir)
             assert result is None
@@ -626,7 +631,8 @@ class TestTier7Fixes:
 
     def test_version_consistency(self):
         """All version strings match pyproject.toml."""
-        import tomllib
+        import tomllib  # type: ignore[import-untyped]
+
         import gemini_faf_mcp
         from gemini_faf_mcp import client
         with open("pyproject.toml", "rb") as f:

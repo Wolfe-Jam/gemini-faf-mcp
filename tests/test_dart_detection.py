@@ -10,17 +10,17 @@ SDK is the single source (faf-cli src/detect/dart.ts <-> faf_sdk/detect.py).
 
 import sys
 from pathlib import Path
-from typing import Dict
 
 import pytest
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from server import _detect_stack, FRONTEND_FRAMEWORKS, BACKEND_FRAMEWORKS
 from faf_sdk import detect_dart_project
 
+from server import BACKEND_FRAMEWORKS, FRONTEND_FRAMEWORKS, _detect_stack
 
-def _write(d: Path, files: Dict[str, str]) -> None:
+
+def _write(d: Path, files: dict[str, str]) -> None:
     for rel, content in files.items():
         p = d / rel
         p.parent.mkdir(parents=True, exist_ok=True)

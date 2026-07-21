@@ -20,14 +20,15 @@ Security (v2.5.1):
 
 __version__ = "2.5.1"
 
-import functions_framework
-import yaml
-import json
-import re
-import os
 import base64
+import json
+import os
+import re
+from datetime import date, datetime
+
+import functions_framework
 import requests
-from datetime import datetime, date
+import yaml
 
 
 class FafJSONEncoder(json.JSONEncoder):
@@ -68,7 +69,7 @@ def validate_sw02_scoring_guard(updated_dna, updates, calculate_score_func):
     setting_orange = False
     if updates.get('faf_distinction') == 'Big Orange':
         setting_orange = True
-    if updates.get('x_faf_orange') == True:
+    if updates.get('x_faf_orange'):
         setting_orange = True
     for key, value in updates.items():
         if 'orange' in key.lower() and value in [True, 'Big Orange', 'orange']:
@@ -127,6 +128,7 @@ def log_mutation_telemetry(success, updates, agent='voice', score=None, has_oran
     """Log mutation attempts to BigQuery (non-blocking)."""
     try:
         import uuid
+
         from google.cloud import bigquery
         client = bigquery.Client()
         table_id = "bucket-460122.faf_telemetry.voice_mutations"
@@ -172,7 +174,7 @@ def get_github_token():
     try:
         from google.cloud import secretmanager
         client = secretmanager.SecretManagerServiceClient()
-        name = f"projects/bucket-460122/secrets/GITHUB_TOKEN/versions/latest"
+        name = "projects/bucket-460122/secrets/GITHUB_TOKEN/versions/latest"
         response = client.access_secret_version(request={"name": name})
         return response.payload.data.decode("UTF-8")
     except Exception:
@@ -432,7 +434,6 @@ def generate_badge(score, has_orange):
 
     # Calculate width based on content
     width = 140 if has_orange else 120
-    text_x = 75
 
     svg = f'''<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="20">
   <linearGradient id="b" x2="0" y2="100%">
@@ -533,7 +534,7 @@ def parse_faf(request):
                 return json.dumps({"error": error}), 400, {'Content-Type': 'application/json'}
 
             # Load current DNA
-            with open('project.faf', 'r') as f:
+            with open('project.faf') as f:
                 current_dna = yaml.safe_load(f)
 
             # Merge updates
@@ -614,7 +615,7 @@ def parse_faf(request):
     # Handle GET request - return badge
     if request.method == 'GET':
         try:
-            with open('project.faf', 'r') as f:
+            with open('project.faf') as f:
                 faf_data = yaml.safe_load(f)
 
             score = calculate_score(faf_data)
@@ -622,7 +623,7 @@ def parse_faf(request):
 
             svg = generate_badge(score, has_orange)
             return svg, 200, {'Content-Type': 'image/svg+xml', 'Cache-Control': 'no-cache', 'X-FAF-Version': __version__}
-        except Exception as e:
+        except Exception:
             # Return error badge
             svg = generate_badge(0, False)
             return svg, 200, {'Content-Type': 'image/svg+xml', 'X-FAF-Version': __version__}
@@ -632,7 +633,7 @@ def parse_faf(request):
     file_path = request_json.get('path', 'project.faf') if request_json else 'project.faf'
 
     try:
-        with open(file_path, 'r') as f:
+        with open(file_path) as f:
             faf_data = yaml.safe_load(f)
 
         # Detect calling agent

@@ -26,6 +26,6 @@ __version__ = "2.5.1"
 __author__ = "wolfejam"
 
 from .client import FAFClient
-from .parser import parse_faf, validate_faf, find_faf_file
+from .parser import find_faf_file, parse_faf, validate_faf
 
 __all__ = ["FAFClient", "parse_faf", "validate_faf", "find_faf_file", "__version__"]

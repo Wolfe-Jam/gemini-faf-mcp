@@ -5,12 +5,13 @@ Validates and parses .faf files according to the v2.5.2 specification.
 Format: application/vnd.faf+yaml (IANA registered)
 """
 
-import yaml
 from pathlib import Path
-from typing import Dict, Any, Optional
+from typing import Any
+
+import yaml
 
 
-def parse_faf(path: str = "project.faf") -> Dict[str, Any]:
+def parse_faf(path: str = "project.faf") -> dict[str, Any]:
     """
     Parse a .faf file and return its contents.
 
@@ -29,18 +30,18 @@ def parse_faf(path: str = "project.faf") -> Dict[str, Any]:
     if not faf_path.exists():
         raise FileNotFoundError(f"FAF file not found: {path}")
 
-    with open(faf_path, "r", encoding="utf-8") as f:
+    with open(faf_path, encoding="utf-8") as f:
         content = f.read()
 
     try:
         data = yaml.safe_load(content)
     except yaml.YAMLError as e:
-        raise ValueError(f"Invalid YAML in FAF file: {e}")
+        raise ValueError(f"Invalid YAML in FAF file: {e}") from e
 
     return data or {}
 
 
-def validate_faf(data: Dict[str, Any]) -> Dict[str, Any]:
+def validate_faf(data: dict[str, Any]) -> dict[str, Any]:
     """
     Validate FAF structure against v2.5.2 specification.
 
@@ -122,7 +123,7 @@ def _get_tier(score: int) -> str:
         return "Red"
 
 
-def find_faf_file(directory: str = ".") -> Optional[str]:
+def find_faf_file(directory: str = ".") -> str | None:
     """
     Find .faf file in directory.
 

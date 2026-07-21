@@ -13,18 +13,19 @@ Tier 8: ROUNDTRIP (Pipeline) — init → read → validate → score → string
 Tier 9: GALLERY (Extension)  — gemini-extension.json manifest validation
 """
 
+import json
 import os
 import sys
-import json
-import pytest
 from pathlib import Path
+
+import pytest
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from fastmcp.client import Client
-from server import mcp, __version__
 from faf_sdk.mk4 import _score_to_tier
+from fastmcp.client import Client
 
+from server import __version__, mcp
 
 # ---------------------------------------------------------------------------
 # Test fixtures & sample data
@@ -139,7 +140,7 @@ class TestTier1Brake:
 
     async def test_server_version(self):
         """Server version matches pyproject.toml."""
-        import tomllib
+        import tomllib  # type: ignore[import-untyped]
         with open("pyproject.toml", "rb") as f:
             expected = tomllib.load(f)["project"]["version"]
         assert __version__ == expected
