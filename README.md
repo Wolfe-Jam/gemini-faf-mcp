@@ -7,6 +7,8 @@
 
 **FAF defines. MD instructs. AI codes.**
 
+⭐ **A star helps other devs discover gemini-faf-mcp** — despite the downloads, ~3 of 4 devs check stars first.
+
 Stop re-explaining your project to every new Gemini session. Every Gemini conversation starts cold — you re-state your stack, your goals, your conventions every single time. `.faf` is one structured file that captures all of it. This package is the MCP server that lets Gemini read it.
 
 <!-- mcp-name: one.faf/gemini-faf-mcp -->
