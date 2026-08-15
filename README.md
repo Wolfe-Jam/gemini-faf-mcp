@@ -20,6 +20,7 @@ Stop re-explaining your project to every new Gemini session. Every Gemini conver
 [![IANA: vnd.fafm+yaml](https://img.shields.io/badge/IANA-vnd.fafm%2Byaml-00D4D4?style=for-the-badge)](https://www.iana.org/assignments/media-types/application/vnd.fafm+yaml)
 [![DOI: Context paper](https://img.shields.io/badge/DOI-Context%20paper-FF6B35?style=for-the-badge)](https://doi.org/10.5281/zenodo.18251362)
 [![DOI: Memory paper](https://img.shields.io/badge/DOI-Memory%20paper-FF6B35?style=for-the-badge)](https://doi.org/10.5281/zenodo.20348942)
+[![DOI: Agents paper](https://img.shields.io/badge/DOI-Agents%20paper-FF6B35?style=for-the-badge)](https://doi.org/10.5281/zenodo.21951641)
 
 ### Before and after
 
@@ -315,6 +316,50 @@ If `gemini-faf-mcp` has been useful, consider starring the repo — it helps oth
 - [faf-python-sdk](https://pypi.org/project/faf-python-sdk/)
 - [faf-cli](https://npmjs.com/package/faf-cli)
 - [Changelog](./CHANGELOG.md)
+
+## Citation
+
+If you use `gemini-faf-mcp` or the `.faf` / `.fafm` / `.fafa` formats in research or production, please cite the format papers:
+
+> Wolfe, J. (2025). *Format-Driven AI Context Architecture: The .faf Standard for Persistent Project Understanding*. Zenodo. https://doi.org/10.5281/zenodo.18251362
+
+> Wolfe, J. (2026). *Permanent Memory and Instant Recall: The .fafm Standard for Multi-Profile AI Agent Memory*. Zenodo. https://doi.org/10.5281/zenodo.20348942
+
+> Wolfe, J. (2026). *Why Agents Need a Passport: .fafa — Portable Identity for the Agentic Era*. Zenodo. https://doi.org/10.5281/zenodo.21951641
+
+### BibTeX
+
+```bibtex
+@article{wolfe2025faf,
+  title     = {Format-Driven AI Context Architecture: The .faf Standard for Persistent Project Understanding},
+  author    = {Wolfe, James},
+  year      = {2025},
+  month     = {nov},
+  publisher = {Zenodo},
+  doi       = {10.5281/zenodo.18251362},
+  url       = {https://doi.org/10.5281/zenodo.18251362}
+}
+
+@article{wolfe2026fafm,
+  title     = {Permanent Memory and Instant Recall: The .fafm Standard for Multi-Profile AI Agent Memory},
+  author    = {Wolfe, James},
+  year      = {2026},
+  month     = {may},
+  publisher = {Zenodo},
+  doi       = {10.5281/zenodo.20348942},
+  url       = {https://doi.org/10.5281/zenodo.20348942}
+}
+
+@article{wolfe2026fafa,
+  title     = {Why Agents Need a Passport: .fafa — Portable Identity for the Agentic Era},
+  author    = {Wolfe, James},
+  year      = {2026},
+  month     = {aug},
+  publisher = {Zenodo},
+  doi       = {10.5281/zenodo.21951641},
+  url       = {https://doi.org/10.5281/zenodo.21951641}
+}
+```
 
 ## License
 
