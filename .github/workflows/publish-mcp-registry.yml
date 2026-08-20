@@ -56,6 +56,31 @@ jobs:
           fi
           echo "✓ server.json v$MANIFEST_VERSION matches release tag v$TAG"
 
+      - name: Wait for PyPI to resolve this version
+        # pypi.yml and publish-mcp-registry.yml both fire off the same
+        # release:published event with no ordering guarantee between parallel
+        # jobs. mcp-publisher's publish call validates the declared pypi package
+        # against the live index, so a still-propagating PyPI publish reads as a
+        # 400 here (same failure class hit live on rust-faf-mcp 0.4.3, 2026-08-20 —
+        # see rust-faf-mcp's publish-mcp-registry.yml for the reference gate).
+        # Uses the version-pinned endpoint (pypi.org/pypi/<pkg>/<ver>/json) —
+        # never the general /pypi/<pkg>/json, which Fastly-lags minutes after
+        # publish and would falsely report "not live yet" long after it is.
+        if: github.event_name == 'release'
+        run: |
+          set -euo pipefail
+          PKG=$(jq -r '.packages[] | select(.registryType=="pypi") | .identifier' server.json)
+          VERSION="${GITHUB_REF_NAME#v}"
+          echo "Waiting for PyPI ${PKG}==${VERSION} to be live..."
+          for i in $(seq 1 30); do
+            code=$(curl -s -o /dev/null -w '%{http_code}' "https://pypi.org/pypi/${PKG}/${VERSION}/json")
+            if [ "$code" = "200" ]; then echo "✅ PyPI confirms ${PKG}==${VERSION} live."; exit 0; fi
+            echo "  attempt ${i}/30 — pypi HTTP ${code}, retrying in 10s..."
+            sleep 10
+          done
+          echo "::error::Timed out after 5m waiting for PyPI to publish ${PKG}==${VERSION}."
+          exit 1
+
       - name: Check if this version is already published (idempotent)
         id: ver
         run: |
