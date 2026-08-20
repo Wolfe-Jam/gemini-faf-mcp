@@ -38,5 +38,5 @@ MCP server for FAF — read, validate, auto-detect, score, and export IANA-regis
 
 ---
 
-*STATUS: BI-SYNC ACTIVE — 2026-07-04T20:50:14.942Z*
+*STATUS: BI-SYNC ACTIVE — 2026-08-20T18:08:18.511Z*
 <!-- faf:end -->
