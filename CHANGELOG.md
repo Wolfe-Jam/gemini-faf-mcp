@@ -1,10 +1,27 @@
 <!-- faf: gemini-faf-mcp | Python | mcp-server | FAF MCP server for Google Gemini — persistent project context via PyPI -->
-<!-- faf: doc=changelog | latest=v2.5.1 | canonical=project.faf | family=FAF -->
+<!-- faf: doc=changelog | latest=v2.6.0 | canonical=project.faf | family=FAF -->
 
 # Changelog
 
 All notable changes to gemini-faf-mcp are documented here.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
+
+## [2.6.0] - 2026-08-20 — The Agent Card Edition
+
+**A real agent.fafa passport, MCP Server Card, and AI Catalog entry — gemini-faf-mcp joins the wider agent-discovery ecosystem.**
+
+- **`agent.fafa`** — a real FAF Agent Card, authored from live introspection of `server.py`'s actual 12 tools (name + docstring, not guessed or copied from another server's tool list).
+- **MCP Server Card** (SEP-2127) — `faf cards --target mcp`, carries the FAF context block by construction.
+- **AI Catalog entry** — `.well-known/ai-catalog.json`, `faf cards --target catalog`. Fresh spec (ratified Nov 2025) — early adoption.
+- **GEMINI.md** — regenerated with a genuinely richer template (Setup & build, Test & verify, Where things live, a universal "Before changing things" safety default) instead of the old thin project/goal/language-only output.
+- **`fastmcp` floor** — `>=3.4.0` → `>=3.4.7` (7 patch releases since June).
+- **`project.faf` data hygiene** — was 5 months stale. Added `project.version` and `project.title` (both previously missing, causing generated cards to silently fall back to `0.1.0`/no title); corrected a separately-stale `state.version` (2.2.0, real: 2.6.0); refreshed the `generated` timestamp.
+- **`.gitignore`** — no longer hides `.faf-dna` (a real birth-certificate lineage file, dated 2026-03-12, invisible to git until now) or `.well-known/` — both now tracked.
+- **Removed** a stale, never-tracked, factually-wrong hand-rolled `.well-known/mcp/server-card.json` (wrong version, a fabricated tool name) — superseded by the real generated card above.
+
+**Not in this release:** A2A support. `faf cards --target a2a` correctly refuses to fabricate an endpoint gemini-faf-mcp doesn't serve — real A2A support is planned as its own future release, not bundled into this one's story.
+
+Trophy 100%, 17/17 slots, throughout.
 
 ## [2.5.1] - 2026-07-04
 

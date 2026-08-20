@@ -1,7 +1,7 @@
 <!-- faf: gemini-faf-mcp | Python | mcp-server | FAF MCP server for Google Gemini — persistent project context via PyPI -->
 <!-- faf: doc=readme | canonical=project.faf | score=100 | family=FAF -->
 
-# gemini-faf-mcp — The Dart Edition
+# gemini-faf-mcp — The Agent Card Edition
 
 **Persistent Project Context for Google Gemini. Define once. Sync everywhere.**
 
@@ -38,15 +38,13 @@ Gemini: [now ready to help]
 
 `.faf` is read once at session start. Every tool call lands on a Gemini that already knows your project.
 
-### What's New in v2.5.0 — The Dart Edition
+### What's New in v2.6.0 — The Agent Card Edition
 
-> **v2.5.1** — **one.faf namespace migration:** gemini joins the fleet on `one.faf/gemini-faf-mcp` (registry publish now DNS-authenticated). No tool or behaviour changes.
+**A real agent.fafa passport, MCP Server Card, and AI Catalog entry — gemini-faf-mcp joins the wider agent-discovery ecosystem.**
 
-**gemini-faf-mcp now understands Dart and Flutter projects.**
+`agent.fafa` is authored from live introspection of the server's actual tools, not guessed. Ships alongside an MCP Server Card (SEP-2127) and a fresh AI Catalog entry (spec ratified Nov 2025). GEMINI.md now renders real setup/test/key-files content instead of a thin project/goal/language stub. Not in this release: A2A support — `faf cards --target a2a` correctly refuses to fabricate an endpoint this server doesn't serve; real A2A support is a future release, not a claim made early.
 
-Detects Dart/Flutter from a `pubspec.yaml` — Flutter app vs package · Dart MCP / backend / CLI / library — by composing faf-python-sdk's detector, the shared engine, not a fork. Zero-Config, 12 exact tools.
-
-> **v2.4.3** made `faf_agents` / `faf_gemini` non-destructive (inject a structured `.faf` block, preserve your Markdown below). **v2.4.2 — The Confinement Edition** confined every caller `path` argument (security). **v2.4.0 — The Chameleon Edition** auto-selects its transport: stdio locally, Streamable HTTP on Cloud Run. 12 tools, zero config.
+> **v2.5.1** — one.faf namespace migration: gemini joins the fleet on `one.faf/gemini-faf-mcp` (registry publish now DNS-authenticated). **v2.5.0 — The Dart Edition** detects Dart/Flutter from `pubspec.yaml` — Flutter app vs package · Dart MCP / backend / CLI / library. **v2.4.3** made `faf_agents` / `faf_gemini` non-destructive (inject a structured `.faf` block, preserve your Markdown below). **v2.4.2 — The Confinement Edition** confined every caller `path` argument (security). **v2.4.0 — The Chameleon Edition** auto-selects its transport: stdio locally, Streamable HTTP on Cloud Run. 12 tools, zero config.
 
 ---
 

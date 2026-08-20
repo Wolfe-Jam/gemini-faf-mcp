@@ -1,9 +1,9 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/v1/server-card.schema.json",
   "name": "one.faf/gemini-faf-mcp",
-  "version": "2.5.1",
+  "version": "2.6.0",
   "description": "MCP server for FAF — read, validate, auto-detect, score, and export IANA-registered .faf project...",
-  "title": "gemini-faf-mcp",
+  "title": "Gemini FAF",
   "websiteUrl": "https://faf.one",
   "_meta": {
     "one.faf/context": {

@@ -21,7 +21,7 @@ from inject import inject_faf_block
 from models import get_model, list_models
 from safe_path import PathConfinementError, confine_file_op, confine_path
 
-__version__ = "2.5.1"
+__version__ = "2.6.0"
 
 # Stack framework buckets — which detected framework lands in which .faf slot.
 # Includes Dart/Flutter (Flutter = frontend/UI; Dart servers = backend) so the

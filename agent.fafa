@@ -7,7 +7,7 @@ agent:
   name: gemini-faf-mcp
   id: did:web:faf.one:gemini-faf-mcp
   vendor: WolfeJAM
-  version: 2.5.1
+  version: 2.6.0
   description: Persistent Project Context for Google Gemini. IANA-registered .faf format, MCP server + Cloud Run REST API, unifies CLAUDE.md, GEMINI.md, AGENTS.md.
   homepage: https://faf.one
   license: MIT

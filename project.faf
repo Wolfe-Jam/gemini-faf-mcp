@@ -27,12 +27,13 @@ context_quality:
   missing_context: null
 project:
   name: gemini-faf-mcp
+  title: Gemini FAF
   homepage: https://faf.one
   goal: MCP server for FAF — read, validate, auto-detect, score, and export IANA-registered .faf project DNA from Gemini CLI
   main_language: Python
   type: mcp-server  # found: no classifying signals — fallback
   framework: fastmcp
-  version: 2.5.1
+  version: 2.6.0
 ai_instructions:
   priority_order:
     - 1. Read THIS .faf file first
@@ -86,7 +87,7 @@ preferences:
   documentation: as_needed
 state:
   phase: production
-  version: 2.5.1
+  version: 2.6.0
   focus: Mk4 Championship Scoring Engine parity
   status: green_flag
   next_milestone: gallery_listing

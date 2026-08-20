@@ -33,17 +33,17 @@
       ]
     }
   ],
+  "version": "2.6.0",
   "repository": {
     "url": "https://github.com/Wolfe-Jam/gemini-faf-mcp",
     "source": "github"
   },
   "websiteUrl": "https://faf.one",
-  "version": "2.5.1",
   "packages": [
     {
       "registryType": "pypi",
       "identifier": "gemini-faf-mcp",
-      "version": "2.5.1",
+      "version": "2.6.0",
       "transport": {
         "type": "stdio"
       }
