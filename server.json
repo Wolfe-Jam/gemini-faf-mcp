@@ -56,7 +56,7 @@
         "mediaType": "application/vnd.faf+yaml",
         "iana": "https://www.iana.org/assignments/media-types/application/vnd.faf+yaml",
         "deterministic": true,
-        "generated": "2026-03-08T07:34:52.974Z"
+        "generated": "2026-08-20T15:59:03.000Z"
       }
     }
   }

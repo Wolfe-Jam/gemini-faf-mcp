@@ -1,0 +1,92 @@
+{
+  "birthCertificate": {
+    "born": "2026-03-12T20:30:37.965Z",
+    "birthDNA": 33,
+    "birthDNASource": "CLAUDE.md",
+    "projectDNA": "6e2a6f90790ab61f",
+    "authenticated": false,
+    "certificate": "FAF-2026-GEMINIFA-AE5Y"
+  },
+  "versions": [
+    {
+      "version": "v1.0.0",
+      "timestamp": "2026-03-12T20:30:37.965Z",
+      "score": 33,
+      "changes": [
+        "Initial context from CLAUDE.md"
+      ],
+      "approved": false,
+      "growth": 0,
+      "growthRate": 0
+    },
+    {
+      "version": "v1.0.1",
+      "timestamp": "2026-08-20T15:49:57.203Z",
+      "score": 100,
+      "changes": [
+        "faf auto"
+      ],
+      "growth": 67
+    }
+  ],
+  "current": {
+    "version": "v1.0.1",
+    "score": 100,
+    "lastSync": "2026-08-20T15:49:57.203Z"
+  },
+  "recovery": {
+    "claudeMD": "/Users/wolfejam/FAF/gemini-faf-mcp/CLAUDE.md",
+    "lastBackup": "2026-03-12T20:30:37.965Z",
+    "syncStatus": "active",
+    "autoRecover": true
+  },
+  "growth": {
+    "totalGrowth": 67,
+    "daysActive": 160,
+    "averageDailyGrowth": 0,
+    "bestDay": {
+      "date": "2026-03-12T20:30:37.965Z",
+      "growth": 0
+    },
+    "bestWeek": {
+      "start": "2026-03-12T20:30:37.965Z",
+      "growth": 0
+    },
+    "milestones": [
+      {
+        "type": "birth",
+        "score": 33,
+        "date": "2026-03-12T20:30:37.965Z",
+        "version": "v1.0.0",
+        "label": "Birth",
+        "emoji": "🐣"
+      },
+      {
+        "type": "doubled",
+        "score": 100,
+        "date": "2026-08-20T15:49:57.203Z",
+        "version": "v1.0.1",
+        "label": "Doubled",
+        "emoji": "2️⃣"
+      },
+      {
+        "type": "peak",
+        "score": 100,
+        "date": "2026-08-20T15:49:57.203Z",
+        "version": "v1.0.1",
+        "label": "Peak",
+        "emoji": "🏔️"
+      },
+      {
+        "type": "current",
+        "score": 100,
+        "date": "2026-08-20T15:49:57.203Z",
+        "version": "v1.0.1",
+        "label": "Current",
+        "emoji": "📍"
+      }
+    ]
+  },
+  "lastModified": "2026-08-20T15:49:57.204Z",
+  "format": "faf-dna-v1"
+}

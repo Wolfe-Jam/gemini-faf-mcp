@@ -31,6 +31,4 @@ dist/
 .benchmarks/
 
 # FAF auto-generated artifacts
-.faf-dna
-.well-known/
 build/

@@ -1,0 +1,13 @@
+{
+  "specVersion": "1.0",
+  "entries": [
+    {
+      "identifier": "urn:air:faf.one:agent:gemini-faf-mcp",
+      "displayName": "gemini-faf-mcp",
+      "type": "application/vnd.fafa+yaml",
+      "description": "FAF agent passport (.fafa).",
+      "url": "https://faf.one/.well-known/fafa",
+      "updatedAt": "2026-08-20T15:59:03.000Z"
+    }
+  ]
+}

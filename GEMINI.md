@@ -1,21 +1,42 @@
----
-faf_score: 100%
-faf_tier: Trophy
-faf_version: 2.5.2
-last_sync: 2026-03-08 07:34:52.974000+00:00
----
+<!-- faf:start -->
+<!-- faf: gemini-faf-mcp | Python | mcp-server | MCP server for FAF — read, validate, auto-detect, score, and export IANA-registered .faf project DNA from Gemini CLI -->
+<!-- faf: claim=project.faf | family=FAF -->
 
-# Persistent project context for Google Gemini (gemini-faf-mcp)
+# GEMINI.md — gemini-faf-mcp
 
-## Project: gemini-faf-mcp
-- **Goal:** MCP server for FAF — read, validate, auto-detect, score, and export IANA-registered .faf persistent project context from Gemini CLI
-- **Language:** Python
-- **Score:** 100% (Trophy)
+> Authored from project.faf — refresh with `faf export --gemini`.
 
-## AI Instructions
-- Read project.faf first for full context
-- Score of 100% means full autonomy
+Project: gemini-faf-mcp
+Goal: MCP server for FAF — read, validate, auto-detect, score, and export IANA-registered .faf project DNA from Gemini CLI
+Language: Python
 
-## Source of Truth
-The .faf file is the single source of truth for project DNA.
-Media Type: application/vnd.faf+yaml (IANA registered)
+## Test & verify
+
+```bash
+pytest
+```
+
+## Where things live
+
+- `pyproject.toml`
+- `main.py`
+- `README.md`
+
+## Stack
+- Backend: Python
+- Main Language: Python
+- Runtime: Python 3.10+
+- Package Manager: pip
+- Build: setuptools
+- Database: BigQuery
+- API: MCP (stdio) + HTTP/REST
+- Connection: MCP (stdio) + HTTP/REST
+- Testing: pytest + WJTTC 9-tier championship suite
+- Hosting: Google Cloud Run
+- CI/CD: GitHub Actions
+
+## Before changing things
+
+- Ask first: dependency installs, deletions, migrations, schema changes, publish/release.
+- Never: force-push · push straight to `main` · commit secrets.
+<!-- faf:end -->

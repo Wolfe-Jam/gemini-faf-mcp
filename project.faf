@@ -1,5 +1,5 @@
 faf_version: "3.0"
-generated: 2026-03-08T07:34:52.974Z
+generated: 2026-08-20T15:59:03.000Z
 ai_scoring_system: 2025-09-20
 ai_score: 100%
 ai_confidence: HIGH
@@ -32,6 +32,7 @@ project:
   main_language: Python
   type: mcp-server  # found: no classifying signals — fallback
   framework: fastmcp
+  version: 2.5.1
 ai_instructions:
   priority_order:
     - 1. Read THIS .faf file first
@@ -85,7 +86,7 @@ preferences:
   documentation: as_needed
 state:
   phase: production
-  version: 2.2.0
+  version: 2.5.1
   focus: Mk4 Championship Scoring Engine parity
   status: green_flag
   next_milestone: gallery_listing
