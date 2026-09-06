@@ -9,7 +9,7 @@ MODELS = {
     "mcp-server": {
         "description": "MCP server for AI tool integration (stdio or HTTP)",
         "covers": ["MCP servers", "Gemini extensions", "Claude tools", "AI integrations"],
-        "faf": """faf_version: '2.5.0'
+        "faf": """faf_version: "3.0"
 project:
   name: weather-mcp
   goal: Real-time weather data for AI assistants via MCP tools
@@ -51,7 +51,7 @@ state:
     "web-app": {
         "description": "Frontend web application (React, Vue, Angular, Svelte)",
         "covers": ["React", "Vue", "Angular", "Svelte", "Next.js", "SvelteKit", "Nuxt"],
-        "faf": """faf_version: '2.5.0'
+        "faf": """faf_version: "3.0"
 project:
   name: team-dashboard
   goal: Real-time metrics dashboard for engineering team velocity and sprint progress
@@ -95,7 +95,7 @@ state:
     "saas": {
         "description": "SaaS product with auth, billing, and multi-tenancy",
         "covers": ["SaaS", "B2B platforms", "subscription products", "multi-tenant apps"],
-        "faf": """faf_version: '2.5.0'
+        "faf": """faf_version: "3.0"
 project:
   name: projecthub
   goal: Lightweight project management for small creative teams with time tracking and invoicing
@@ -139,7 +139,7 @@ state:
     "cli-tool": {
         "description": "Command-line tool distributed via package manager or binary",
         "covers": ["CLI tools", "developer tools", "npm packages", "Homebrew", "cargo install"],
-        "faf": """faf_version: '2.5.0'
+        "faf": """faf_version: "3.0"
 project:
   name: migrator
   goal: Zero-downtime database migrations with rollback support and dry-run mode
@@ -183,7 +183,7 @@ state:
     "api-service": {
         "description": "Backend API service (REST, GraphQL, gRPC)",
         "covers": ["REST APIs", "GraphQL", "gRPC", "microservices", "serverless functions"],
-        "faf": """faf_version: '2.5.0'
+        "faf": """faf_version: "3.0"
 project:
   name: payments-api
   goal: Handle subscription billing, invoices, and multi-currency payment processing
@@ -227,7 +227,7 @@ state:
     "mobile-app": {
         "description": "Mobile application (React Native, Flutter, native iOS/Android)",
         "covers": ["React Native", "Flutter", "iOS", "Swift", "Kotlin", "PWA", "Expo"],
-        "faf": """faf_version: '2.5.0'
+        "faf": """faf_version: "3.0"
 project:
   name: field-tracker
   goal: Offline-first mobile app for field service technicians to log jobs and capture photos
@@ -272,7 +272,7 @@ state:
     "chrome-extension": {
         "description": "Browser extension (Chrome, Firefox, Edge)",
         "covers": ["Chrome extensions", "Firefox add-ons", "Edge extensions", "browser plugins", "Manifest V3"],
-        "faf": """faf_version: '2.5.0'
+        "faf": """faf_version: "3.0"
 project:
   name: tab-saver
   goal: Save and restore browser tab groups with one click, synced across devices
@@ -316,7 +316,7 @@ state:
     "python-ml": {
         "description": "Machine learning or data science project",
         "covers": ["ML pipelines", "data science", "PyTorch", "TensorFlow", "LLM apps", "RAG", "computer vision"],
-        "faf": """faf_version: '2.5.0'
+        "faf": """faf_version: "3.0"
 project:
   name: doc-classifier
   goal: Classify legal documents and extract key clauses using fine-tuned models
@@ -361,7 +361,7 @@ state:
     "rust-crate": {
         "description": "Rust library or application published to crates.io",
         "covers": ["Rust crates", "cargo", "systems programming", "WASM", "embedded Rust"],
-        "faf": """faf_version: '2.5.0'
+        "faf": """faf_version: "3.0"
 project:
   name: fast-compress
   goal: Zero-copy compression library with SIMD acceleration for structured data
@@ -405,7 +405,7 @@ state:
     "library": {
         "description": "Reusable library or SDK (npm, PyPI, crates.io, etc.)",
         "covers": ["npm packages", "PyPI packages", "SDKs", "component libraries", "shared utilities"],
-        "faf": """faf_version: '2.5.0'
+        "faf": """faf_version: "3.0"
 project:
   name: date-engine
   goal: Lightweight date manipulation library with timezone support and human-readable output
@@ -450,7 +450,7 @@ state:
     "monorepo": {
         "description": "Multi-package monorepo (Turborepo, Nx, pnpm workspaces)",
         "covers": ["monorepos", "Turborepo", "Nx", "Lerna", "pnpm workspaces", "multi-app"],
-        "faf": """faf_version: '2.5.0'
+        "faf": """faf_version: "3.0"
 project:
   name: shopfront
   goal: Headless e-commerce platform with shared component library and admin panel
@@ -496,7 +496,7 @@ state:
     "android-app": {
         "description": "Android native application (Kotlin, Jetpack Compose)",
         "covers": ["Android", "Kotlin", "Jetpack Compose", "Material Design", "Google Play"],
-        "faf": """faf_version: '2.5.0'
+        "faf": """faf_version: "3.0"
 project:
   name: fit-log
   goal: Workout tracking app with exercise recognition and progress visualization
@@ -540,7 +540,7 @@ state:
     "iot-device": {
         "description": "IoT, embedded, or hardware project (Arduino, Raspberry Pi, ESP32)",
         "covers": ["IoT", "embedded systems", "Arduino", "Raspberry Pi", "ESP32", "Matter", "smart home"],
-        "faf": """faf_version: '2.5.0'
+        "faf": """faf_version: "3.0"
 project:
   name: greenhouse-monitor
   goal: Automated greenhouse monitoring with soil moisture, temperature, and light sensors
@@ -585,7 +585,7 @@ state:
     "desktop-app": {
         "description": "Desktop application (Electron, Tauri, native)",
         "covers": ["Electron", "Tauri", "WPF", "Qt", "cross-platform desktop", "macOS", "Windows", "Linux"],
-        "faf": """faf_version: '2.5.0'
+        "faf": """faf_version: "3.0"
 project:
   name: markdown-studio
   goal: Distraction-free Markdown editor with live preview, vim keybindings, and local file management
@@ -629,7 +629,7 @@ state:
     "game": {
         "description": "Game or interactive experience (Unity, Godot, web, native)",
         "covers": ["Unity", "Godot", "Unreal", "Phaser", "WebGL", "game development", "interactive"],
-        "faf": """faf_version: '2.5.0'
+        "faf": """faf_version: "3.0"
 project:
   name: pixel-quest
   goal: Procedurally generated roguelike with pixel art and permadeath

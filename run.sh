@@ -5,6 +5,6 @@ DIR="$(cd "$(dirname "$0")" && pwd)"
 VENV="$DIR/.venv"
 if [ ! -d "$VENV" ]; then
   python3 -m venv "$VENV" >&2
-  "$VENV/bin/pip" install --quiet fastmcp faf-python-sdk pyyaml >&2
+  "$VENV/bin/pip" install --quiet "$DIR" >&2   # installs from pyproject.toml — all runtime deps
 fi
 exec "$VENV/bin/python3" "$DIR/server.py"

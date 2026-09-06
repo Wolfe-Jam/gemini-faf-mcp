@@ -45,7 +45,7 @@ ai_instructions:
     quality_bar: zero_errors
     testing: required
   warnings:
-    - All changes must pass 221 tests before commit
+    - All changes must pass 243 tests before commit
     - faf-python-sdk handles parsing — server.py delegates
     - Version must match in pyproject.toml, __init__.py, client.py, server.py, main.py
 stack:
@@ -170,7 +170,7 @@ surfaces:
       status: live
     - type: mcp-registry
       id: one.faf/gemini-faf-mcp
-      status: pending   # migration target — see runbook
+      status: active   # live at 2.6.0 (the io.github.Wolfe-Jam/* entries are frozen at 2.5.0 — dual-namespace, cf. registry#1556)
     - type: pulsemcp
       id: gemini-faf-mcp
       status: pending

@@ -1,5 +1,5 @@
 """
-gemini-faf-mcp v2.5.0 — FastMCP Server
+gemini-faf-mcp v2.6.0 — FastMCP Server
 
 Native MCP server for FAF (Foundational AI-context Format).
 Powered by faf-python-sdk with Mk4 Championship Scoring Engine.
