@@ -1,10 +1,29 @@
 <!-- faf: gemini-faf-mcp | Python | mcp-server | FAF MCP server for Google Gemini — persistent project context via PyPI -->
-<!-- faf: doc=changelog | latest=v2.6.0 | canonical=project.faf | family=FAF -->
+<!-- faf: doc=changelog | latest=v2.7.0 | canonical=project.faf | family=FAF -->
 
 # Changelog
 
 All notable changes to gemini-faf-mcp are documented here.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
+
+## [2.7.0] - 2026-09-06 — The Interop Edition
+
+**`faf_agents` and `faf_gemini` now author family-standard AGENTS.md / GEMINI.md, and a new `faf_migrate` brings a .faf up to the current format.**
+
+### Changed
+- **`faf_agents`** — was a 4-field stub (`## Project`, `## Context`, `## Stack` with "N/A" everywhere, and it *included* who/why marketing). Now authors a full BETTER-shaped doc via `faf-python-sdk`'s `generate_agents_md` — `## Setup & build` (install→build→dev ordered) · `## Run the tests` · `## Where things live` · `## Conventions` (human-interaction prefs filtered) · three-tier `## Guardrails` · `## Definition of Done` · `## When stuck` · `## Security & secrets` · `## Commit & PR` · `## Stack`. **No Human Context section** — who/why belongs in the README / .faf DNA, not agent ops. In parity with faf-cli's `faf export --agents`.
+- **`faf_gemini`** — now follows Gemini CLI's own convention via `generate_gemini_md` (hierarchical, `@file`-importable — setup / verify / key files / stack / confirm-first). Dropped the YAML frontmatter and the embedded score/IANA prose (that data is in the tool *result*, not the file).
+- **`faf-python-sdk>=1.3.0`** — the interop generators live in the SDK now, so every Python FAF tool shares one implementation.
+- **fastmcp `>=4.0.0`** (was `>=3.4.7`).
+- **Python 3.10 dropped** — `requires-python >=3.11` (the test suite `import tomllib` unconditionally; 3.10 EOL).
+- `faf_init` / `faf_auto` templates emit `faf_version: "3.0"` and `slotignored` (was `'2.5.0'` + `null`).
+
+### Added
+- **`faf_migrate`** — bump a .faf to the current format version, ensure the section roots, re-serialize. Legacy slot names still score via the registry's aliases. `dry_run` to preview. Parity with faf-cli's `faf migrate`.
+- **`.github/workflows/ci.yml`** — `ruff` + `mypy` + `pytest` on Python 3.11–3.13 + `faf-cli check project.faf --strict`, on every push/PR. The 245-test suite previously ran only locally.
+
+### Fixed
+- `[tool.mypy]` overrides that sat after `[tool.ruff]` were silently dropped — consolidated. `python_version "3.10"`.
 
 ## [2.6.0] - 2026-08-20 — The Agent Card Edition
 

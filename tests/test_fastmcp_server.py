@@ -32,7 +32,7 @@ from server import __version__, mcp
 # ---------------------------------------------------------------------------
 
 FULL_FAF = """\
-faf_version: '2.5.0'
+faf_version: "3.0"
 project:
   name: test-project
   goal: Test project for MCP server validation
@@ -60,13 +60,13 @@ state:
 """
 
 MINIMAL_FAF = """\
-faf_version: '2.5.0'
+faf_version: "3.0"
 project:
   name: minimal-project
 """
 
 EMPTY_PROJECT_FAF = """\
-faf_version: '2.5.0'
+faf_version: "3.0"
 project:
   name: empty-slots
   goal: null
@@ -146,19 +146,19 @@ class TestTier1Brake:
         assert __version__ == expected
 
     async def test_tool_count(self, client):
-        """Exactly 12 tools registered."""
+        """Exactly 13 tools registered."""
         tools = await client.list_tools()
-        assert len(tools) == 12
+        assert len(tools) == 13
 
     async def test_all_tool_names(self, client):
-        """All 12 expected tools are present."""
+        """All 13 expected tools are present."""
         tools = await client.list_tools()
         names = {t.name for t in tools}
         expected = {
             "faf_read", "faf_validate", "faf_score", "faf_discover",
             "faf_init", "faf_stringify", "faf_context",
-            "faf_gemini", "faf_agents", "faf_about", "faf_model",
-            "faf_auto",
+            "faf_gemini", "faf_agents", "faf_migrate", "faf_about",
+            "faf_model", "faf_auto",
         }
         assert names == expected
 
@@ -481,51 +481,48 @@ class TestTier4Scoring:
 # ===================================================================
 
 class TestTier5Exports:
-    """Export tools produce valid, useful output."""
+    """Export tools produce valid family-standard output (faf-python-sdk generators)."""
 
-    async def test_gemini_has_frontmatter(self, client, full_faf):
-        data = _parse(await client.call_tool("faf_gemini", {"path": full_faf}))
-        content = data["content"]
-        assert content.startswith("---")
-        assert "faf_score:" in content
-        assert "faf_tier:" in content
+    async def test_gemini_starts_with_metastamp_and_header(self, client, full_faf):
+        content = _parse(await client.call_tool("faf_gemini", {"path": full_faf}))["content"]
+        assert content.startswith("<!-- faf:")
+        assert "# GEMINI.md — test-project" in content
 
     async def test_gemini_has_project_name(self, client, full_faf):
         data = _parse(await client.call_tool("faf_gemini", {"path": full_faf}))
         assert "test-project" in data["content"]
 
-    async def test_gemini_has_iana_reference(self, client, full_faf):
-        data = _parse(await client.call_tool("faf_gemini", {"path": full_faf}))
-        assert "application/vnd.faf+yaml" in data["content"]
+    async def test_gemini_has_confirm_first_section(self, client, full_faf):
+        content = _parse(await client.call_tool("faf_gemini", {"path": full_faf}))["content"]
+        assert "## Before changing things" in content
+        assert "Ask first:" in content
 
-    async def test_gemini_score_matches_metadata(self, client, full_faf):
-        data = _parse(await client.call_tool("faf_gemini", {"path": full_faf}))
-        assert f"{data['score']}%" in data["content"]
-        # Tier is now an emoji, check it appears in content
-        assert str(data["tier"]) in data["content"]
+    async def test_gemini_no_stale_frontmatter_or_iana_line(self, client, full_faf):
+        # v2.7.0: GEMINI.md follows Gemini CLI's own convention — no YAML
+        # frontmatter, no embedded score, no IANA prose (that's tool-result data).
+        content = _parse(await client.call_tool("faf_gemini", {"path": full_faf}))["content"]
+        assert not content.startswith("---")
+        assert "faf_score:" not in content
 
-    async def test_gemini_high_score_autonomy(self, client, full_faf):
-        """Score >= 85 should say 'full autonomy' in GEMINI.md."""
+    async def test_gemini_result_still_carries_score(self, client, full_faf):
         data = _parse(await client.call_tool("faf_gemini", {"path": full_faf}))
-        if data["score"] >= 85:
-            assert "full autonomy" in data["content"]
+        assert "score" in data and "tier" in data
 
     async def test_agents_has_header(self, client, full_faf):
         data = _parse(await client.call_tool("faf_agents", {"path": full_faf}))
-        assert "# AGENTS.md" in data["content"]
+        assert "# AGENTS.md — test-project" in data["content"]
 
-    async def test_agents_has_project_section(self, client, full_faf):
-        data = _parse(await client.call_tool("faf_agents", {"path": full_faf}))
-        assert "## Project" in data["content"]
-        assert "test-project" in data["content"]
+    async def test_agents_family_standard_sections(self, client, full_faf):
+        content = _parse(await client.call_tool("faf_agents", {"path": full_faf}))["content"]
+        for section in ("## Guardrails", "## Definition of Done", "## When stuck", "## Commit & PR"):
+            assert section in content, f"missing {section}"
 
-    async def test_agents_has_iana_reference(self, client, full_faf):
-        data = _parse(await client.call_tool("faf_agents", {"path": full_faf}))
-        assert "application/vnd.faf+yaml" in data["content"]
-
-    async def test_agents_includes_human_context(self, client, full_faf):
-        data = _parse(await client.call_tool("faf_agents", {"path": full_faf}))
-        assert "Developers" in data["content"]
+    async def test_agents_omits_human_context(self, client, full_faf):
+        # v2.7.0: AGENTS.md is agent ops — who/why marketing belongs in the
+        # README / .faf DNA, not here (matches faf-cli's generator).
+        content = _parse(await client.call_tool("faf_agents", {"path": full_faf}))["content"]
+        assert "## Context" not in content
+        assert "## Human Context" not in content
 
     async def test_agents_includes_stack(self, client, full_faf):
         data = _parse(await client.call_tool("faf_agents", {"path": full_faf}))
@@ -533,10 +530,34 @@ class TestTier5Exports:
         assert "PostgreSQL" in data["content"]
 
     async def test_agents_minimal_still_valid(self, client, minimal_faf):
-        """Minimal .faf produces valid AGENTS.md (no stack/context sections)."""
+        """Minimal .faf produces valid AGENTS.md (guardrails always render)."""
         data = _parse(await client.call_tool("faf_agents", {"path": minimal_faf}))
         assert "# AGENTS.md" in data["content"]
         assert "minimal-project" in data["content"]
+        assert "## Guardrails" in data["content"]
+
+    async def test_migrate_bumps_version(self, client, tmp_path):
+        old = tmp_path / "project.faf"
+        old.write_text(
+            "faf_version: '2.5.0'\nproject:\n  name: legacy\n  goal: g\n  main_language: Python\n"
+        )
+        data = _parse(await client.call_tool("faf_migrate", {"path": str(old)}))
+        assert data["success"] and data["changed"]
+        assert 'faf_version: "3.0"' in old.read_text() or "faf_version: '3.0'" in old.read_text()
+
+    async def test_migrate_noop_when_current(self, client, tmp_path):
+        cur = tmp_path / "project.faf"
+        cur.write_text('faf_version: "3.0"\nproject:\n  name: cur\n  goal: g\n  main_language: Python\n')
+        data = _parse(await client.call_tool("faf_migrate", {"path": str(cur)}))
+        assert data["success"] and data["changed"] is False
+
+    async def test_migrate_dry_run_writes_nothing(self, client, tmp_path):
+        old = tmp_path / "project.faf"
+        original = "faf_version: '2.5.0'\nproject:\n  name: legacy\n  goal: g\n  main_language: Go\n"
+        old.write_text(original)
+        data = _parse(await client.call_tool("faf_migrate", {"path": str(old), "dry_run": True}))
+        assert data["dry_run"] is True
+        assert old.read_text() == original
 
 
 # ===================================================================
