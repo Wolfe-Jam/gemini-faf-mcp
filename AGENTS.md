@@ -21,7 +21,7 @@ python -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"      # runtime + pytest / ruff / mypy
 ```
 
-Python 3.10 or newer.
+Python 3.11 or newer.
 
 ## Build
 
@@ -44,7 +44,7 @@ ruff check .
 mypy server.py models.py safe_path.py inject.py src/
 ```
 
-CI runs all three on Python 3.10–3.13 plus `faf-cli check project.faf --strict`
+CI runs all three on Python 3.11–3.13 plus `faf-cli check project.faf --strict`
 for every push and PR to `main` (`.github/workflows/ci.yml`). PyPI and the MCP
 Registry publish on a tag (`pypi.yml`, `publish-mcp-registry.yml` — DNS auth,
 namespace `one.faf/gemini-faf-mcp`).

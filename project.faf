@@ -55,7 +55,7 @@ stack:
   state_management: slotignored
   backend: Python
   main_language: Python
-  runtime: Python 3.10+
+  runtime: Python 3.11+
   package_manager: pip
   build: setuptools
   database: BigQuery

@@ -10,11 +10,10 @@ authors = [
 ]
 description = "Persistent Project Context for Google Gemini. IANA-registered .faf format, MCP server + Cloud Run REST API, unifies CLAUDE.md, GEMINI.md, AGENTS.md."
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 license = {text = "MIT"}
 classifiers = [
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "License :: OSI Approved :: MIT License",
@@ -68,26 +67,22 @@ package-dir = {"gemini_faf_mcp" = "src/gemini_faf_mcp"}
 asyncio_mode = "auto"
 
 [tool.mypy]
-python_version = "3.10"
+python_version = "3.11"
 warn_return_any = true
 warn_unused_configs = true
 ignore_missing_imports = false
 exclude = ["dist/", "build/", "gemini_faf_mcp.egg-info/", ".venv/"]
 
 [[tool.mypy.overrides]]
-# All must stay contiguous, directly under [tool.mypy] — a [[tool.mypy.overrides]]
-# placed after another [tool.*] table is silently dropped by some mypy versions
-# ("unused section(s)" note).
+# Keep every [[tool.mypy.overrides]] contiguous, directly under [tool.mypy] — one
+# placed after another [tool.*] table is silently dropped ("unused section(s)").
 #  - functions_framework / google: Cloud Run deps, no stubs
 #  - faf_sdk: faf-python-sdk ships without a py.typed marker (upstream gap)
-#  - tomllib: stdlib only on 3.11+; python_version is pinned to 3.10, so mypy
-#    reports import-not-found. server.py imports it inside try/except Exception
-#    (degrades on 3.10), so ignoring the missing import is correct.
-module = ["functions_framework.*", "google.*", "faf_sdk.*", "tomllib"]
+module = ["functions_framework.*", "google.*", "faf_sdk.*"]
 ignore_missing_imports = true
 
 [tool.ruff]
-target-version = "py310"
+target-version = "py311"
 line-length = 120
 exclude = ["dist", "build", ".venv", "gemini_faf_mcp.egg-info"]
 
