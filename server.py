@@ -607,7 +607,7 @@ def _detect_stack(directory: str) -> dict:
     # --- Metadata Extraction (Name, Version, Goal) ---
     try:
         if has_pyproject:
-            import tomllib  # type: ignore[import-untyped]
+            import tomllib
             data = tomllib.loads((dir_path / "pyproject.toml").read_text())
             if "project" in data:
                 detected["name"] = data["project"].get("name")

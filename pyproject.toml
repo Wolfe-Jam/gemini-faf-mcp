@@ -75,14 +75,15 @@ ignore_missing_imports = false
 exclude = ["dist/", "build/", "gemini_faf_mcp.egg-info/", ".venv/"]
 
 [[tool.mypy.overrides]]
-module = ["functions_framework.*", "google.*"]
-ignore_missing_imports = true
-
-[[tool.mypy.overrides]]
-# faf-python-sdk ships without a py.typed marker (upstream packaging gap, not
-# a code issue here) — 6 "missing library stubs" errors as of faf_sdk 1.0.2.
-# Same class as functions_framework/google above; mirrors that pattern.
-module = ["faf_sdk.*"]
+# All must stay contiguous, directly under [tool.mypy] — a [[tool.mypy.overrides]]
+# placed after another [tool.*] table is silently dropped by some mypy versions
+# ("unused section(s)" note).
+#  - functions_framework / google: Cloud Run deps, no stubs
+#  - faf_sdk: faf-python-sdk ships without a py.typed marker (upstream gap)
+#  - tomllib: stdlib only on 3.11+; python_version is pinned to 3.10, so mypy
+#    reports import-not-found. server.py imports it inside try/except Exception
+#    (degrades on 3.10), so ignoring the missing import is correct.
+module = ["functions_framework.*", "google.*", "faf_sdk.*", "tomllib"]
 ignore_missing_imports = true
 
 [tool.ruff]
@@ -94,7 +95,4 @@ exclude = ["dist", "build", ".venv", "gemini_faf_mcp.egg-info"]
 select = ["E", "F", "I", "UP", "B"]
 ignore = ["E501"]  # line length handled separately; keep noise down for first pass
 
-[[tool.mypy.overrides]]
-module = "tomllib"
-disable_error_code = ["import-untyped"]
 
