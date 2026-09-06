@@ -11,7 +11,7 @@ ai_tldr:
   current_focus: Gemini Extensions Gallery listing
   your_role: Build features with perfect context
 instant_context:
-  what_building: Native MCP server for FAF — 12 tools for Gemini CLI, plus Cloud Run REST API
+  what_building: Native MCP server for FAF — 13 tools for Gemini CLI, plus Cloud Run REST API
   tech_stack: Python + FastMCP + faf-python-sdk + Cloud Run
   main_language: Python
   key_files:
@@ -33,7 +33,7 @@ project:
   main_language: Python
   type: mcp-server  # found: no classifying signals — fallback
   framework: fastmcp
-  version: 2.6.0
+  version: 2.7.0
 ai_instructions:
   priority_order:
     - 1. Read THIS .faf file first
@@ -45,7 +45,7 @@ ai_instructions:
     quality_bar: zero_errors
     testing: required
   warnings:
-    - All changes must pass 243 tests before commit
+    - All changes must pass 245 tests before commit
     - faf-python-sdk handles parsing — server.py delegates
     - Version must match in pyproject.toml, __init__.py, client.py, server.py, main.py
 stack:
@@ -87,7 +87,7 @@ preferences:
   documentation: as_needed
 state:
   phase: production
-  version: 2.6.0
+  version: 2.7.0
   focus: Mk4 Championship Scoring Engine parity
   status: green_flag
   next_milestone: gallery_listing
@@ -183,8 +183,17 @@ surfaces:
 tech_stack:
   - Python
 key_files:
+  - server.py — the FastMCP server, every @mcp.tool
+  - models.py — 16 reference project.faf templates for faf_model
+  - safe_path.py — confine_file_op, every write stays in the project root
+  - inject.py — non-destructive faf-managed-block injection
+  - src/gemini_faf_mcp/ — client.py + parser helpers over faf-python-sdk
+  - main.py — Cloud Run / functions-framework entry point
+  - tests/ — pytest, the WJTTC 9-tier suite
   - pyproject.toml
-  - main.py
-  - README.md
 commands:
-  test: pytest
+  install: pip install -e ".[dev]"
+  test: pytest -q
+  lint: ruff check .
+  typecheck: mypy server.py models.py safe_path.py inject.py src/
+  build: python -m build

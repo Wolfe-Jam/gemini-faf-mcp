@@ -1,5 +1,5 @@
 """
-gemini-faf-mcp v2.6.0 — FastMCP Server
+gemini-faf-mcp v2.7.0 — FastMCP Server
 
 Native MCP server for FAF (Foundational AI-context Format).
 Powered by faf-python-sdk with Mk4 Championship Scoring Engine.
@@ -13,7 +13,16 @@ import functools
 import os
 from pathlib import Path
 
-from faf_sdk import detect_dart_project, find_faf_file, parse_file, score_faf, stringify, validate
+from faf_sdk import (
+    detect_dart_project,
+    find_faf_file,
+    generate_agents_md,
+    generate_gemini_md,
+    parse_file,
+    score_faf,
+    stringify,
+    validate,
+)
 from faf_sdk.parser import FafParseError
 from fastmcp import FastMCP
 
@@ -21,7 +30,11 @@ from inject import inject_faf_block
 from models import get_model, list_models
 from safe_path import PathConfinementError, confine_file_op, confine_path
 
-__version__ = "2.6.0"
+__version__ = "2.7.0"
+
+# The .faf FORMAT version this server writes (distinct from __version__, the
+# server's own release). Matches faf-cli's FAF_VERSION / faf-python-sdk.
+FAF_FORMAT_VERSION = "3.0"
 
 # Stack framework buckets — which detected framework lands in which .faf slot.
 # Includes Dart/Flutter (Flutter = frontend/UI; Dart servers = backend) so the
@@ -161,25 +174,32 @@ def faf_init(
     if safe.exists():
         return {"success": False, "error": f"File already exists: {path}"}
 
-    content = f"""faf_version: '2.5.0'
+    content = f"""faf_version: "{FAF_FORMAT_VERSION}"
 project:
   name: {name}
   goal: {goal or 'Describe your project goal'}
   main_language: {language or 'unknown'}
+commands:
+  install: ""
+  build: ""
+  test: ""
+key_files: []
 stack:
-  frontend: null
-  backend: null
-  database: null
-  testing: null
+  frontend: slotignored
+  backend: slotignored
+  database: slotignored
+  runtime: slotignored
+  testing: slotignored
 human_context:
   who: Developers
   what: {goal or 'What problem does this solve?'}
   why: Why does this project exist?
 ai_instructions:
-  priority: Read project.faf first
-  usage: Code-first, minimal explanations
+  working_style:
+    quality_bar: zero_errors
+    testing: required
+  warnings: []
 preferences:
-  quality_bar: zero_errors
   commit_style: conventional
 state:
   phase: development
@@ -267,45 +287,23 @@ def faf_context(path: str = "project.faf") -> dict:
 @_confined
 def faf_gemini(path: str = "project.faf") -> dict:
     """Export and write GEMINI.md from a .faf file (non-destructive).
-    Generates Markdown with YAML frontmatter for Gemini CLI and injects it into
-    GEMINI.md as a faf-managed block, preserving any existing content. Re-running
-    updates the block in place — it never overwrites your file."""
+    Authors GEMINI.md in Gemini CLI's own convention (hierarchical,
+    @file-importable — setup · verify · key files · stack · confirm-first
+    actions) via faf-python-sdk's generator, in parity with faf-cli's
+    `faf export --gemini`. Injects it as a faf-managed block, preserving any
+    hand content. Re-running updates the block in place."""
     try:
         faf = _parse_faf(path)
-        data = faf.data
         mk4 = _mk4_score_file(path)
-        score = mk4.score
-        tier = mk4.tier
-
-        md = f"""---
-faf_score: {score}%
-faf_tier: {tier}
-faf_version: {data.faf_version}
----
-
-# Gemini Project DNA ({data.project.name})
-
-## Project: {data.project.name}
-- **Goal:** {data.project.goal or 'Not specified'}
-- **Language:** {data.project.main_language or 'Not specified'}
-- **Score:** {score}% ({tier})
-
-## AI Instructions
-- Read project.faf first for full context
-- Score of {score}% means {'full autonomy' if score >= 85 else 'check with user on ambiguous decisions'}
-
-## Source of Truth
-The .faf file is the single source of truth for project DNA.
-Media Type: application/vnd.faf+yaml (IANA registered)
-"""
+        md = generate_gemini_md(faf.data.raw)
         target = confine_file_op(str(Path(path).parent / "GEMINI.md"))
         inject_faf_block(target, md)
         return {
             "success": True,
             "path": str(target),
             "content": md,
-            "score": score,
-            "tier": tier,
+            "score": mk4.score,
+            "tier": mk4.tier,
             "message": "GEMINI.md updated — faf block injected, existing content preserved",
         }
     except FileNotFoundError:
@@ -318,44 +316,14 @@ Media Type: application/vnd.faf+yaml (IANA registered)
 @_confined
 def faf_agents(path: str = "project.faf") -> dict:
     """Export and write AGENTS.md from a .faf file (non-destructive).
-    Generates a universal agent context file (OpenAI Codex, Cursor, etc.) and
-    injects it into AGENTS.md as a faf-managed block, preserving any existing
+    Authors a BETTER-shaped AGENTS.md (setup · tests · layout · conventions ·
+    three-tier guardrails · definition of done · security · commit) via
+    faf-python-sdk's generator — in parity with faf-cli's `faf export --agents`.
+    Injects it into AGENTS.md as a faf-managed block, preserving any hand
     content. Re-running updates the block in place — it never overwrites your file."""
     try:
         faf = _parse_faf(path)
-        data = faf.data
-        mk4 = _mk4_score_file(path)
-
-        md = f"""# AGENTS.md — {data.project.name}
-
-## Project
-- **Name:** {data.project.name}
-- **Goal:** {data.project.goal or 'Not specified'}
-- **Language:** {data.project.main_language or 'Not specified'}
-- **FAF Score:** {mk4.score}%
-
-## Instructions for AI Agents
-- This project uses FAF (Foundational AI-context Format)
-- Read project.faf for complete project DNA
-- Media Type: application/vnd.faf+yaml (IANA registered)
-"""
-
-        if data.human_context:
-            md += f"""
-## Context
-- **Who:** {data.human_context.who or 'Not specified'}
-- **What:** {data.human_context.what or 'Not specified'}
-- **Why:** {data.human_context.why or 'Not specified'}
-"""
-
-        if data.stack:
-            md += f"""
-## Stack
-- **Frontend:** {data.stack.frontend or 'N/A'}
-- **Backend:** {data.stack.backend or 'N/A'}
-- **Database:** {data.stack.database or 'N/A'}
-- **Testing:** {data.stack.testing or 'N/A'}
-"""
+        md = generate_agents_md(faf.data.raw)
         target = confine_file_op(str(Path(path).parent / "AGENTS.md"))
         inject_faf_block(target, md)
         return {
@@ -364,6 +332,44 @@ def faf_agents(path: str = "project.faf") -> dict:
             "content": md,
             "message": "AGENTS.md updated — faf block injected, existing content preserved",
         }
+    except FileNotFoundError:
+        return {"success": False, "error": f"File not found: {path}"}
+    except FafParseError as e:
+        return {"success": False, "error": str(e)}
+
+
+@mcp.tool()
+@_confined
+def faf_migrate(path: str = "project.faf", dry_run: bool = False) -> dict:
+    """Migrate a .faf file to the current format version (3.0).
+    Bumps `faf_version`, ensures the section roots exist (`project`, `stack`,
+    `human_context`, `monorepo`), and re-serializes. Legacy slot names
+    (`frontend`/`database`/…) still score via the registry's aliases — this
+    only touches the version and structure, never your values. Parity with
+    faf-cli's `faf migrate`. Pass dry_run=true to preview."""
+    try:
+        faf = _parse_faf(path)
+        data = dict(faf.data.raw)
+        old = str(data.get("faf_version") or "unknown")
+
+        if old == FAF_FORMAT_VERSION:
+            return {"success": True, "changed": False,
+                    "message": f"Already at faf_version {FAF_FORMAT_VERSION}"}
+
+        data["faf_version"] = FAF_FORMAT_VERSION
+        for root in ("project", "stack", "human_context", "monorepo"):
+            data.setdefault(root, {})
+
+        if dry_run:
+            return {"success": True, "changed": True, "dry_run": True,
+                    "message": f"Would migrate {path}: faf_version {old} -> {FAF_FORMAT_VERSION}"}
+
+        safe = confine_file_op(path)
+        safe.write_text(stringify(data))
+        return {"success": True, "changed": True,
+                "old_version": old, "new_version": FAF_FORMAT_VERSION,
+                "path": str(safe),
+                "message": f"Migrated {path}: faf_version {old} -> {FAF_FORMAT_VERSION}"}
     except FileNotFoundError:
         return {"success": False, "error": f"File not found: {path}"}
     except FafParseError as e:
@@ -677,25 +683,27 @@ def faf_auto(directory: str = ".", path: str = "project.faf") -> dict:
             lang = detected.get("main_language", "unknown")
             goal = detected.get("goal") or "Describe your project goal"
             version = detected.get("version") or "0.1.0"
-            content = f"""faf_version: '2.5.0'
+            content = f"""faf_version: "{FAF_FORMAT_VERSION}"
 project:
   name: {name}
   goal: {goal}
   main_language: {lang}
 stack:
-  frontend: {detected.get('framework') if detected.get('framework') in FRONTEND_FRAMEWORKS else 'null'}
-  backend: {detected.get('framework') if detected.get('framework') in BACKEND_FRAMEWORKS else 'null'}
-  database: {detected.get('database', 'null')}
-  testing: {detected.get('testing', 'null')}
+  frontend: {detected.get('framework') if detected.get('framework') in FRONTEND_FRAMEWORKS else 'slotignored'}
+  backend: {detected.get('framework') if detected.get('framework') in BACKEND_FRAMEWORKS else 'slotignored'}
+  database: {detected.get('database', 'slotignored')}
+  runtime: slotignored
+  testing: {detected.get('testing', 'slotignored')}
 human_context:
   who: Developers
   what: {goal}
   why: Why does this project exist?
 ai_instructions:
-  priority: Read project.faf first
-  usage: Code-first, minimal explanations
+  working_style:
+    quality_bar: zero_errors
+    testing: required
+  warnings: []
 preferences:
-  quality_bar: zero_errors
   commit_style: conventional
 state:
   phase: development
