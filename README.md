@@ -1,7 +1,7 @@
 <!-- faf: gemini-faf-mcp | Python | mcp-server | FAF MCP server for Google Gemini — persistent project context via PyPI -->
 <!-- faf: doc=readme | canonical=project.faf | score=100 | family=FAF -->
 
-# gemini-faf-mcp — The Agent Card Edition
+# gemini-faf-mcp — The Interop Edition
 
 **Persistent Project Context for Google Gemini. Define once. Sync everywhere.**
 
@@ -15,7 +15,7 @@ Stop re-explaining your project to every new Gemini session. Every Gemini conver
 
 [![PyPI](https://img.shields.io/pypi/v/gemini-faf-mcp?style=for-the-badge&logo=pypi&logoColor=white)](https://pypi.org/project/gemini-faf-mcp/)
 [![FAF Trophy 100%](https://img.shields.io/badge/FAF-%F0%9F%8F%86%20100%25-000000?labelColor=FF6B35)](https://faf.one)
-[![Tests](https://img.shields.io/badge/Tests-243%20passing-brightgreen?style=for-the-badge)](https://github.com/Wolfe-Jam/gemini-faf-mcp)
+[![Tests](https://img.shields.io/badge/Tests-245%20passing-brightgreen?style=for-the-badge)](https://github.com/Wolfe-Jam/gemini-faf-mcp)
 [![IANA: vnd.faf+yaml](https://img.shields.io/badge/IANA-vnd.faf%2Byaml-00D4D4?style=for-the-badge)](https://www.iana.org/assignments/media-types/application/vnd.faf+yaml)
 [![IANA: vnd.fafm+yaml](https://img.shields.io/badge/IANA-vnd.fafm%2Byaml-00D4D4?style=for-the-badge)](https://www.iana.org/assignments/media-types/application/vnd.fafm+yaml)
 [![DOI: Context paper](https://img.shields.io/badge/DOI-Context%20paper-FF6B35?style=for-the-badge)](https://doi.org/10.5281/zenodo.18251362)
@@ -38,13 +38,13 @@ Gemini: [now ready to help]
 
 `.faf` is read once at session start. Every tool call lands on a Gemini that already knows your project.
 
-### What's New in v2.6.0 — The Agent Card Edition
+### What's New in v2.7.0 — The Interop Edition
 
-**A real agent.fafa passport, MCP Server Card, and AI Catalog entry — gemini-faf-mcp joins the wider agent-discovery ecosystem.**
+**`faf_agents` and `faf_gemini` now author family-standard AGENTS.md / GEMINI.md, and a new `faf_migrate` brings a .faf up to the current format.**
 
-`agent.fafa` is authored from live introspection of the server's actual tools, not guessed. Ships alongside an MCP Server Card (SEP-2127) and a fresh AI Catalog entry (spec ratified Nov 2025). GEMINI.md now renders real setup/test/key-files content instead of a thin project/goal/language stub. Not in this release: A2A support — `faf cards --target a2a` correctly refuses to fabricate an endpoint this server doesn't serve; real A2A support is a future release, not a claim made early.
+`faf_agents` was a 4-field stub that padded sections with "N/A" and shipped who/why marketing. It now authors a full BETTER-shaped doc through `faf-python-sdk`'s `generate_agents_md` — setup (install→build→dev ordered) · tests · where things live · conventions · three-tier guardrails · definition of done · when stuck · security · commit & PR · stack. No Human Context section — that belongs in the README / `.faf` DNA, not agent ops. `faf_gemini` now follows Gemini CLI's own hierarchical, `@file`-importable convention. Both are in parity with faf-cli's `faf export`. New `faf_migrate` bumps a `.faf` to the current format version (`dry_run` to preview). **13 tools.** Also: `fastmcp >=4.0.0`, Python 3.11+, and a `ci.yml` running the 245-test suite on every push.
 
-> **v2.5.1** — one.faf namespace migration: gemini joins the fleet on `one.faf/gemini-faf-mcp` (registry publish now DNS-authenticated). **v2.5.0 — The Dart Edition** detects Dart/Flutter from `pubspec.yaml` — Flutter app vs package · Dart MCP / backend / CLI / library. **v2.4.3** made `faf_agents` / `faf_gemini` non-destructive (inject a structured `.faf` block, preserve your Markdown below). **v2.4.2 — The Confinement Edition** confined every caller `path` argument (security). **v2.4.0 — The Chameleon Edition** auto-selects its transport: stdio locally, Streamable HTTP on Cloud Run. 12 tools, zero config.
+> **v2.6.0 — The Agent Card Edition** added a real `agent.fafa` passport (authored from live tool introspection), an MCP Server Card (SEP-2127), and an AI Catalog entry. **v2.5.1** one.faf namespace migration. **v2.5.0 — The Dart Edition** detects Dart/Flutter from `pubspec.yaml`. **v2.4.3** made `faf_agents` / `faf_gemini` non-destructive. **v2.4.2 — The Confinement Edition** confined every caller `path` argument. **v2.4.0 — The Chameleon Edition** auto-selects its transport: stdio locally, Streamable HTTP on Cloud Run.
 
 ---
 
@@ -232,9 +232,10 @@ Your `.faf` file is scored on completeness — how many slots are filled with re
 ## Architecture
 
 ```
-gemini-faf-mcp v2.4.2
-├── server.py              → FastMCP MCP server (12 tools, dual-transport, Mk4 scoring)
+gemini-faf-mcp v2.7.0
+├── server.py              → FastMCP MCP server (13 tools, dual-transport, Mk4 scoring)
 ├── safe_path.py           → path confinement for caller-supplied `path` args
+├── inject.py              → non-destructive faf-managed-block injection
 ├── main.py                → Cloud Run REST API (GET/POST/PUT)
 ├── models.py              → 15 project type examples
 └── src/gemini_faf_mcp/    → Python SDK (FAFClient, parser)

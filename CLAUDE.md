@@ -13,7 +13,7 @@ MCP server for FAF — read, validate, auto-detect, score, and export IANA-regis
 - **Language:** Python
 - **Backend:** Python
 - **Main Language:** Python
-- **Runtime:** Python 3.10+
+- **Runtime:** Python 3.11+
 - **Package Manager:** pip
 - **Build:** setuptools
 - **Database:** BigQuery
@@ -38,5 +38,5 @@ MCP server for FAF — read, validate, auto-detect, score, and export IANA-regis
 
 ---
 
-*STATUS: BI-SYNC ACTIVE — 2026-08-20T18:08:18.511Z*
+*STATUS: BI-SYNC ACTIVE — 2026-09-06T22:43:16.356Z*
 <!-- faf:end -->

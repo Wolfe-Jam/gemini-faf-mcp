@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "gemini-faf-mcp"
 version = "2.7.0"
 authors = [
-  { name="wolfejam", email="james@wolfejam.dev" },
+  { name="wolfejam", email="team@faf.one" },
 ]
 description = "Persistent Project Context for Google Gemini. IANA-registered .faf format, MCP server + Cloud Run REST API, unifies CLAUDE.md, GEMINI.md, AGENTS.md."
 readme = "README.md"
