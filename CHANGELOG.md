@@ -14,7 +14,7 @@ Docs / copy patch — no behavior change.
 - README claimed **12 tools** and **233 tests** in the body sections (`## All 12 Tools`, Testing) — the v2.7.0 Doc Gate updated the front door but not the tables. Corrected to **13 tools** (added the `faf_migrate` row) and **245 tests**.
 - README's "What about my `GEMINI.md`?" section and `commands/faf/export.toml` still described **YAML frontmatter** output — v2.7.0 dropped that. Rewritten for the hierarchical, `@file`-importable format `faf_gemini` now writes.
 - Example `.faf` in the README used `faf_version: '2.5.0'`; updated to `"3.0"`.
-- `AGENTS.md` / `GEMINI.md` regenerated against faf-python-sdk 1.3.1 (was stale at v2.7.0 with the old frontmatter-style GEMINI.md).
+- `AGENTS.md` / `GEMINI.md` re-authored against faf-python-sdk 1.3.1 (was stale at v2.7.0 with the old frontmatter-style GEMINI.md).
 - "generate" removed from external copy — README prose, the `faf_init` / `faf_auto` / `faf_gemini` / `faf_agents` tool descriptions, and `/faf:export`. FAF authors and delivers facts. The `generate_agents_md` / `generate_gemini_md` function identifiers are unchanged.
 
 ### Changed
