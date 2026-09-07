@@ -13,7 +13,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 ### Changed
 - **`faf_agents`** — was a 4-field stub (`## Project`, `## Context`, `## Stack` with "N/A" everywhere, and it *included* who/why marketing). Now authors a full BETTER-shaped doc via `faf-python-sdk`'s `generate_agents_md` — `## Setup & build` (install→build→dev ordered) · `## Run the tests` · `## Where things live` · `## Conventions` (human-interaction prefs filtered) · three-tier `## Guardrails` · `## Definition of Done` · `## When stuck` · `## Security & secrets` · `## Commit & PR` · `## Stack`. **No Human Context section** — who/why belongs in the README / .faf DNA, not agent ops. In parity with faf-cli's `faf export --agents`.
 - **`faf_gemini`** — now follows Gemini CLI's own convention via `generate_gemini_md` (hierarchical, `@file`-importable — setup / verify / key files / stack / confirm-first). Dropped the YAML frontmatter and the embedded score/IANA prose (that data is in the tool *result*, not the file).
-- **`faf-python-sdk>=1.3.0`** — the interop generators live in the SDK now, so every Python FAF tool shares one implementation.
+- **`faf-python-sdk>=1.3.0`** — the interop authoring tools live in the SDK now, so every Python FAF tool shares one implementation.
 - **fastmcp `>=4.0.0`** (was `>=3.4.7`).
 - **Python 3.10 dropped** — `requires-python >=3.11` (the test suite `import tomllib` unconditionally; 3.10 EOL).
 - `faf_init` / `faf_auto` templates emit `faf_version: "3.0"` and `slotignored` (was `'2.5.0'` + `null`).
