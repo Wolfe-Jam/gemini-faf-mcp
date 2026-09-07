@@ -1,10 +1,31 @@
 <!-- faf: gemini-faf-mcp | Python | mcp-server | FAF MCP server for Google Gemini — persistent project context via PyPI -->
-<!-- faf: doc=changelog | latest=v2.7.1 | canonical=project.faf | family=FAF -->
+<!-- faf: doc=changelog | latest=v2.8.0 | canonical=project.faf | family=FAF -->
 
 # Changelog
 
 All notable changes to gemini-faf-mcp are documented here.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
+
+## [2.8.0] - 2026-09-07 — The Full-Facts Edition
+
+**`faf_auto` now grounds its detection in the repo's own files, and every `faf_model` reference template scores 100% Trophy.**
+
+### Added
+
+- **Full-Facts grounding for `faf_auto`** (`interrogate.py`, in parity with faf-cli 7.10). After the root-manifest scan, `faf_auto` reads:
+  - **docker-compose service images** — `postgres` / `redis` / `elasticsearch` / `minio` / `clickhouse` / `qdrant` / … map onto the `database` / `cache` / `search` / `storage` slots. A running Postgres service **is** the database — it wins over a dependency guess (an ORM in `requirements.txt` is not the DB).
+  - **Makefile / justfile targets** — `test` / `build` / `check-all` map onto the `commands` block. The root file wins; a nested `backend/Makefile` is found and prefixed with `cd backend &&`.
+  - **`.github/workflows/`** → `cicd: GitHub Actions` (also GitLab CI, CircleCI).
+  A polyglot repo that reported `library` / `JavaScript` now reports its real Postgres + Redis + FastAPI stack.
+- The `faf_auto` template now writes the full 12-slot stack plus a `commands` block and `key_files`.
+
+### Fixed
+
+- **Every `faf_model` reference template now scores 100% Trophy.** The 15 examples were scoring 48–57% (RED / YELLOW) — they filled only 4 stack slots and used `null` instead of `slotignored`. All 15 rewritten to the full 21-slot schema with realistic values; a test locks each at Trophy.
+
+### Changed
+
+- 245 → 262 tests (15 for `interrogate`, 2 for `faf_model` parity).
 
 ## [2.7.1] - 2026-09-07 — The Interop Edition
 

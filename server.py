@@ -1,5 +1,5 @@
 """
-gemini-faf-mcp v2.7.1 — FastMCP Server
+gemini-faf-mcp v2.8.0 — FastMCP Server
 
 Native MCP server for FAF (Foundational AI-context Format).
 Powered by faf-python-sdk with Mk4 Championship Scoring Engine.
@@ -27,10 +27,11 @@ from faf_sdk.parser import FafParseError
 from fastmcp import FastMCP
 
 from inject import inject_faf_block
+from interrogate import interrogate_repo
 from models import get_model, list_models
 from safe_path import PathConfinementError, confine_file_op, confine_path
 
-__version__ = "2.7.1"
+__version__ = "2.8.0"
 
 # The .faf FORMAT version this server writes (distinct from __version__, the
 # server's own release). Matches faf-cli's FAF_VERSION / faf-python-sdk.
@@ -651,6 +652,14 @@ def _detect_stack(directory: str) -> dict:
     except Exception:
         pass
 
+    # CI/CD — a file fact, same class as docker-compose.
+    if (dir_path / ".github" / "workflows").is_dir():
+        detected["cicd"] = "GitHub Actions"
+    elif (dir_path / ".gitlab-ci.yml").is_file():
+        detected["cicd"] = "GitLab CI"
+    elif (dir_path / ".circleci").is_dir():
+        detected["cicd"] = "CircleCI"
+
     return detected
 
 
@@ -658,16 +667,33 @@ def _detect_stack(directory: str) -> dict:
 @_confined
 def faf_auto(directory: str = ".", path: str = "project.faf") -> dict:
     """Auto-detect project stack and author/update a .faf file.
-    Scans for package.json, pyproject.toml, Cargo.toml, go.mod, and other
-    manifest files. Extracts language, framework, database, API type, and
-    build tools from actual dependencies — no hardcoded defaults.
-    Creates a new .faf if none exists, or fills empty slots in an existing one."""
+    Scans package.json, pyproject.toml, Cargo.toml, go.mod, and other manifest
+    files for language, framework, database, API type, and build tools — then
+    grounds the result in the repo's own files: docker-compose service images
+    (Postgres, Redis, Elasticsearch...) map onto stack slots, and Makefile /
+    justfile targets map onto test / build / lint commands. Facts from files,
+    no hardcoded defaults. Creates a new .faf if none exists, or fills empty
+    slots in an existing one."""
     try:
         dir_path = Path(directory).resolve()
         if not dir_path.is_dir():
             return {"success": False, "error": f"Directory not found: {directory}"}
 
         detected = _detect_stack(directory)
+
+        # Full-Facts grounding: docker-compose services + Makefile targets are
+        # ground truth the root-manifest scan never sees (in parity with
+        # faf-cli 7.10). A running Postgres/Redis service IS the database/cache —
+        # it wins over a dependency guess (an ORM in requirements ≠ the DB).
+        # `hosting` / `runtime` only fill empties (Cloud Run beats "Docker Compose").
+        ground = interrogate_repo(directory)
+        for slot in ("database", "cache", "search", "storage"):
+            if ground["stack"].get(slot):
+                detected[slot] = ground["stack"][slot]
+        for slot in ("runtime", "hosting"):
+            if ground["stack"].get(slot) and not detected.get(slot):
+                detected[slot] = ground["stack"][slot]
+        commands: dict[str, str] = dict(ground["commands"])
 
         # Resolve path relative to directory
         faf_path = Path(path)
@@ -677,26 +703,53 @@ def faf_auto(directory: str = ".", path: str = "project.faf") -> dict:
 
         created = not faf_path.exists()
 
+        def _yv(v: str) -> str:
+            """Quote a detected value for YAML unless it is the bare sentinel."""
+            return v if v == "slotignored" else '"' + v.replace('"', '\\"') + '"'
+
         if created:
-            # Generate new .faf from detections
+            # Author a new .faf from detection + Full-Facts grounding.
             name = detected.get("name") or dir_path.name or "my-project"
             lang = detected.get("main_language", "unknown")
             goal = detected.get("goal") or "Describe your project goal"
             version = detected.get("version") or "0.1.0"
+            fw = detected.get("framework")
+            _stack = {
+                "frontend": fw if fw in FRONTEND_FRAMEWORKS else "slotignored",
+                "css_framework": "slotignored",
+                "ui_library": "slotignored",
+                "state_management": "slotignored",
+                "backend": fw if fw in BACKEND_FRAMEWORKS else "slotignored",
+                "api_type": detected.get("api_type", "slotignored"),
+                "runtime": detected.get("runtime", "slotignored"),
+                "database": detected.get("database", "slotignored"),
+                "cache": detected.get("cache", "slotignored"),
+                "search": detected.get("search", "slotignored"),
+                "storage": detected.get("storage", "slotignored"),
+                "connection": "slotignored",
+                "hosting": detected.get("hosting", "slotignored"),
+                "build": detected.get("build_tool", "slotignored"),
+                "cicd": detected.get("cicd", "slotignored"),
+                "testing": detected.get("testing", "slotignored"),
+            }
+            stack_lines = "\n".join(f"  {k}: {_yv(v)}" for k, v in _stack.items())
+            cmd_lines = (
+                "\n".join(f"  {k}: {_yv(v)}" for k, v in commands.items())
+                if commands else '  test: ""\n  build: ""'
+            )
             content = f"""faf_version: "{FAF_FORMAT_VERSION}"
 project:
-  name: {name}
-  goal: {goal}
-  main_language: {lang}
+  name: {_yv(name)}
+  goal: {_yv(goal)}
+  main_language: {_yv(lang)}
 stack:
-  frontend: {detected.get('framework') if detected.get('framework') in FRONTEND_FRAMEWORKS else 'slotignored'}
-  backend: {detected.get('framework') if detected.get('framework') in BACKEND_FRAMEWORKS else 'slotignored'}
-  database: {detected.get('database', 'slotignored')}
-  runtime: slotignored
-  testing: {detected.get('testing', 'slotignored')}
+{stack_lines}
+commands:
+{cmd_lines}
+key_files: []
 human_context:
   who: Developers
-  what: {goal}
+  what: {_yv(goal)}
   why: Why does this project exist?
 ai_instructions:
   working_style:
@@ -707,7 +760,7 @@ preferences:
   commit_style: conventional
 state:
   phase: development
-  version: {version}
+  version: {_yv(version)}
   status: active
 """
             faf_path.parent.mkdir(parents=True, exist_ok=True)
@@ -729,16 +782,31 @@ state:
                 if val and field == "goal" and "Describe your project goal" in updated:
                     updated = updated.replace("Describe your project goal", val)
 
-            # Fill null stack fields
-            for field, key in [("frontend", "framework"), ("backend", "framework"), ("database", "database"), ("testing", "testing")]:
+            # Fill null stack fields — includes the Full-Facts slots
+            # (database / cache / search / storage / runtime / hosting) grounded
+            # from docker-compose above.
+            _stack_fill = [
+                ("frontend", "framework"), ("backend", "framework"),
+                ("database", "database"), ("cache", "cache"), ("search", "search"),
+                ("storage", "storage"), ("runtime", "runtime"), ("hosting", "hosting"),
+                ("testing", "testing"),
+            ]
+            for field, key in _stack_fill:
                 val = detected.get(key)
                 if val and f"  {field}: null" in updated:
-                    # Only set frontend for frontend frameworks, backend for backend frameworks
                     if field == "frontend" and val not in FRONTEND_FRAMEWORKS:
                         continue
                     if field == "backend" and val not in BACKEND_FRAMEWORKS:
                         continue
-                    updated = updated.replace(f"  {field}: null", f"  {field}: {val}")
+                    updated = updated.replace(f"  {field}: null", f'  {field}: {_yv(val)}')
+
+            # Fill empty command slots from Makefile / justfile targets
+            for cmd, val in commands.items():
+                for empty in (f'  {cmd}: ""', f"  {cmd}: null"):
+                    if empty in updated:
+                        updated = updated.replace(empty, f'  {cmd}: {_yv(val)}')
+                        break
+
             if updated != existing:
                 faf_path.write_text(updated)
 
@@ -770,6 +838,10 @@ state:
                 "framework": detected.get("framework"),
                 "api_type": detected.get("api_type"),
                 "database": detected.get("database"),
+                "cache": detected.get("cache"),
+                "search": detected.get("search"),
+                "hosting": detected.get("hosting"),
+                "commands": commands or None,
             },
             "score": score,
             "tier": tier,

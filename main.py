@@ -3,7 +3,7 @@ gemini-faf-mcp: Google Cloud Function for FAF Context Bridge
 
 Media Type: application/vnd.faf+yaml
 Endpoint: https://faf-source-of-truth-*.run.app
-Version: 2.7.1
+Version: 2.8.0
 
 Features:
 - GET: Return live SVG badge showing FAF score
@@ -18,7 +18,7 @@ Security (v2.5.1):
 - YAML round-trip: validate before commit
 """
 
-__version__ = "2.7.1"
+__version__ = "2.8.0"
 
 import base64
 import json

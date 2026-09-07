@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "gemini-faf-mcp"
-version = "2.7.1"
+version = "2.8.0"
 authors = [
   { name="wolfejam", email="team@faf.one" },
 ]
@@ -56,7 +56,7 @@ dev = [
 ]
 
 [tool.setuptools]
-py-modules = ["server", "models", "safe_path", "inject"]
+py-modules = ["server", "models", "safe_path", "inject", "interrogate"]
 packages = ["gemini_faf_mcp"]
 package-dir = {"gemini_faf_mcp" = "src/gemini_faf_mcp"}
 

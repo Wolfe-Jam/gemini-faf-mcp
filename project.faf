@@ -33,7 +33,7 @@ project:
   main_language: Python
   type: mcp-server  # found: no classifying signals — fallback
   framework: fastmcp
-  version: 2.7.1
+  version: 2.8.0
 ai_instructions:
   priority_order:
     - 1. Read THIS .faf file first
@@ -87,7 +87,7 @@ preferences:
   documentation: as_needed
 state:
   phase: production
-  version: 2.7.1
+  version: 2.8.0
   focus: Mk4 Championship Scoring Engine parity
   status: green_flag
   next_milestone: gallery_listing
@@ -170,7 +170,7 @@ surfaces:
       status: live
     - type: mcp-registry
       id: one.faf/gemini-faf-mcp
-      status: active   # live at 2.7.1 (the io.github.Wolfe-Jam/* entries are frozen at 2.5.0 — dual-namespace, cf. registry#1556)
+      status: active   # live at 2.8.0 (the io.github.Wolfe-Jam/* entries are frozen at 2.5.0 — dual-namespace, cf. registry#1556)
     - type: pulsemcp
       id: gemini-faf-mcp
       status: pending
@@ -187,6 +187,7 @@ key_files:
   - models.py — 15 reference project.faf templates for faf_model
   - safe_path.py — confine_file_op, every write stays in the project root
   - inject.py — non-destructive faf-managed-block injection
+  - interrogate.py — Full-Facts grounding for faf_auto (docker-compose + Makefile signals)
   - src/gemini_faf_mcp/ — client.py + parser helpers over faf-python-sdk
   - main.py — Cloud Run / functions-framework entry point
   - tests/ — pytest, the WJTTC 9-tier suite

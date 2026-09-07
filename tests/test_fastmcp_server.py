@@ -971,7 +971,10 @@ class TestAutoTier7Contract:
         expected = {"success", "path", "created", "detected", "score", "tier", "message"}
         assert expected == set(data.keys())
         assert isinstance(data["detected"], dict)
-        detected_keys = {"main_language", "package_manager", "build_tool", "framework", "api_type", "database"}
+        detected_keys = {
+            "main_language", "package_manager", "build_tool", "framework",
+            "api_type", "database", "cache", "search", "hosting", "commands",
+        }
         assert detected_keys == set(data["detected"].keys())
 
     async def test_auto_error_schema(self, client):

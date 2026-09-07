@@ -7,7 +7,7 @@ agent:
   name: gemini-faf-mcp
   id: did:web:faf.one:gemini-faf-mcp
   vendor: WolfeJAM
-  version: 2.7.1
+  version: 2.8.0
   description: Persistent Project Context for Google Gemini. IANA-registered .faf format, MCP server + Cloud Run REST API, unifies CLAUDE.md, GEMINI.md, AGENTS.md.
   homepage: https://faf.one
   license: MIT
@@ -80,7 +80,7 @@ capabilities:
       - faf
   - name: faf_auto
     type: tool
-    description: Auto-detect project stack and author/update a .faf file.
+    description: Auto-detect project stack — grounded in docker-compose services and Makefile targets — and author/update a .faf file.
     cites_spec: application/vnd.faf+yaml
     tags:
       - faf

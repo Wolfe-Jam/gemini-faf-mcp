@@ -31,6 +31,7 @@ mypy server.py models.py safe_path.py inject.py src/
 - `models.py — 15 reference project.faf templates for faf_model`
 - `safe_path.py — confine_file_op, every write stays in the project root`
 - `inject.py — non-destructive faf-managed-block injection`
+- `interrogate.py — Full-Facts grounding for faf_auto (docker-compose + Makefile signals)`
 - `src/gemini_faf_mcp/ — client.py + parser helpers over faf-python-sdk`
 - `main.py — Cloud Run / functions-framework entry point`
 - `tests/ — pytest, the WJTTC 9-tier suite`

@@ -330,6 +330,29 @@ class TestWJTTCTier3Aero:
         assert "available_types" in data
         assert len(data["available_types"]) >= 10
 
+    async def test_every_model_is_trophy(self, client):
+        """Every faf_model reference template must score 100% TROPHY on the
+        21-slot Mk4 engine — they are what AI copies as the target."""
+        from faf_sdk import score_faf
+
+        from models import MODELS
+
+        for key, model in MODELS.items():
+            r = score_faf(model["faf"])
+            assert r.score == 100, f"{key}: {r.score}% {r.tier} ({r.populated}/{r.active})"
+            assert r.tier == "TROPHY", f"{key}: tier {r.tier}"
+
+    async def test_model_returns_full_21_slot_stack(self, client):
+        """A returned model fills all 12 scored stack slots (populated or
+        slotignored — never null / missing)."""
+        data = _parse(await client.call_tool("faf_model", {"project_type": "web-app"}))
+        faf = data["model"]["faf"] if "model" in data else data.get("faf", "")
+        for slot in ("frontend", "css_framework", "ui_library", "state_management",
+                     "backend", "api_type", "runtime", "database", "connection",
+                     "hosting", "build", "cicd"):
+            assert f"  {slot}:" in faf, f"missing stack slot: {slot}"
+        assert "null" not in faf
+
 
 # ===================================================================
 # TIER 4: STRESS — Scale resilience
