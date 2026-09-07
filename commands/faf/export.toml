@@ -29,12 +29,12 @@ You are running the FAF Export command. Export the project's .faf DNA to context
 6. Based on their choice, run the appropriate tool(s):
 
    **For GEMINI.md:**
-   - Use `faf_gemini` to generate the content
+   - Use `faf_gemini` to author the content
    - Write the content to `GEMINI.md` in the project root
    - Note: "GEMINI.md is auto-loaded by this extension — Gemini will read it on every session"
 
    **For AGENTS.md:**
-   - Use `faf_agents` to generate the content
+   - Use `faf_agents` to author the content
    - Write the content to `AGENTS.md` in the project root
    - Note: "AGENTS.md works with OpenAI Codex, Cursor, and other AI coding tools"
 
@@ -56,14 +56,14 @@ You are running the FAF Export command. Export the project's .faf DNA to context
 
 ## File Format Notes
 
-- **GEMINI.md**: Has YAML frontmatter with faf_score, faf_tier, faf_version. Auto-loaded by gemini-faf-mcp extension via contextFileName in gemini-extension.json.
+- **GEMINI.md**: Gemini CLI's hierarchical, `@file`-importable format — setup, verify, key files, stack, confirm-first actions. Auto-loaded by the gemini-faf-mcp extension via contextFileName in gemini-extension.json.
 - **AGENTS.md**: Markdown format compatible with the AGENTS.md convention used by OpenAI Codex and other tools.
-- Both files are generated from the single source of truth: project.faf
+- Both files are authored from the single source of truth: project.faf
 
 ## Rules
 
 - Use FAF MCP tools only — never built-in file tools for .faf operations
 - Always show score and tier when displaying project status
 - Write files to the project root directory (same level as project.faf)
-- If a file already exists, overwrite it (exports are regenerated from .faf)
+- If a file already exists, overwrite it (exports are re-authored from .faf)
 """

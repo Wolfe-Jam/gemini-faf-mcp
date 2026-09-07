@@ -28,7 +28,7 @@ Stop re-explaining your project to every new Gemini session. Every Gemini conver
 Without FAF                           With FAF (.faf at 85%+ Bronze)
 ─────────────────────────             ─────────────────────────
 You: "I'm using FastAPI with...       You: "Add a /users/me endpoint"
-      PostgreSQL, pytest, and..."     Gemini: [generates correct code,
+      PostgreSQL, pytest, and..."     Gemini: [writes correct code,
 Gemini: "Got it. What's the              uses your auth pattern,
         codebase like?"                  matches your test style]
 You: "It's a REST API for..."
@@ -38,11 +38,13 @@ Gemini: [now ready to help]
 
 `.faf` is read once at session start. Every tool call lands on a Gemini that already knows your project.
 
-### What's New in v2.7.0 — The Interop Edition
+### What's New in v2.7.1 — The Interop Edition
 
 **`faf_agents` and `faf_gemini` now author family-standard AGENTS.md / GEMINI.md, and a new `faf_migrate` brings a .faf up to the current format.**
 
-`faf_agents` was a 4-field stub that padded sections with "N/A" and shipped who/why marketing. It now authors a full BETTER-shaped doc through `faf-python-sdk`'s `generate_agents_md` — setup (install→build→dev ordered) · tests · where things live · conventions · three-tier guardrails · definition of done · when stuck · security · commit & PR · stack. No Human Context section — that belongs in the README / `.faf` DNA, not agent ops. `faf_gemini` now follows Gemini CLI's own hierarchical, `@file`-importable convention. Both are in parity with faf-cli's `faf export`. New `faf_migrate` bumps a `.faf` to the current format version (`dry_run` to preview). **13 tools.** Also: `fastmcp >=4.0.0`, Python 3.11+, and a `ci.yml` running the 245-test suite on every push.
+> **v2.7.1** is a docs patch — corrected the tool count (13) and test count (245), and rewrote the GEMINI.md section for the new frontmatter-free format. The v2.7.0 feature set below is unchanged.
+
+`faf_agents` was a 4-field stub that padded sections with "N/A" and shipped who/why marketing. It now authors a full BETTER-shaped doc through `faf-python-sdk`'s shared authoring tool — setup (install→build→dev ordered) · tests · where things live · conventions · three-tier guardrails · definition of done · when stuck · security · commit & PR · stack. No Human Context section — that belongs in the README / `.faf` DNA, not agent ops. `faf_gemini` now follows Gemini CLI's own hierarchical, `@file`-importable convention. Both are in parity with faf-cli's `faf export`. New `faf_migrate` bumps a `.faf` to the current format version (`dry_run` to preview). **13 tools.** Also: `fastmcp >=4.0.0`, Python 3.11+, and a `ci.yml` running the 245-test suite on every push.
 
 > **v2.6.0 — The Agent Card Edition** added a real `agent.fafa` passport (authored from live tool introspection), an MCP Server Card (SEP-2127), and an AI Catalog entry. **v2.5.1** one.faf namespace migration. **v2.5.0 — The Dart Edition** detects Dart/Flutter from `pubspec.yaml`. **v2.4.3** made `faf_agents` / `faf_gemini` non-destructive. **v2.4.2 — The Confinement Edition** confined every caller `path` argument. **v2.4.0 — The Chameleon Edition** auto-selects its transport: stdio locally, Streamable HTTP on Cloud Run.
 
@@ -83,7 +85,7 @@ A `.faf` file is structured YAML that captures your project DNA. Every AI agent 
 
 ```yaml
 # project.faf — your project, machine-readable
-faf_version: '2.5.0'
+faf_version: "3.0"
 project:
   name: my-api
   goal: REST API for user management
@@ -104,11 +106,11 @@ human_context:
 
 ### What about my `GEMINI.md`?
 
-You don't replace it. `.faf` **authors** it. Run `faf_gemini` and you get a fresh `GEMINI.md` with the structured project data baked in as YAML frontmatter — the same `GEMINI.md` Gemini CLI already reads, but authored from a single source of truth instead of hand-maintained.
+You don't replace it. `.faf` **authors** it. Run `faf_gemini` and you get a fresh `GEMINI.md` in Gemini CLI's own hierarchical, `@file`-importable convention — setup, verify, key files, stack, confirm-first actions — authored from a single source of truth instead of hand-maintained. Your hand-written content outside the faf-managed block is preserved.
 
 ```bash
 > /faf:export
-# Generates GEMINI.md from project.faf
+# Authors GEMINI.md from project.faf
 ```
 
 `.faf` is the source. `GEMINI.md` is one of its outputs. Same logic for `AGENTS.md` (OpenAI Codex), `.cursorrules`, `CLAUDE.md`, and others — write once, render everywhere.
@@ -154,7 +156,7 @@ You don't replace it. `.faf` **authors** it. Run `faf_gemini` and you get a fres
 
 ---
 
-## All 12 Tools
+## All 13 Tools
 
 ### Create & Detect
 
@@ -183,8 +185,14 @@ You don't replace it. `.faf` **authors** it. Run `faf_gemini` and you get a fres
 
 | Tool | What it does |
 |------|-------------|
-| `faf_gemini` | Export `GEMINI.md` with YAML frontmatter for Gemini CLI |
-| `faf_agents` | Export `AGENTS.md` for OpenAI Codex, Cursor, and other AI tools |
+| `faf_gemini` | Export `GEMINI.md` in Gemini CLI's hierarchical convention (non-destructive) |
+| `faf_agents` | Export a BETTER-shaped `AGENTS.md` for OpenAI Codex, Cursor, and other AI tools (non-destructive) |
+
+### Migrate
+
+| Tool | What it does |
+|------|-------------|
+| `faf_migrate` | Bring a `.faf` up to the current format version (3.0); `dry_run` to preview |
 
 ### Reference
 
@@ -225,6 +233,7 @@ Your `.faf` file is scored on completeness — how many slots are filled with re
 > What is FAF and how does it work?
 > Read my project.faf and summarize the stack
 > Validate my .faf and fix the warnings
+> Migrate my project.faf to the current format
 ```
 
 ---
@@ -232,7 +241,7 @@ Your `.faf` file is scored on completeness — how many slots are filled with re
 ## Architecture
 
 ```
-gemini-faf-mcp v2.7.0
+gemini-faf-mcp v2.7.1
 ├── server.py              → FastMCP MCP server (13 tools, dual-transport, Mk4 scoring)
 ├── safe_path.py           → path confinement for caller-supplied `path` args
 ├── inject.py              → non-destructive faf-managed-block injection
@@ -241,7 +250,7 @@ gemini-faf-mcp v2.7.0
 └── src/gemini_faf_mcp/    → Python SDK (FAFClient, parser)
 ```
 
-The MCP server delegates to `faf-python-sdk` for parsing, validation, and Mk4 scoring. Stack detection in `faf_auto` is Python-native — no external CLI dependencies.
+The MCP server delegates to `faf-python-sdk` for parsing, validation, Mk4 scoring, and AGENTS.md / GEMINI.md authoring. Stack detection in `faf_auto` is Python-native — no external CLI dependencies.
 
 ---
 
@@ -252,7 +261,7 @@ pip3 install -e ".[dev]"
 python -m pytest tests/ -v
 ```
 
-233 tests passing across 9 WJTTC tiers (137 MCP server + 55 Cloud Function + 41 Mk4 WJTTC championship). Championship-grade test coverage — [WJTTC certified](https://github.com/Wolfe-Jam/WJTTC).
+245 tests passing (129 FastMCP server · 55 Cloud Function · 41 Mk4 WJTTC championship · 20 path-confinement, write-guard, and Dart detection). Championship-grade test coverage — [WJTTC certified](https://github.com/Wolfe-Jam/WJTTC).
 
 ---
 

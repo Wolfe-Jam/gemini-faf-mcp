@@ -1,5 +1,5 @@
 """
-gemini-faf-mcp v2.7.0 — FastMCP Server
+gemini-faf-mcp v2.7.1 — FastMCP Server
 
 Native MCP server for FAF (Foundational AI-context Format).
 Powered by faf-python-sdk with Mk4 Championship Scoring Engine.
@@ -30,7 +30,7 @@ from inject import inject_faf_block
 from models import get_model, list_models
 from safe_path import PathConfinementError, confine_file_op, confine_path
 
-__version__ = "2.7.0"
+__version__ = "2.7.1"
 
 # The .faf FORMAT version this server writes (distinct from __version__, the
 # server's own release). Matches faf-cli's FAF_VERSION / faf-python-sdk.
@@ -165,7 +165,7 @@ def faf_init(
     path: str = "project.faf",
 ) -> dict:
     """Create a starter .faf file with project name, goal, and language.
-    Generates a valid FAF YAML file with all required sections.
+    Writes a valid FAF YAML file with all required sections.
     Will not overwrite an existing file — use faf_discover first to check.
     The path is confined to the project root (cwd / FAF_ALLOWED_ROOTS)."""
     # Confine the write target — no arbitrary file write outside the project
@@ -289,7 +289,7 @@ def faf_gemini(path: str = "project.faf") -> dict:
     """Export and write GEMINI.md from a .faf file (non-destructive).
     Authors GEMINI.md in Gemini CLI's own convention (hierarchical,
     @file-importable — setup · verify · key files · stack · confirm-first
-    actions) via faf-python-sdk's generator, in parity with faf-cli's
+    actions) via faf-python-sdk's authoring tool, in parity with faf-cli's
     `faf export --gemini`. Injects it as a faf-managed block, preserving any
     hand content. Re-running updates the block in place."""
     try:
@@ -318,7 +318,7 @@ def faf_agents(path: str = "project.faf") -> dict:
     """Export and write AGENTS.md from a .faf file (non-destructive).
     Authors a BETTER-shaped AGENTS.md (setup · tests · layout · conventions ·
     three-tier guardrails · definition of done · security · commit) via
-    faf-python-sdk's generator — in parity with faf-cli's `faf export --agents`.
+    faf-python-sdk's authoring tool — in parity with faf-cli's `faf export --agents`.
     Injects it into AGENTS.md as a faf-managed block, preserving any hand
     content. Re-running updates the block in place — it never overwrites your file."""
     try:
@@ -657,7 +657,7 @@ def _detect_stack(directory: str) -> dict:
 @mcp.tool()
 @_confined
 def faf_auto(directory: str = ".", path: str = "project.faf") -> dict:
-    """Auto-detect project stack and generate/update a .faf file.
+    """Auto-detect project stack and author/update a .faf file.
     Scans for package.json, pyproject.toml, Cargo.toml, go.mod, and other
     manifest files. Extracts language, framework, database, API type, and
     build tools from actual dependencies — no hardcoded defaults.

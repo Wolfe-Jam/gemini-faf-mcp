@@ -4,9 +4,9 @@
 
 # AGENTS.md — gemini-faf-mcp
 
-MCP server for FAF — read, validate, auto-detect, score, and export IANA-registered .faf project DNA from Gemini CLI — Python · type: mcp-server · v2.7.0
+MCP server for FAF — read, validate, auto-detect, score, and export IANA-registered .faf project DNA from Gemini CLI — Python · type: mcp-server · v2.7.1
 
-> Authored by faf — refresh with `faf export --agents` or the `faf_agents` MCP tool. The managed block is regenerated each time; hand-written content outside it is preserved.
+> Authored by faf — do not edit the managed block; refresh with `faf export --agents` or the `faf_agents` MCP tool. Hand-written content outside it is preserved.
 
 ## Setup & build
 
@@ -28,7 +28,7 @@ mypy server.py models.py safe_path.py inject.py src/
 | Path | Role |
 |------|------|
 | `server.py` | the FastMCP server, every @mcp.tool |
-| `models.py` | 16 reference project.faf templates for faf_model |
+| `models.py` | 15 reference project.faf templates for faf_model |
 | `safe_path.py` | confine_file_op, every write stays in the project root |
 | `inject.py` | non-destructive faf-managed-block injection |
 | `src/gemini_faf_mcp/` | client.py + parser helpers over faf-python-sdk |
@@ -82,12 +82,12 @@ Ask a clarifying question, propose a short plan, or open a draft PR with notes �
 <!-- faf:end -->
 
 
-## Notes the generator can't know
+## Notes faf can't know
 
 - **Deploy:** `Dockerfile` -> Cloud Run (`pip install .`, stateless Streamable
   HTTP on $PORT). The `mcpaas.live` edge fronts it as the tool executor.
 - **faf-python-sdk does the work.** Parsing, validation, scoring, and the
-  AGENTS.md / GEMINI.md generation all live in `faf_sdk` — `server.py` wires
+  AGENTS.md / GEMINI.md authoring all live in `faf_sdk` — `server.py` wires
   tools to it, never reimplements.
 - **Publish:** PyPI + MCP Registry on a `v*` tag (DNS auth, namespace
   `one.faf/gemini-faf-mcp`).
