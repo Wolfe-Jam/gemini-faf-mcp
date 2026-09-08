@@ -38,9 +38,11 @@ Gemini: [now ready to help]
 
 `.faf` is read once at session start. Every tool call lands on a Gemini that already knows your project.
 
-### What's New in v2.8.0 — The Full-Facts Edition
+### What's New in v2.8.1 — The Full-Facts Edition
 
 **`faf_auto` now grounds its detection in the repo's own files, and every `faf_model` reference template scores 100% Trophy.**
+
+> **v2.8.1** is a dependency patch — `faf-python-sdk` floor `>=1.4.0`, where the interop functions are now named `author_agents_md` / `author_gemini_md`. Authored AGENTS.md / GEMINI.md output is byte-identical. The v2.8.0 feature set below is unchanged.
 
 `faf_auto` used to read only the root manifest (`pyproject.toml`, `package.json`, …). It now also reads the files that carry the real stack: **docker-compose service images** map onto `database` / `cache` / `search` / `storage` (a running Postgres service *is* the database — it beats a dependency guess), **Makefile / justfile targets** map onto the `commands` block (`test` / `build` / `check-all`, root file or a nested `backend/Makefile`), and **`.github/workflows/`** sets `cicd`. A polyglot repo that reported `library` / `JavaScript` now reports its real Postgres + Redis + FastAPI stack. In parity with faf-cli 7.10.
 
@@ -247,7 +249,7 @@ Your `.faf` file is scored on completeness — how many slots are filled with re
 ## Architecture
 
 ```
-gemini-faf-mcp v2.8.0
+gemini-faf-mcp v2.8.1
 ├── server.py              → FastMCP MCP server (13 tools, dual-transport, Mk4 scoring)
 ├── safe_path.py           → path confinement for caller-supplied `path` args
 ├── inject.py              → non-destructive faf-managed-block injection

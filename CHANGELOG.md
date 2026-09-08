@@ -1,10 +1,24 @@
 <!-- faf: gemini-faf-mcp | Python | mcp-server | FAF MCP server for Google Gemini — persistent project context via PyPI -->
-<!-- faf: doc=changelog | latest=v2.8.0 | canonical=project.faf | family=FAF -->
+<!-- faf: doc=changelog | latest=v2.8.1 | canonical=project.faf | family=FAF -->
 
 # Changelog
 
 All notable changes to gemini-faf-mcp are documented here.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
+
+## [2.8.1] - 2026-09-08 — The Full-Facts Edition
+
+Dependency patch — no behavior change.
+
+### Changed
+- `faf-python-sdk` floor `>=1.4.0`. The SDK renamed its interop functions: the
+  public names are now `author_agents_md` / `author_gemini_md` (`generate_*`
+  still works there as a deprecated alias, removed in the SDK's 2.0). `faf_agents`
+  and `faf_gemini` call the new names. **Authored AGENTS.md / GEMINI.md output is
+  byte-identical** — a naming change in the dependency, not a behavior change.
+- `gemini-extension.json`, `server.json`, `project.faf`, `AGENTS.md` version → 2.8.1.
+
+**13 tools · 262 tests.**
 
 ## [2.8.0] - 2026-09-07 — The Full-Facts Edition
 
