@@ -170,7 +170,7 @@ surfaces:
       status: live
     - type: mcp-registry
       id: one.faf/gemini-faf-mcp
-      status: active   # live at 2.8.0 (the io.github.Wolfe-Jam/* entries are frozen at 2.5.0 — dual-namespace, cf. registry#1556)
+      status: active   # live at 2.8.1 (the io.github.Wolfe-Jam/* entries are frozen at 2.5.0 — dual-namespace, cf. registry#1556)
     - type: pulsemcp
       id: gemini-faf-mcp
       status: pending
