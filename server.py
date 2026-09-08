@@ -14,10 +14,10 @@ import os
 from pathlib import Path
 
 from faf_sdk import (
+    author_agents_md,
+    author_gemini_md,
     detect_dart_project,
     find_faf_file,
-    generate_agents_md,
-    generate_gemini_md,
     parse_file,
     score_faf,
     stringify,
@@ -296,7 +296,7 @@ def faf_gemini(path: str = "project.faf") -> dict:
     try:
         faf = _parse_faf(path)
         mk4 = _mk4_score_file(path)
-        md = generate_gemini_md(faf.data.raw)
+        md = author_gemini_md(faf.data.raw)
         target = confine_file_op(str(Path(path).parent / "GEMINI.md"))
         inject_faf_block(target, md)
         return {
@@ -324,7 +324,7 @@ def faf_agents(path: str = "project.faf") -> dict:
     content. Re-running updates the block in place — it never overwrites your file."""
     try:
         faf = _parse_faf(path)
-        md = generate_agents_md(faf.data.raw)
+        md = author_agents_md(faf.data.raw)
         target = confine_file_op(str(Path(path).parent / "AGENTS.md"))
         inject_faf_block(target, md)
         return {
