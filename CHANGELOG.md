@@ -1,15 +1,20 @@
 <!-- faf: gemini-faf-mcp | Python | mcp-server | FAF MCP server for Google Gemini — persistent project context via PyPI -->
-<!-- faf: doc=changelog | latest=v2.8.1 | canonical=project.faf | family=FAF -->
+<!-- faf: doc=changelog | latest=v2.8.2 | canonical=project.faf | family=FAF -->
 
 # Changelog
 
 All notable changes to gemini-faf-mcp are documented here.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
-## [Unreleased]
+## [2.8.2] - 2026-09-11 — The Full-Facts Edition
+
+**Privacy patch — `FAFClient`'s start-up ping is now opt-in (`FAF_TELEMETRY=1`).**
 
 ### Changed
 - `FAFClient`'s start-up ping is now opt-in: it sends only when `FAF_TELEMETRY=1`. It used to send by default, and the opt-out wasn't documented. `FAF_TELEMETRY_OFF` still turns it off. The MCP server never used `FAFClient`.
+- `gemini-extension.json`, `server.json`, `project.faf`, `AGENTS.md` version → 2.8.2.
+
+**13 tools · 265 tests.**
 
 ## [2.8.1] - 2026-09-08 — The Full-Facts Edition
 

@@ -15,7 +15,7 @@ Stop re-explaining your project to every new Gemini session. Every Gemini conver
 
 [![PyPI](https://img.shields.io/pypi/v/gemini-faf-mcp?style=for-the-badge&logo=pypi&logoColor=white)](https://pypi.org/project/gemini-faf-mcp/)
 [![FAF Trophy 100%](https://img.shields.io/badge/FAF-%F0%9F%8F%86%20100%25-000000?labelColor=FF6B35)](https://faf.one)
-[![Tests](https://img.shields.io/badge/Tests-262%20passing-brightgreen?style=for-the-badge)](https://github.com/Wolfe-Jam/gemini-faf-mcp)
+[![Tests](https://img.shields.io/badge/Tests-265%20passing-brightgreen?style=for-the-badge)](https://github.com/Wolfe-Jam/gemini-faf-mcp)
 [![IANA: vnd.faf+yaml](https://img.shields.io/badge/IANA-vnd.faf%2Byaml-00D4D4?style=for-the-badge)](https://www.iana.org/assignments/media-types/application/vnd.faf+yaml)
 [![IANA: vnd.fafm+yaml](https://img.shields.io/badge/IANA-vnd.fafm%2Byaml-00D4D4?style=for-the-badge)](https://www.iana.org/assignments/media-types/application/vnd.fafm+yaml)
 [![DOI: Context paper](https://img.shields.io/badge/DOI-Context%20paper-FF6B35?style=for-the-badge)](https://doi.org/10.5281/zenodo.18251362)
@@ -38,15 +38,19 @@ Gemini: [now ready to help]
 
 `.faf` is read once at session start. Every tool call lands on a Gemini that already knows your project.
 
-### What's New in v2.8.1 — The Full-Facts Edition
+### What's New in v2.8.2 — The Full-Facts Edition
 
-**`faf_auto` now grounds its detection in the repo's own files, and every `faf_model` reference template scores 100% Trophy.**
+**Privacy patch — `FAFClient`'s start-up ping is now opt-in (`FAF_TELEMETRY=1`).**
 
-> **v2.8.1** is a dependency patch — `faf-python-sdk` floor `>=1.4.0`, where the interop functions are now named `author_agents_md` / `author_gemini_md`. Authored AGENTS.md / GEMINI.md output is byte-identical. The v2.8.0 feature set below is unchanged.
+`FAFClient` (the Python SDK client — the MCP server never used it) sent a start-up ping, package name and version, by default, and the opt-out wasn't documented. It now sends only when you set `FAF_TELEMETRY=1`; `FAF_TELEMETRY_OFF` still turns it off. See [faf.one/privacy](https://faf.one/privacy).
+
+> **v2.8.1** was a dependency patch — `faf-python-sdk` floor `>=1.4.0`, where the interop functions are now named `author_agents_md` / `author_gemini_md`. Authored AGENTS.md / GEMINI.md output is byte-identical.
+
+**v2.8.0** — `faf_auto` now grounds its detection in the repo's own files, and every `faf_model` reference template scores 100% Trophy.
 
 `faf_auto` used to read only the root manifest (`pyproject.toml`, `package.json`, …). It now also reads the files that carry the real stack: **docker-compose service images** map onto `database` / `cache` / `search` / `storage` (a running Postgres service *is* the database — it beats a dependency guess), **Makefile / justfile targets** map onto the `commands` block (`test` / `build` / `check-all`, root file or a nested `backend/Makefile`), and **`.github/workflows/`** sets `cicd`. A polyglot repo that reported `library` / `JavaScript` now reports its real Postgres + Redis + FastAPI stack. In parity with faf-cli 7.10.
 
-Separately: the **15 `faf_model` reference templates were scoring 48–57%** — they filled 4 stack slots and used `null`. All rewritten to the full 21-slot schema; every one is 100% Trophy now, and a test keeps it that way. **13 tools · 262 tests.**
+Separately: the **15 `faf_model` reference templates were scoring 48–57%** — they filled 4 stack slots and used `null`. All rewritten to the full 21-slot schema; every one is 100% Trophy now, and a test keeps it that way. **13 tools · 265 tests.**
 
 > **v2.7.1 / v2.7.0 — The Interop Edition** — `faf_agents` / `faf_gemini` rewritten as `faf-python-sdk` authoring-tool wrappers (were 4-field stubs); new `faf_migrate` brings a `.faf` up to the current format. **v2.6.0 — The Agent Card Edition** added a real `agent.fafa` passport, an MCP Server Card (SEP-2127), and an AI Catalog entry. **v2.5.0 — The Dart Edition** detects Dart/Flutter from `pubspec.yaml`. **v2.4.2 — The Confinement Edition** confined every caller `path` argument. **v2.4.0 — The Chameleon Edition** auto-selects its transport: stdio locally, Streamable HTTP on Cloud Run.
 
@@ -249,7 +253,7 @@ Your `.faf` file is scored on completeness — how many slots are filled with re
 ## Architecture
 
 ```
-gemini-faf-mcp v2.8.1
+gemini-faf-mcp v2.8.2
 ├── server.py              → FastMCP MCP server (13 tools, dual-transport, Mk4 scoring)
 ├── safe_path.py           → path confinement for caller-supplied `path` args
 ├── inject.py              → non-destructive faf-managed-block injection
