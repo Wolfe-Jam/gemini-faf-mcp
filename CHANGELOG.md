@@ -6,6 +6,11 @@
 All notable changes to gemini-faf-mcp are documented here.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
+## [Unreleased]
+
+### Changed
+- `FAFClient`'s start-up ping is now opt-in: it sends only when `FAF_TELEMETRY=1`. It used to send by default, and the opt-out wasn't documented. `FAF_TELEMETRY_OFF` still turns it off. The MCP server never used `FAFClient`.
+
 ## [2.8.1] - 2026-09-08 — The Full-Facts Edition
 
 Dependency patch — no behavior change.

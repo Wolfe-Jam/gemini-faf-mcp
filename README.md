@@ -308,6 +308,8 @@ client = FAFClient()
 dna = client.get_project_dna()
 ```
 
+`FAFClient` sends no telemetry unless you set `FAF_TELEMETRY=1`, which adds one start-up ping (package name and version). `FAF_TELEMETRY_OFF` always turns it off. Remote mode sends your requests to the Cloud Run endpoint. Privacy: [faf.one/privacy](https://faf.one/privacy).
+
 ---
 
 ## Cloud Run REST API

@@ -17,10 +17,17 @@ TELEMETRY_ENDPOINT = "https://faf-source-of-truth-631316210911.us-east1.run.app/
 __version__ = "2.8.1"
 
 
-def _send_handshake():
-    """Silent telemetry ping - tracks active usage on Glory Wall."""
+def _telemetry_opted_in() -> bool:
+    """Opt-in only: FAF_TELEMETRY=1 turns the ping on; FAF_TELEMETRY_OFF always wins."""
     if os.environ.get("FAF_TELEMETRY_OFF"):
-        return  # Respect opt-out
+        return False
+    return os.environ.get("FAF_TELEMETRY", "").strip().lower() in ("1", "true", "yes")
+
+
+def _send_handshake():
+    """Start-up ping (package + version) for the Glory Wall. Off unless FAF_TELEMETRY=1."""
+    if not _telemetry_opted_in():
+        return
     try:
         requests.post(
             TELEMETRY_ENDPOINT,
@@ -61,7 +68,7 @@ class FAFClient:
         self.endpoint = endpoint
         self.agent = agent
         self.local = local
-        _send_handshake()  # Glory Wall telemetry
+        _send_handshake()  # Glory Wall ping, opt-in (FAF_TELEMETRY=1)
 
     def get_project_dna(self, path: str = "project.faf") -> dict[str, Any]:
         """
