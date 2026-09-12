@@ -92,3 +92,8 @@ Ask a clarifying question, propose a short plan, or open a draft PR with notes â
   tools to it, never reimplements.
 - **Publish:** PyPI + MCP Registry on a `v*` tag (DNS auth, namespace
   `one.faf/gemini-faf-mcp`).
+- **Workflow:** the maintainer works trunk-based. Commits land on `main` once
+  `pytest -q`, `ruff check .`, and `mypy` are green, and releases are cut from
+  `main` (tag, then GitHub release). The branch-and-PR rule in the block above
+  is for outside contributors, and for any agent working without the
+  maintainer's go-ahead.
