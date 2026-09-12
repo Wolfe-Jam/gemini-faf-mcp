@@ -44,7 +44,7 @@ mypy server.py models.py safe_path.py inject.py src/
 
 ## Guardrails
 
-- All changes must pass 245 tests before commit
+- All changes must pass the full test suite (pytest -q) before commit
 - faf-python-sdk handles parsing — server.py delegates
 - Version must match in pyproject.toml, __init__.py, client.py, server.py, main.py
 - **Always OK:** read the tree · run the tests (`pytest -q`) · build the project · `ruff check .`.

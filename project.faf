@@ -45,7 +45,7 @@ ai_instructions:
     quality_bar: zero_errors
     testing: required
   warnings:
-    - All changes must pass 245 tests before commit
+    - All changes must pass the full test suite (pytest -q) before commit
     - faf-python-sdk handles parsing — server.py delegates
     - Version must match in pyproject.toml, __init__.py, client.py, server.py, main.py
 stack:
