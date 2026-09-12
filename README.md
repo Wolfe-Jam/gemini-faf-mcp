@@ -274,7 +274,7 @@ pip3 install -e ".[dev]"
 python -m pytest tests/ -v
 ```
 
-262 tests passing (129 FastMCP server · 55 Cloud Function · 41 Mk4 WJTTC championship · 15 Full-Facts grounding · 22 path-confinement, write-guard, model-parity, and Dart detection). Championship-grade test coverage — [WJTTC certified](https://github.com/Wolfe-Jam/WJTTC).
+265 tests passing across the FastMCP server, Cloud Function, Mk4 WJTTC championship, Full-Facts grounding, path-confinement, write-guard, model-parity, Dart detection, and client-telemetry suites. Championship-grade test coverage — [WJTTC certified](https://github.com/Wolfe-Jam/WJTTC).
 
 ---
 
