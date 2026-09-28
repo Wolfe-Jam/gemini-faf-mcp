@@ -56,6 +56,19 @@ stack:
   hosting: Cloud Run
   build: setuptools
   cicd: GitHub Actions
+  monorepo_tool: slotignored
+  package_manager: slotignored
+  workspaces: slotignored
+  admin: slotignored
+  cache: slotignored
+  search: slotignored
+  storage: slotignored
+monorepo:
+  packages_count: slotignored
+  build_orchestrator: slotignored
+  versioning_strategy: slotignored
+  shared_configs: slotignored
+  remote_cache: slotignored
 """
 
 MINIMAL_FAF = """
@@ -91,6 +104,19 @@ stack:
   hosting: AWS
   build: setuptools
   cicd: GitHub Actions
+  monorepo_tool: slotignored
+  package_manager: slotignored
+  workspaces: slotignored
+  admin: slotignored
+  cache: slotignored
+  search: slotignored
+  storage: slotignored
+monorepo:
+  packages_count: slotignored
+  build_orchestrator: slotignored
+  versioning_strategy: slotignored
+  shared_configs: slotignored
+  remote_cache: slotignored
 human_context:
   who: API consumers
   what: REST API
@@ -163,8 +189,8 @@ class TestWJTTCTier1Brake:
         assert data["score"] == 100
         assert data["tier"] == "TROPHY"
         assert data["populated"] == 21
-        assert data["active"] == 21
-        assert data["total"] == 21
+        assert data["active"] == 21  # 33 - 12 enterprise slots marked slotignored
+        assert data["total"] == 33
 
     async def test_faf_score_minimal_low(self, client, minimal_faf):
         data = _parse(await client.call_tool("faf_score", {"path": minimal_faf}))
@@ -175,7 +201,7 @@ class TestWJTTCTier1Brake:
         data = _parse(await client.call_tool("faf_validate", {"path": trophy_faf}))
         assert data["score"] == 100
         assert data["populated"] == 21
-        assert data["total"] == 21
+        assert data["total"] == 33
         assert data["valid"] is True
 
     async def test_faf_score_and_validate_agree(self, client, trophy_faf):
@@ -236,8 +262,8 @@ class TestWJTTCTier2Engine:
 
     async def test_slotignored_adjusts_denominator(self, client, slotignored_faf):
         data = _parse(await client.call_tool("faf_score", {"path": slotignored_faf}))
-        assert data["total"] == 21
-        assert data["active"] < 21  # some slots ignored
+        assert data["total"] == 33
+        assert data["active"] == 17  # 4 frontend + 12 enterprise slots ignored
         assert data["score"] == 100  # all active slots populated
 
     async def test_empty_slots_score_low(self, client, empty_slots_faf):
@@ -332,7 +358,7 @@ class TestWJTTCTier3Aero:
 
     async def test_every_model_is_trophy(self, client):
         """Every faf_model reference template must score 100% TROPHY on the
-        21-slot Mk4 engine — they are what AI copies as the target."""
+        always-33 Mk4 engine — they are what AI copies as the target."""
         from faf_sdk import score_faf
 
         from models import MODELS

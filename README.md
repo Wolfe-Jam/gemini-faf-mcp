@@ -38,7 +38,13 @@ Gemini: [now ready to help]
 
 `.faf` is read once at session start. Every tool call lands on a Gemini that already knows your project.
 
-### What's New in v2.8.2 — The Full-Facts Edition
+### What's New in v3.0.0 — The Always33 Edition
+
+One engine, one number: gemini-faf-mcp scores all 33 slots exactly like faf-kernel — the same score faf-cli 8, claude-faf-mcp 7, faf-mcp 4 and grok-faf-mcp 2 give.
+
+Built on `faf-python-sdk>=2.0.0`. The 12 enterprise slots count unless marked `slotignored`: 21 slots filled with no markers scores 64% (21/33); the same file plus the 12 markers scores 100% (21/21). `faf auto` (faf-cli) writes the markers. The 15 `faf_model` templates carry them and stay 100% Trophy.
+
+#### v2.8.2 — The Full-Facts Edition
 
 **Privacy patch — `FAFClient`'s start-up ping is now opt-in (`FAF_TELEMETRY=1`).**
 
@@ -253,7 +259,7 @@ Your `.faf` file is scored on completeness — how many slots are filled with re
 ## Architecture
 
 ```
-gemini-faf-mcp v2.8.2
+gemini-faf-mcp v3.0.0
 ├── server.py              → FastMCP MCP server (13 tools, dual-transport, Mk4 scoring)
 ├── safe_path.py           → path confinement for caller-supplied `path` args
 ├── inject.py              → non-destructive faf-managed-block injection

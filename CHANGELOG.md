@@ -1,10 +1,33 @@
 <!-- faf: gemini-faf-mcp | Python | mcp-server | FAF MCP server for Google Gemini — persistent project context via PyPI -->
-<!-- faf: doc=changelog | latest=v2.8.2 | canonical=project.faf | family=FAF -->
+<!-- faf: doc=changelog | latest=v3.0.0 | canonical=project.faf | family=FAF -->
 
 # Changelog
 
 All notable changes to gemini-faf-mcp are documented here.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
+
+## [3.0.0] - 2026-09-28 — The Always33 Edition
+
+One engine, one number: gemini-faf-mcp scores all 33 slots exactly like faf-kernel — the same score faf-cli 8, claude-faf-mcp 7, faf-mcp 4 and grok-faf-mcp 2 give.
+
+### Changed (breaking — scores move)
+- **`faf-python-sdk>=2.0.0`** — the SDK's `score_faf` now returns exactly what
+  faf-kernel returns. Every tool that reports a score (`faf_score`,
+  `faf_validate`, `faf_context`, `faf_gemini`, `faf_agents`, `faf_auto`) scores
+  against 33 slots: the 12 enterprise slots count unless marked `slotignored`.
+  `total` is 33. A file with 21 slots filled and no markers scores 64% (21/33);
+  the same file plus the 12 markers scores 100% (21/21).
+- The 15 `faf_model` reference templates carry the 12 enterprise slots —
+  `slotignored` where they do not apply; the `monorepo` template fills
+  `packages_count`, `build_orchestrator`, `shared_configs`, `remote_cache`. Every
+  template is still 100% Trophy (checked against faf-kernel and
+  `faf-cli@8.0.0 check --strict`).
+- CI checks `project.faf` with `faf-cli@8.0.0` (was 7.10.1).
+- `gemini-extension.json`, `server.json`, `project.faf`, `AGENTS.md` version → 3.0.0.
+
+### Upgrading
+- Files without the 12 enterprise markers score lower. `faf auto` (faf-cli)
+  writes the 12 markers.
 
 ## [2.8.2] - 2026-09-11 — The Full-Facts Edition
 

@@ -1,7 +1,8 @@
 """
 FAF Model Library — 100% Trophy-scored .faf examples by project type.
 
-Each model is a complete, realistic project.faf that fills all 21 scored slots.
+Each model is a complete, realistic project.faf that fills all 33 scored slots
+(populated, or marked slotignored where the slot does not apply).
 Used by the faf_model tool to give AI a reference target for any project type.
 """
 
@@ -28,6 +29,18 @@ stack:
   build: "hatchling"
   cicd: "GitHub Actions"
   package_manager: "pip"
+  monorepo_tool: slotignored
+  workspaces: slotignored
+  admin: slotignored
+  cache: slotignored
+  search: slotignored
+  storage: slotignored
+monorepo:
+  packages_count: slotignored
+  build_orchestrator: slotignored
+  versioning_strategy: slotignored
+  shared_configs: slotignored
+  remote_cache: slotignored
 human_context:
   who: "AI tool developers adding weather awareness to assistants"
   what: "MCP server with 5 tools — current weather, forecast, alerts, history, location search"
@@ -67,6 +80,18 @@ stack:
   build: "Vite"
   cicd: "GitHub Actions"
   package_manager: "pnpm"
+  monorepo_tool: slotignored
+  workspaces: slotignored
+  admin: slotignored
+  cache: slotignored
+  search: slotignored
+  storage: slotignored
+monorepo:
+  packages_count: slotignored
+  build_orchestrator: slotignored
+  versioning_strategy: slotignored
+  shared_configs: slotignored
+  remote_cache: slotignored
 human_context:
   who: "Engineering teams tracking sprint velocity and deployment frequency"
   what: "Interactive dashboard with charts, filters, and team comparison views"
@@ -106,6 +131,18 @@ stack:
   build: "Turbopack"
   cicd: "GitHub Actions"
   package_manager: "pnpm"
+  monorepo_tool: slotignored
+  workspaces: slotignored
+  admin: slotignored
+  cache: slotignored
+  search: slotignored
+  storage: slotignored
+monorepo:
+  packages_count: slotignored
+  build_orchestrator: slotignored
+  versioning_strategy: slotignored
+  shared_configs: slotignored
+  remote_cache: slotignored
 human_context:
   who: "Product teams collecting and triaging customer feedback across workspaces"
   what: "Feedback boards, roadmaps, and changelogs with Stripe-metered seats"
@@ -145,6 +182,18 @@ stack:
   build: "go build"
   cicd: "GitHub Actions"
   package_manager: "go modules"
+  monorepo_tool: slotignored
+  workspaces: slotignored
+  admin: slotignored
+  cache: slotignored
+  search: slotignored
+  storage: slotignored
+monorepo:
+  packages_count: slotignored
+  build_orchestrator: slotignored
+  versioning_strategy: slotignored
+  shared_configs: slotignored
+  remote_cache: slotignored
 human_context:
   who: "Platform engineers scripting network checks in build pipelines"
   what: "Single static binary that scans a host or CIDR and emits JSON or a table"
@@ -184,6 +233,18 @@ stack:
   build: "Docker"
   cicd: "GitHub Actions"
   package_manager: "uv"
+  monorepo_tool: slotignored
+  workspaces: slotignored
+  admin: slotignored
+  cache: slotignored
+  search: slotignored
+  storage: slotignored
+monorepo:
+  packages_count: slotignored
+  build_orchestrator: slotignored
+  versioning_strategy: slotignored
+  shared_configs: slotignored
+  remote_cache: slotignored
 human_context:
   who: "Frontend and mobile teams consuming the order lifecycle"
   what: "CRUD plus state transitions (placed, paid, shipped, refunded) with webhooks"
@@ -223,6 +284,18 @@ stack:
   build: "EAS Build"
   cicd: "GitHub Actions + EAS"
   package_manager: "npm"
+  monorepo_tool: slotignored
+  workspaces: slotignored
+  admin: slotignored
+  cache: slotignored
+  search: slotignored
+  storage: slotignored
+monorepo:
+  packages_count: slotignored
+  build_orchestrator: slotignored
+  versioning_strategy: slotignored
+  shared_configs: slotignored
+  remote_cache: slotignored
 human_context:
   who: "Day hikers and backpackers who lose signal on the trail"
   what: "Record GPS tracks, drop waypoints, and sync notes when back online"
@@ -262,6 +335,18 @@ stack:
   build: "Vite + CRXJS"
   cicd: "GitHub Actions"
   package_manager: "pnpm"
+  monorepo_tool: slotignored
+  workspaces: slotignored
+  admin: slotignored
+  cache: slotignored
+  search: slotignored
+  storage: slotignored
+monorepo:
+  packages_count: slotignored
+  build_orchestrator: slotignored
+  versioning_strategy: slotignored
+  shared_configs: slotignored
+  remote_cache: slotignored
 human_context:
   who: "Tab hoarders whose browser eats RAM by mid-afternoon"
   what: "Auto-groups tabs by domain and suspends ones untouched for N minutes"
@@ -301,6 +386,18 @@ stack:
   build: "uv"
   cicd: "GitHub Actions"
   package_manager: "uv"
+  monorepo_tool: slotignored
+  workspaces: slotignored
+  admin: slotignored
+  cache: slotignored
+  search: slotignored
+  storage: slotignored
+monorepo:
+  packages_count: slotignored
+  build_orchestrator: slotignored
+  versioning_strategy: slotignored
+  shared_configs: slotignored
+  remote_cache: slotignored
 human_context:
   who: "The growth team acting on at-risk accounts"
   what: "Feature build, XGBoost training, evaluation, and a scored CSV to the CRM"
@@ -340,6 +437,18 @@ stack:
   build: "cargo"
   cicd: "GitHub Actions"
   package_manager: "cargo"
+  monorepo_tool: slotignored
+  workspaces: slotignored
+  admin: slotignored
+  cache: slotignored
+  search: slotignored
+  storage: slotignored
+monorepo:
+  packages_count: slotignored
+  build_orchestrator: slotignored
+  versioning_strategy: slotignored
+  shared_configs: slotignored
+  remote_cache: slotignored
 human_context:
   who: "Rust service authors who need backpressure without a Redis round-trip"
   what: "A `Governor`-style limiter with per-key buckets and a Tokio-friendly API"
@@ -379,6 +488,18 @@ stack:
   build: "tsup"
   cicd: "GitHub Actions"
   package_manager: "pnpm"
+  monorepo_tool: slotignored
+  workspaces: slotignored
+  admin: slotignored
+  cache: slotignored
+  search: slotignored
+  storage: slotignored
+monorepo:
+  packages_count: slotignored
+  build_orchestrator: slotignored
+  versioning_strategy: slotignored
+  shared_configs: slotignored
+  remote_cache: slotignored
 human_context:
   who: "Frontend developers who find Zod too big for a landing page"
   what: "A composable validator that infers a TypeScript type from the schema"
@@ -420,6 +541,16 @@ stack:
   package_manager: "pnpm"
   monorepo_tool: "Turborepo"
   workspaces: "pnpm workspaces"
+  admin: slotignored
+  cache: slotignored
+  search: slotignored
+  storage: slotignored
+monorepo:
+  packages_count: 6
+  build_orchestrator: "Turborepo"
+  versioning_strategy: slotignored
+  shared_configs: "@acme/config, @acme/tsconfig"
+  remote_cache: "Turborepo remote cache"
 human_context:
   who: "A product team sharing UI and types across a site, an app, and an API"
   what: "Two Next.js apps, a NestJS API, and shared `ui` / `config` / `tsconfig` packages"
@@ -459,6 +590,18 @@ stack:
   build: "Gradle (Kotlin DSL)"
   cicd: "GitHub Actions"
   package_manager: "gradle"
+  monorepo_tool: slotignored
+  workspaces: slotignored
+  admin: slotignored
+  cache: slotignored
+  search: slotignored
+  storage: slotignored
+monorepo:
+  packages_count: slotignored
+  build_orchestrator: slotignored
+  versioning_strategy: slotignored
+  shared_configs: slotignored
+  remote_cache: slotignored
 human_context:
   who: "People who budget by envelope and do not want their bank data in the cloud"
   what: "Accounts, envelopes, and transactions with an optional encrypted backup"
@@ -498,6 +641,18 @@ stack:
   build: "cargo + espflash"
   cicd: "GitHub Actions"
   package_manager: "cargo"
+  monorepo_tool: slotignored
+  workspaces: slotignored
+  admin: slotignored
+  cache: slotignored
+  search: slotignored
+  storage: slotignored
+monorepo:
+  packages_count: slotignored
+  build_orchestrator: slotignored
+  versioning_strategy: slotignored
+  shared_configs: slotignored
+  remote_cache: slotignored
 human_context:
   who: "Home gardeners and a small greenhouse operation"
   what: "Reads capacitive moisture and temperature every 15 min, deep-sleeps between"
@@ -537,6 +692,18 @@ stack:
   build: "Tauri CLI + Vite"
   cicd: "GitHub Actions"
   package_manager: "pnpm"
+  monorepo_tool: slotignored
+  workspaces: slotignored
+  admin: slotignored
+  cache: slotignored
+  search: slotignored
+  storage: slotignored
+monorepo:
+  packages_count: slotignored
+  build_orchestrator: slotignored
+  versioning_strategy: slotignored
+  shared_configs: slotignored
+  remote_cache: slotignored
 human_context:
   who: "Writers and developers who want their notes as plain files on disk"
   what: "A folder of Markdown files with an FTS5 index, tags, and backlinks"
@@ -576,6 +743,18 @@ stack:
   build: "Godot export templates"
   cicd: "GitHub Actions"
   package_manager: slotignored
+  monorepo_tool: slotignored
+  workspaces: slotignored
+  admin: slotignored
+  cache: slotignored
+  search: slotignored
+  storage: slotignored
+monorepo:
+  packages_count: slotignored
+  build_orchestrator: slotignored
+  versioning_strategy: slotignored
+  shared_configs: slotignored
+  remote_cache: slotignored
 human_context:
   who: "Players who like tense, short roguelike runs"
   what: "Descend procedurally generated caves, manage oxygen and light, die and restart"
