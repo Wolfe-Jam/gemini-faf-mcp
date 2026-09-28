@@ -726,6 +726,12 @@ def faf_auto(directory: str = ".", path: str = "project.faf") -> dict:
                 "cache": detected.get("cache", "slotignored"),
                 "search": detected.get("search", "slotignored"),
                 "storage": detected.get("storage", "slotignored"),
+                # The other enterprise slots: always-33 counts all 12, so mark
+                # the ones detection can't fill (else they score as empty).
+                "monorepo_tool": "slotignored",
+                "package_manager": detected.get("package_manager", "slotignored"),
+                "workspaces": "slotignored",
+                "admin": "slotignored",
                 "connection": "slotignored",
                 "hosting": detected.get("hosting", "slotignored"),
                 "build": detected.get("build_tool", "slotignored"),
@@ -744,6 +750,12 @@ project:
   main_language: {_yv(lang)}
 stack:
 {stack_lines}
+monorepo:
+  packages_count: slotignored
+  build_orchestrator: slotignored
+  versioning_strategy: slotignored
+  shared_configs: slotignored
+  remote_cache: slotignored
 commands:
 {cmd_lines}
 key_files: []

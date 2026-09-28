@@ -260,6 +260,29 @@ class TestWJTTCTier2Engine:
         assert isinstance(data["score"], int)
         assert data["score"] >= 0
 
+    async def test_faf_auto_marks_every_enterprise_slot(self, client, tmp_path):
+        """always-33 counts the 12 enterprise slots; faf_auto must mark the ones
+        it can't fill as slotignored, or a fresh file scores far too low
+        (independent review of 3.0.0: a FastAPI + psycopg2 project fell 77 -> 45)."""
+        from faf_sdk import score_faf
+        from faf_sdk.mk4 import SLOTS
+
+        (tmp_path / "pyproject.toml").write_text(
+            '[project]\nname = "api"\ndescription = "An API"\n'
+            'dependencies = ["fastapi", "psycopg2"]\n'
+        )
+        target = tmp_path / "project.faf"
+        data = _parse(await client.call_tool("faf_auto", {
+            "directory": str(tmp_path), "path": str(target)
+        }))
+        assert data["success"] is True
+        result = score_faf(target.read_text())
+        enterprise = SLOTS[21:]
+        assert len(enterprise) == 12
+        empty = [slot for slot, state in result.slots if slot in enterprise and state.value == "empty"]
+        assert empty == [], f"enterprise slots left empty: {empty}"
+        assert result.score == data["score"]
+
     async def test_slotignored_adjusts_denominator(self, client, slotignored_faf):
         data = _parse(await client.call_tool("faf_score", {"path": slotignored_faf}))
         assert data["total"] == 33
