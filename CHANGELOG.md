@@ -22,6 +22,10 @@ One engine, one number: gemini-faf-mcp scores all 33 slots exactly like faf-kern
   `packages_count`, `build_orchestrator`, `shared_configs`, `remote_cache`. Every
   template is still 100% Trophy (checked against faf-kernel and
   `faf-cli@8.0.0 check --strict`).
+- `faf_auto` writes all 12 enterprise slots when it creates a `project.faf`
+  (`slotignored` unless detection fills them, e.g. `package_manager`), so a fresh
+  file scores what it did under 2.x instead of dropping: a FastAPI + psycopg2
+  project scores 77 (10/13), not 45.
 - CI checks `project.faf` with `faf-cli@8.0.0` (was 7.10.1).
 - `gemini-extension.json`, `server.json`, `project.faf`, `AGENTS.md` version → 3.0.0.
 

@@ -15,7 +15,7 @@ Stop re-explaining your project to every new Gemini session. Every Gemini conver
 
 [![PyPI](https://img.shields.io/pypi/v/gemini-faf-mcp?style=for-the-badge&logo=pypi&logoColor=white)](https://pypi.org/project/gemini-faf-mcp/)
 [![FAF Trophy 100%](https://img.shields.io/badge/FAF-%F0%9F%8F%86%20100%25-000000?labelColor=FF6B35)](https://faf.one)
-[![Tests](https://img.shields.io/badge/Tests-265%20passing-brightgreen?style=for-the-badge)](https://github.com/Wolfe-Jam/gemini-faf-mcp)
+[![Tests](https://img.shields.io/badge/Tests-266%20passing-brightgreen?style=for-the-badge)](https://github.com/Wolfe-Jam/gemini-faf-mcp)
 [![IANA: vnd.faf+yaml](https://img.shields.io/badge/IANA-vnd.faf%2Byaml-00D4D4?style=for-the-badge)](https://www.iana.org/assignments/media-types/application/vnd.faf+yaml)
 [![IANA: vnd.fafm+yaml](https://img.shields.io/badge/IANA-vnd.fafm%2Byaml-00D4D4?style=for-the-badge)](https://www.iana.org/assignments/media-types/application/vnd.fafm+yaml)
 [![DOI: Context paper](https://img.shields.io/badge/DOI-Context%20paper-FF6B35?style=for-the-badge)](https://doi.org/10.5281/zenodo.18251362)
@@ -280,7 +280,7 @@ pip3 install -e ".[dev]"
 python -m pytest tests/ -v
 ```
 
-265 tests passing across the FastMCP server, Cloud Function, Mk4 WJTTC championship, Full-Facts grounding, path-confinement, write-guard, model-parity, Dart detection, and client-telemetry suites. Championship-grade test coverage — [WJTTC certified](https://github.com/Wolfe-Jam/WJTTC).
+266 tests passing across the FastMCP server, Cloud Function, Mk4 WJTTC championship, Full-Facts grounding, path-confinement, write-guard, model-parity, Dart detection, and client-telemetry suites. Championship-grade test coverage — [WJTTC certified](https://github.com/Wolfe-Jam/WJTTC).
 
 ---
 
