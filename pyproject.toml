@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "gemini-faf-mcp"
-version = "3.0.0"
+version = "3.0.0rc1"
 authors = [
   { name="wolfejam", email="team@faf.one" },
 ]
