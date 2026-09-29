@@ -6,6 +6,11 @@
 All notable changes to gemini-faf-mcp are documented here.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
+## [Unreleased]
+
+### Fixed
+- **The hosted function scores always-33.** `faf-source-of-truth` (Cloud Function, `main.py`) had its own scorer: it trusted a `scores.faf_score` written inside the file, or else counted top-level keys over 21. `calculate_score` now uses `faf_sdk.score_faf`, the same kernel-exact score as every FAF app, and never trusts a score the file claims for itself. Not in the PyPI package (`main.py` is hosted-only); deployed by the Cloud Build trigger on merge.
+
 ## [3.0.0] - 2026-09-28 — The Always33 Edition
 
 One engine, one number: gemini-faf-mcp scores all 33 slots exactly like faf-kernel — the same score faf-cli 8, claude-faf-mcp 7, faf-mcp 4 and grok-faf-mcp 2 give.
