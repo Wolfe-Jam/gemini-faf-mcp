@@ -44,4 +44,4 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - name: faf-cli check --strict
-        run: npx -y faf-cli@7.10.1 check project.faf --strict
+        run: npx -y faf-cli@8.0.0 check project.faf --strict

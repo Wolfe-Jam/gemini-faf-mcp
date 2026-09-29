@@ -1,5 +1,5 @@
 """
-gemini-faf-mcp v2.8.2 — FastMCP Server
+gemini-faf-mcp v3.0.0 — FastMCP Server
 
 Native MCP server for FAF (Foundational AI-context Format).
 Powered by faf-python-sdk with Mk4 Championship Scoring Engine.
@@ -31,7 +31,7 @@ from interrogate import interrogate_repo
 from models import get_model, list_models
 from safe_path import PathConfinementError, confine_file_op, confine_path
 
-__version__ = "2.8.2"
+__version__ = "3.0.0"
 
 # The .faf FORMAT version this server writes (distinct from __version__, the
 # server's own release). Matches faf-cli's FAF_VERSION / faf-python-sdk.
@@ -129,7 +129,7 @@ def faf_validate(path: str = "project.faf") -> dict:
 @_confined
 def faf_score(path: str = "project.faf") -> dict:
     """Quick Mk4 score check — returns score (0-100%), tier, and slot counts.
-    Uses the Mk4 Championship 21-slot scoring engine for universal parity.
+    Uses the Mk4 always-33 scoring engine (faf-kernel parity) for universal parity.
     Use this for status checks; use faf_validate when you need error details."""
     try:
         mk4 = _mk4_score_file(path)
@@ -414,7 +414,7 @@ def faf_about() -> dict:
 @mcp.tool()
 def faf_model(project_type: str = "") -> dict:
     """Get a 100% Trophy-scored example .faf file for a specific project type.
-    Returns a complete, realistic project.faf that fills all 21 scored slots.
+    Returns a complete, realistic project.faf that fills all 33 scored slots (populated, or slotignored where a slot does not apply).
     Use this as a reference when building or improving a .faf file — shows exactly what 100% looks like.
     Call without arguments to list all 15 available project types."""
     if not project_type:
@@ -726,6 +726,12 @@ def faf_auto(directory: str = ".", path: str = "project.faf") -> dict:
                 "cache": detected.get("cache", "slotignored"),
                 "search": detected.get("search", "slotignored"),
                 "storage": detected.get("storage", "slotignored"),
+                # The other enterprise slots: always-33 counts all 12, so mark
+                # the ones detection can't fill (else they score as empty).
+                "monorepo_tool": "slotignored",
+                "package_manager": detected.get("package_manager", "slotignored"),
+                "workspaces": "slotignored",
+                "admin": "slotignored",
                 "connection": "slotignored",
                 "hosting": detected.get("hosting", "slotignored"),
                 "build": detected.get("build_tool", "slotignored"),
@@ -744,6 +750,12 @@ project:
   main_language: {_yv(lang)}
 stack:
 {stack_lines}
+monorepo:
+  packages_count: slotignored
+  build_orchestrator: slotignored
+  versioning_strategy: slotignored
+  shared_configs: slotignored
+  remote_cache: slotignored
 commands:
 {cmd_lines}
 key_files: []

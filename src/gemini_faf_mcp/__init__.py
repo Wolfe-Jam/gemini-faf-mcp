@@ -22,7 +22,7 @@ Glory Wall:
     https://faf.one/glory
 """
 
-__version__ = "2.8.2"
+__version__ = "3.0.0"
 __author__ = "wolfejam"
 
 from .client import FAFClient
