@@ -1,5 +1,5 @@
-faf_version: "3.0"
-generated: 2026-08-20T15:59:03.000Z
+faf_version: '3.0'
+generated: '2026-09-30T11:26:13.865435Z'
 ai_scoring_system: 2025-09-20
 ai_score: 100%
 ai_confidence: HIGH
@@ -11,15 +11,16 @@ ai_tldr:
   current_focus: Gemini Extensions Gallery listing
   your_role: Build features with perfect context
 instant_context:
-  what_building: Native MCP server for FAF — 13 tools for Gemini CLI, plus Cloud Run REST API
+  what_building: "Native MCP server for FAF \u2014 13 tools for Gemini CLI, plus Cloud\
+    \ Run REST API"
   tech_stack: Python + FastMCP + faf-python-sdk + Cloud Run
   main_language: Python
   key_files:
-    - server.py
-    - main.py
-    - pyproject.toml
-    - tests/test_fastmcp_server.py
-    - tests/test_gemini_faf_mcp.py
+  - server.py
+  - main.py
+  - pyproject.toml
+  - tests/test_fastmcp_server.py
+  - tests/test_gemini_faf_mcp.py
 context_quality:
   slots_filled: 21/21 (100%)
   ai_confidence: HIGH
@@ -29,25 +30,26 @@ project:
   name: gemini-faf-mcp
   title: Gemini FAF
   homepage: https://faf.one
-  goal: MCP server for FAF — read, validate, auto-detect, score, and export IANA-registered .faf project DNA from Gemini CLI
+  goal: "MCP server for FAF \u2014 read, validate, auto-detect, score, and export\
+    \ IANA-registered .faf project DNA from Gemini CLI"
   main_language: Python
-  type: mcp-server  # found: no classifying signals — fallback
+  type: mcp-server
   framework: fastmcp
   version: 3.0.0
 ai_instructions:
   priority_order:
-    - 1. Read THIS .faf file first
-    - 2. Check CLAUDE.md for session context
-    - 3. Review pyproject.toml for dependencies and version
+  - 1. Read THIS .faf file first
+  - 2. Check CLAUDE.md for session context
+  - 3. Review pyproject.toml for dependencies and version
   working_style:
     code_first: true
     explanations: minimal
     quality_bar: zero_errors
     testing: required
   warnings:
-    - All changes must pass the full test suite (pytest -q) before commit
-    - faf-python-sdk handles parsing — server.py delegates
-    - Version must match in pyproject.toml, __init__.py, client.py, server.py, main.py
+  - All changes must pass the full test suite (pytest -q) before commit
+  - "faf-python-sdk handles parsing \u2014 server.py delegates"
+  - Version must match in pyproject.toml, __init__.py, client.py, server.py, main.py
 stack:
   frontend: slotignored
   css_framework: slotignored
@@ -66,11 +68,12 @@ stack:
   cicd: GitHub Actions
   target_user: developers
   core_problem: AI tools lack structured project context
-  mission_purpose: Give any AI structured project context via IANA-registered .faf files
+  mission_purpose: Give any AI structured project context via IANA-registered .faf
+    files
   frameworks:
-    - FastMCP
-    - faf-python-sdk
-    - functions-framework
+  - FastMCP
+  - faf-python-sdk
+  - functions-framework
   monorepo_tool: slotignored
   workspaces: slotignored
   admin: slotignored
@@ -97,22 +100,22 @@ scores:
   slot_based_percentage: 100
   total_slots: 21
 tags:
-  - gemini-faf-mcp
-  - python
-  - mcp-server
-  - fastmcp
-  - gemini-cli
-  - .faf
-  - ai-ready
-  - "2026"
-  - iana-registered
-  - pypi
+- gemini-faf-mcp
+- python
+- mcp-server
+- fastmcp
+- gemini-cli
+- .faf
+- ai-ready
+- '2026'
+- iana-registered
+- pypi
 human_context:
   who: Gemini CLI developers who want instant project context
   what: MCP server that reads, validates, scores, and exports .faf project DNA
   why: Eliminate re-explaining your project every Gemini session
   where: Gemini CLI via Extensions Gallery, local MCP server
-  when: Every coding session — context loads automatically via GEMINI.md
+  when: "Every coding session \u2014 context loads automatically via GEMINI.md"
   how: Install extension, run /gemini-faf-mcp:setup, project DNA flows to Gemini
 ai_scoring_details:
   system_date: 2025-09-20
@@ -133,15 +136,15 @@ gemini:
 faf_dna:
   birth_dna: 24
   birth_certificate: FAF-2026-GEMINIFA-FY80
-  birth_date: 2026-03-08T07:34:47.984Z
+  birth_date: 2026-03-08 07:34:47.984000+00:00
   current_score: 100
 stack_signature: python-fastmcp-cloudrun
 detected_frameworks:
-  - Claude Code
-  - FastMCP
-  - faf-python-sdk
-  - OpenAPI
-  - Python
+- Claude Code
+- FastMCP
+- faf-python-sdk
+- OpenAPI
+- Python
 turbo_cat_intelligence: 275
 monorepo:
   packages_count: slotignored
@@ -150,51 +153,52 @@ monorepo:
   shared_configs: slotignored
   remote_cache: slotignored
 surfaces:
-  # Distribution map — the machine-checkable form of human_context.where. Score-neutral.
-  auto:                      # derived from manifests; regenerate with `faf surface --sync`
-    - type: pypi
-      id: gemini-faf-mcp
-      source: pyproject.toml#name
-    - type: github
-      id: Wolfe-Jam/gemini-faf-mcp
-      source: repository
-    - type: mcp-registry
-      id: io.github.Wolfe-Jam/gemini-faf-mcp
-      state: active
-      source: server.json#name
-  declared:                  # hand-authored: surfaces the manifests don't carry + targets
-    - type: mcpaas
-      id: gemini
-      url: https://mcpaas.live/gemini/mcp/v1
-      transport: streamable-http
-      status: live
-    - type: mcp-registry
-      id: one.faf/gemini-faf-mcp
-      status: active   # live at 2.8.2 (the io.github.Wolfe-Jam/* entries are frozen at 2.5.0 — dual-namespace, cf. registry#1556)
-    - type: pulsemcp
-      id: gemini-faf-mcp
-      status: pending
-    - type: glama
-      id: gemini-faf-mcp
-      status: pending
-    - type: awesome-mcp-servers
-      id: gemini-faf-mcp
-      status: pending
+  auto:
+  - type: pypi
+    id: gemini-faf-mcp
+    source: pyproject.toml#name
+  - type: github
+    id: Wolfe-Jam/gemini-faf-mcp
+    source: repository
+  - type: mcp-registry
+    id: io.github.Wolfe-Jam/gemini-faf-mcp
+    state: active
+    source: server.json#name
+  declared:
+  - type: mcpaas
+    id: gemini
+    url: https://mcpaas.live/gemini/mcp/v1
+    transport: streamable-http
+    status: live
+  - type: mcp-registry
+    id: one.faf/gemini-faf-mcp
+    status: active
+  - type: pulsemcp
+    id: gemini-faf-mcp
+    status: pending
+  - type: glama
+    id: gemini-faf-mcp
+    status: pending
+  - type: awesome-mcp-servers
+    id: gemini-faf-mcp
+    status: pending
 tech_stack:
-  - Python
+- Python
 key_files:
-  - server.py — the FastMCP server, every @mcp.tool
-  - models.py — 15 reference project.faf templates for faf_model
-  - safe_path.py — confine_file_op, every write stays in the project root
-  - inject.py — non-destructive faf-managed-block injection
-  - interrogate.py — Full-Facts grounding for faf_auto (docker-compose + Makefile signals)
-  - src/gemini_faf_mcp/ — client.py + parser helpers over faf-python-sdk
-  - main.py — Cloud Run / functions-framework entry point
-  - tests/ — pytest, the WJTTC 9-tier suite
-  - pyproject.toml
+- "server.py \u2014 the FastMCP server, every @mcp.tool"
+- "models.py \u2014 15 reference project.faf templates for faf_model"
+- "safe_path.py \u2014 confine_file_op, every write stays in the project root"
+- "inject.py \u2014 non-destructive faf-managed-block injection"
+- "interrogate.py \u2014 Full-Facts grounding for faf_auto (docker-compose + Makefile\
+  \ signals)"
+- "src/gemini_faf_mcp/ \u2014 client.py + parser helpers over faf-python-sdk"
+- "main.py \u2014 Cloud Run / functions-framework entry point"
+- "tests/ \u2014 pytest, the WJTTC 9-tier suite"
+- pyproject.toml
 commands:
   install: pip install -e ".[dev]"
   test: pytest -q
   lint: ruff check .
   typecheck: mypy server.py models.py safe_path.py inject.py src/
   build: python -m build
+sample text: value
