@@ -29,6 +29,7 @@ from datetime import date, datetime
 import functions_framework
 import requests
 import yaml
+from faf_sdk import score_faf
 
 
 class FafJSONEncoder(json.JSONEncoder):
@@ -459,15 +460,18 @@ def generate_badge(score, has_orange):
 
 
 def calculate_score(data):
-    """Calculate FAF score from data."""
-    # Check if scores section exists
-    if 'scores' in data and 'faf_score' in data['scores']:
-        return data['scores']['faf_score']
+    """The always-33 score, from faf-python-sdk's ``score_faf`` (faf-kernel parity).
 
-    # Fallback: count filled fields
-    total_slots = 21
-    filled = sum(1 for k, v in data.items() if v and v != "TBD")
-    return min(int((filled / total_slots) * 100), 100)
+    One engine, one number: the hosted function gives the same score as
+    faf-cli 8, the MCP servers and mcpaas.live. A score written inside the
+    file (``scores.faf_score``) is never trusted — FAF don't lie.
+    """
+    if not isinstance(data, dict):
+        return 0
+    try:
+        return score_faf(yaml.safe_dump(data, sort_keys=False, allow_unicode=True)).score
+    except Exception:
+        return 0
 
 
 def check_orange(data):
