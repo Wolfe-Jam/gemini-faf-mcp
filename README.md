@@ -40,7 +40,7 @@ Gemini: [now ready to help]
 
 ### What's New in v3.0.0 — The Always33 Edition
 
-One engine, one number: gemini-faf-mcp scores all 33 slots exactly like faf-kernel — the same score faf-cli 8, claude-faf-mcp 7, faf-mcp 4 and grok-faf-mcp 2 give.
+One engine, one number: gemini-faf-mcp scores with the always-33 engine, exactly like faf-kernel — the same score faf-cli 8, claude-faf-mcp 7, faf-mcp 4 and grok-faf-mcp 2 give.
 
 Built on `faf-python-sdk>=2.0.0`. The 12 enterprise slots count unless marked `slotignored`: 21 slots filled with no markers scores 64% (21/33); the same file plus the 12 markers scores 100% (21/21). `faf auto` (faf-cli) writes the markers. The 15 `faf_model` templates carry them and stay 100% Trophy.
 

@@ -13,7 +13,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
 ## [3.0.0] - 2026-09-28 — The Always33 Edition
 
-One engine, one number: gemini-faf-mcp scores all 33 slots exactly like faf-kernel — the same score faf-cli 8, claude-faf-mcp 7, faf-mcp 4 and grok-faf-mcp 2 give.
+One engine, one number: gemini-faf-mcp scores with the always-33 engine, exactly like faf-kernel — the same score faf-cli 8, claude-faf-mcp 7, faf-mcp 4 and grok-faf-mcp 2 give.
 
 ### Changed (breaking — scores move)
 - **`faf-python-sdk>=2.0.0`** — the SDK's `score_faf` now returns exactly what
