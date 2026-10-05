@@ -25,6 +25,7 @@ from faf_sdk import (
 )
 from faf_sdk.parser import FafParseError
 from fastmcp import FastMCP
+from mcp.types import ToolAnnotations
 
 from inject import inject_faf_block
 from interrogate import interrogate_repo
@@ -82,8 +83,18 @@ def _mk4_score_file(path: str):
 
 # --- Tools ---
 
+# --- Tool annotations (checked against each tool's code) ---
+# Reads only: nothing on disk changes, nothing leaves the machine.
+READS = ToolAnnotations(read_only_hint=True, open_world_hint=False)
+# Writes without losing anything: creates a new file, fills empty slots, or
+# updates faf's own block. Re-running with the same input changes nothing more.
+WRITES = ToolAnnotations(read_only_hint=False, destructive_hint=False,
+                         idempotent_hint=True, open_world_hint=False)
+# Rewrites an existing file (faf_migrate re-serializes it; comments are lost).
+REWRITES = ToolAnnotations(read_only_hint=False, destructive_hint=True,
+                           idempotent_hint=True, open_world_hint=False)
 
-@mcp.tool()
+@mcp.tool(annotations=READS)
 @_confined
 def faf_read(path: str = "project.faf") -> dict:
     """Read project DNA from a .faf file. Returns the full parsed structure
@@ -98,7 +109,7 @@ def faf_read(path: str = "project.faf") -> dict:
         return {"success": False, "error": str(e)}
 
 
-@mcp.tool()
+@mcp.tool(annotations=READS)
 @_confined
 def faf_validate(path: str = "project.faf") -> dict:
     """Validate a .faf file and return score, tier, and issues.
@@ -125,7 +136,7 @@ def faf_validate(path: str = "project.faf") -> dict:
         return {"success": False, "error": str(e)}
 
 
-@mcp.tool()
+@mcp.tool(annotations=READS)
 @_confined
 def faf_score(path: str = "project.faf") -> dict:
     """Quick Mk4 score check — returns score (0-100%), tier, and slot counts.
@@ -146,7 +157,7 @@ def faf_score(path: str = "project.faf") -> dict:
         return {"score": 0, "tier": "WHITE", "error": str(e)}
 
 
-@mcp.tool()
+@mcp.tool(annotations=READS)
 def faf_discover(start_dir: str = ".") -> dict:
     """Find .faf files in the project tree by walking up from start_dir.
     Searches the current directory and parent directories for project.faf.
@@ -157,7 +168,7 @@ def faf_discover(start_dir: str = ".") -> dict:
     return {"found": False, "searched_from": os.path.abspath(start_dir)}
 
 
-@mcp.tool()
+@mcp.tool(annotations=WRITES)
 @_confined
 def faf_init(
     name: str = "my-project",
@@ -211,7 +222,7 @@ state:
     return {"success": True, "path": str(safe), "message": f"Created {path} — edit to match your project"}
 
 
-@mcp.tool()
+@mcp.tool(annotations=READS)
 @_confined
 def faf_stringify(path: str = "project.faf") -> dict:
     """Convert parsed FAF data back to YAML string.
@@ -227,7 +238,7 @@ def faf_stringify(path: str = "project.faf") -> dict:
         return {"success": False, "error": str(e)}
 
 
-@mcp.tool()
+@mcp.tool(annotations=READS)
 @_confined
 def faf_context(path: str = "project.faf") -> dict:
     """Get Gemini-optimized context from a .faf file.
@@ -284,7 +295,7 @@ def faf_context(path: str = "project.faf") -> dict:
         return {"success": False, "error": str(e)}
 
 
-@mcp.tool()
+@mcp.tool(annotations=WRITES)
 @_confined
 def faf_gemini(path: str = "project.faf") -> dict:
     """Export and write GEMINI.md from a .faf file (non-destructive).
@@ -313,7 +324,7 @@ def faf_gemini(path: str = "project.faf") -> dict:
         return {"success": False, "error": str(e)}
 
 
-@mcp.tool()
+@mcp.tool(annotations=WRITES)
 @_confined
 def faf_agents(path: str = "project.faf") -> dict:
     """Export and write AGENTS.md from a .faf file (non-destructive).
@@ -339,14 +350,15 @@ def faf_agents(path: str = "project.faf") -> dict:
         return {"success": False, "error": str(e)}
 
 
-@mcp.tool()
+@mcp.tool(annotations=REWRITES)
 @_confined
 def faf_migrate(path: str = "project.faf", dry_run: bool = False) -> dict:
     """Migrate a .faf file to the current format version (3.0).
     Bumps `faf_version`, ensures the section roots exist (`project`, `stack`,
     `human_context`, `monorepo`), and re-serializes. Legacy slot names
     (`frontend`/`database`/…) still score via the registry's aliases — this
-    only touches the version and structure, never your values. Parity with
+    only touches the version and structure, never your values. The file is
+    re-serialized, so YAML comments and formatting are not kept. Parity with
     faf-cli's `faf migrate`. Pass dry_run=true to preview."""
     try:
         faf = _parse_faf(path)
@@ -377,7 +389,7 @@ def faf_migrate(path: str = "project.faf", dry_run: bool = False) -> dict:
         return {"success": False, "error": str(e)}
 
 
-@mcp.tool()
+@mcp.tool(annotations=READS)
 def faf_about() -> dict:
     """FAF format info — IANA registration, version, ecosystem.
     Returns metadata about the FAF format, server version, and available MCP bridges.
@@ -390,7 +402,7 @@ def faf_about() -> dict:
         "server": "gemini-faf-mcp",
         "server_version": __version__,
         "sdk": "faf-python-sdk",
-        "tools": 12,
+        "tools": 13,
         "ecosystem": {
             "claude": "claude-faf-mcp (npm)",
             "gemini": "gemini-faf-mcp (PyPI)",
@@ -411,7 +423,7 @@ def faf_about() -> dict:
     }
 
 
-@mcp.tool()
+@mcp.tool(annotations=READS)
 def faf_model(project_type: str = "") -> dict:
     """Get a 100% Trophy-scored example .faf file for a specific project type.
     Returns a complete, realistic project.faf that fills all 33 scored slots (populated, or slotignored where a slot does not apply).
@@ -663,7 +675,7 @@ def _detect_stack(directory: str) -> dict:
     return detected
 
 
-@mcp.tool()
+@mcp.tool(annotations=WRITES)
 @_confined
 def faf_auto(directory: str = ".", path: str = "project.faf") -> dict:
     """Auto-detect project stack and author/update a .faf file.
