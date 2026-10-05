@@ -4,12 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>gemini-faf-mcp — project context for Gemini</title>
-  <meta name="description" content="A Gemini CLI extension and MCP server. Gemini reads your IANA-registered project.faf at the start of every session, scored always-33. Install with one command.">
+  <meta name="description" content="A Gemini CLI extension and MCP server that also works in Google Antigravity. Gemini reads your IANA-registered project.faf at the start of every session, scored always-33. Install with one command.">
   <meta property="og:title" content="gemini-faf-mcp — project context for Gemini">
   <meta property="og:description" content="A Gemini CLI extension and MCP server. Gemini reads your project.faf at the start of every session. One command to install.">
   <meta property="og:image" content="https://raw.githubusercontent.com/Wolfe-Jam/gemini-faf-mcp/main/assets/thumbnail.png">
   <meta name="theme-color" content="#060606">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍊</text></svg>">
+  <link rel="icon" type="image/svg+xml" href="https://faf.one/orange-smiley.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:wght@400;500&family=Google+Sans+Code:wght@400;500&display=swap" rel="stylesheet">
@@ -66,7 +66,7 @@
       width: 30px; height: 30px; border-radius: 8px; padding: 1.5px;
       background: var(--gemini); display: inline-flex;
     }
-    .tile-icon span {
+    .tile-icon > span {
       flex: 1; border-radius: 6.5px; background: #0d0e10;
       display: flex; align-items: center; justify-content: center; font-size: 16px;
     }
@@ -106,7 +106,7 @@
       font-size: clamp(44px, 7.4vw, 92px); font-weight: 400;
       letter-spacing: -0.035em; line-height: 1.02;
     }
-    h1 .g { background: var(--gemini); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .g { background: var(--gemini); -webkit-background-clip: text; background-clip: text; color: transparent; }
     .lede { font-size: clamp(17px, 2vw, 19px); color: var(--body); margin-top: 24px; max-width: 540px; }
     .hero-cta { display: flex; gap: 10px; margin-top: 32px; flex-wrap: wrap; }
 
@@ -187,6 +187,7 @@
 
     .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .compare .term pre { font-size: 13px; }
+    .tile-icon img { display: block; }
 
     /* tiles */
     .tiles { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
@@ -212,6 +213,7 @@
     .foot-grid .col { display: flex; flex-direction: column; gap: 8px; }
     .foot-grid .col a:hover { color: var(--text); }
     .foot-title { color: var(--text); font-weight: 500; margin-bottom: 4px; }
+    .foot-brand { display: flex; align-items: center; gap: 8px; }
     .foot-note { margin-top: 36px; display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; color: var(--dim); font-size: 13px; }
 
     .share {
@@ -252,12 +254,13 @@
   <nav>
     <div class="wrap">
       <a class="brand" href="./">
-        <span class="tile-icon"><span>🍊</span></span>
+        <span class="tile-icon"><span><img src="https://faf.one/orange-smiley.svg" alt="FAF" width="20" height="20"></span></span>
         <span>gemini-faf-mcp</span>
         <span id="versionBadge" class="version-badge" title="Latest on PyPI">v3.0.0</span>
       </a>
       <div class="nav-links">
         <a href="#install">Install</a>
+        <a href="#antigravity">Antigravity</a>
         <a href="#tools">Tools</a>
         <a href="https://github.com/Wolfe-Jam/gemini-faf-mcp/blob/main/CHANGELOG.md">Changelog</a>
         <a href="https://faf.one">faf.one</a>
@@ -280,7 +283,7 @@
       <div class="hero-grid">
         <div>
           <h1>Your project,<br>known to <span class="g">Gemini</span>.</h1>
-          <p class="lede">A Gemini CLI extension and MCP server. Gemini reads your IANA-registered <code>project.faf</code> at the start of every session, so it already knows the stack, the goal and the rules.</p>
+          <p class="lede">A Gemini CLI extension and MCP server that also works in Google Antigravity. Gemini reads your IANA-registered <code>project.faf</code> at the start of every session, so it already knows the stack, the goal and the rules.</p>
           <div class="hero-cta">
             <a class="btn btn-cta" href="#install">Install the extension</a>
             <a class="btn btn-outline" href="https://github.com/Wolfe-Jam/gemini-faf-mcp#readme">Read the docs</a>
@@ -313,7 +316,7 @@
 
       <div class="sec-head" id="install">
         <h2>Get started in three steps</h2>
-        <p>Works in Gemini CLI. Runs on Python through <code>uvx</code>.</p>
+        <p>Works in Gemini CLI and Google Antigravity. Runs on Python through <code>uvx</code>.</p>
       </div>
       <div class="steps">
         <div class="step">
@@ -336,6 +339,30 @@
         </div>
       </div>
       <p class="alt">Using another MCP client? Run <code>uvx gemini-faf-mcp</code>, or <code>pip install gemini-faf-mcp</code>.</p>
+
+      <div class="sec-head" id="antigravity">
+        <h2>Works in Google <span class="g">Antigravity</span></h2>
+        <p>Antigravity reads one MCP config file, and it takes both modes. <a class="t-blue" href="https://faf.one/blog/chameleon-edition">Read how it works ›</a></p>
+      </div>
+      <div class="compare">
+        <div class="term">
+          <div class="term-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="title">~/.gemini/config/mcp_config.json · local</span></div>
+<pre>{
+  "mcpServers": {
+    "gemini-faf": { "command": "uvx", "args": ["gemini-faf-mcp"] }
+  }
+}</pre>
+        </div>
+        <div class="term">
+          <div class="term-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="title">~/.gemini/config/mcp_config.json · hosted</span></div>
+<pre>{
+  "mcpServers": {
+    "gemini-faf": { "serverUrl": "https://mcpaas.live/gemini/mcp/v1" }
+  }
+}</pre>
+        </div>
+      </div>
+      <p class="alt">Antigravity expects <code>serverUrl</code>, not <code>url</code> or <code>httpUrl</code>.</p>
 
       <div class="sec-head" id="tools">
         <h2>Thirteen tools. You can see what each one does.</h2>
@@ -418,7 +445,7 @@
     <div class="wrap">
       <div class="foot-grid">
         <div class="col">
-          <span class="foot-title">🍊 gemini-faf-mcp</span>
+          <span class="foot-title foot-brand"><img src="https://faf.one/orange-smiley.svg" alt="" width="18" height="18"> gemini-faf-mcp</span>
           <span>Part of the FAF MCP family</span>
         </div>
         <div class="col">
@@ -450,7 +477,7 @@
     </div>
   </footer>
 
-  <a class="share" href="https://twitter.com/intent/tweet?text=gemini-faf-mcp%20%E2%80%94%20Gemini%20reads%20your%20project.faf%20at%20the%20start%20of%20every%20session.%20One%20command%20to%20install%20%F0%9F%8D%8A&url=https%3A%2F%2Fwolfe-jam.github.io%2Fgemini-faf-mcp%2F" target="_blank" rel="noopener">
+  <a class="share" href="https://twitter.com/intent/tweet?text=gemini-faf-mcp%20%E2%80%94%20Gemini%20reads%20your%20project.faf%20at%20the%20start%20of%20every%20session.%20One%20command%20to%20install.&url=https%3A%2F%2Fwolfe-jam.github.io%2Fgemini-faf-mcp%2F" target="_blank" rel="noopener">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
     Share
   </a>
