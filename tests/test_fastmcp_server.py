@@ -324,7 +324,7 @@ class TestTier2Engine:
         data = _parse(result)
         assert data["iana_registered"] is True
         assert data["media_type"] == "application/vnd.faf+yaml"
-        assert data["tools"] == 12
+        assert data["tools"] == len(await client.list_tools())
         assert len(data["ecosystem"]) >= 5
 
 
@@ -1078,3 +1078,46 @@ class TestTier9Gallery:
         """GEMINI.md exists at repo root."""
         gemini_path = Path(__file__).parent.parent / "GEMINI.md"
         assert gemini_path.exists()
+
+
+# ---------------------------------------------------------------------------
+# Tool annotations — hints match what each tool really does (2026-10-05).
+# Read-only means "does not modify its environment". faf_migrate rewrites the
+# whole file (comments are lost), so it is the one destructive tool.
+# ---------------------------------------------------------------------------
+
+READ_ONLY = {
+    "faf_read", "faf_validate", "faf_score", "faf_discover",
+    "faf_stringify", "faf_context", "faf_about", "faf_model",
+}
+DESTRUCTIVE = {"faf_migrate"}
+
+
+class TestToolAnnotations:
+
+    async def test_every_tool_declares_annotations(self, client):
+        for t in await client.list_tools():
+            assert t.annotations is not None, f"{t.name} has no annotations"
+
+    async def test_read_only_hint_matches_behaviour(self, client):
+        for t in await client.list_tools():
+            assert t.annotations.read_only_hint is (t.name in READ_ONLY), t.name
+
+    async def test_only_migrate_is_destructive(self, client):
+        for t in await client.list_tools():
+            if t.name not in READ_ONLY:
+                assert t.annotations.destructive_hint is (t.name in DESTRUCTIVE), t.name
+
+    async def test_nothing_is_open_world(self, client):
+        for t in await client.list_tools():
+            assert t.annotations.open_world_hint is False, t.name
+
+    async def test_migrate_drops_comments_as_annotated(self, client, tmp_path, monkeypatch):
+        """The destructive label is earned: a comment in the file does not survive."""
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "project.faf").write_text(
+            'faf_version: "2.5"\n# my note\nproject:\n  name: x\n'
+        )
+        data = _parse(await client.call_tool("faf_migrate", {"path": "project.faf"}))
+        assert data["changed"] is True
+        assert "# my note" not in (tmp_path / "project.faf").read_text()

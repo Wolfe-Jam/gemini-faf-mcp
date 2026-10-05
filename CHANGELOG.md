@@ -8,7 +8,12 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
 ## [Unreleased]
 
+### Added
+- **Tool annotations on all 13 tools**, checked against each tool's code: read-only `faf_read`, `faf_validate`, `faf_score`, `faf_discover`, `faf_stringify`, `faf_context`, `faf_about`, `faf_model`; non-destructive writers `faf_init` (refuses to overwrite), `faf_auto` (fills empty slots only), `faf_gemini` and `faf_agents` (update faf's own block, keep the rest); destructive `faf_migrate`. None is open-world. New `TestToolAnnotations` tests.
+
 ### Fixed
+- `faf_migrate` re-serializes the whole file, so YAML comments and formatting are lost; its description now says so, and it is annotated as destructive. A test checks a comment does not survive, so the label stays earned.
+- `faf_about` reported `"tools": 12`; the server has 13. The test now compares it with the live `tools/list` count instead of a fixed number.
 - **The hosted function scores always-33.** `faf-source-of-truth` (Cloud Function, `main.py`) had its own scorer: it trusted a `scores.faf_score` written inside the file, or else counted top-level keys over 21. `calculate_score` now uses `faf_sdk.score_faf`, the same kernel-exact score as every FAF app, and never trusts a score the file claims for itself. Not in the PyPI package (`main.py` is hosted-only); deployed by the Cloud Build trigger on merge.
 
 ## [3.0.0] - 2026-09-28 — The Always33 Edition
