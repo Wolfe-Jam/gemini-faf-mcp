@@ -1,339 +1,518 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>gemini-faf-mcp | Persistent Project Context for Gemini</title>
-  <meta name="description" content="gemini-faf-mcp — Google Gemini MCP server. Persistent .faf project context. IANA-registered format (application/vnd.faf+yaml). PyPI + MCP Registry.">
-  <meta property="og:title" content="gemini-faf-mcp | Persistent Project Context for Gemini">
-  <meta property="og:description" content="Google Gemini MCP — persistent AI context via the IANA-registered .faf format. pip install gemini-faf-mcp.">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>gemini-faf-mcp — project context for Gemini</title>
+  <meta name="description" content="A Gemini CLI extension and MCP server that also works in Google Antigravity. Gemini reads your IANA-registered project.faf at the start of every session, scored always-33. Install with one command.">
+  <meta property="og:title" content="gemini-faf-mcp — project context for Gemini">
+  <meta property="og:description" content="A Gemini CLI extension and MCP server. Gemini reads your project.faf at the start of every session. One command to install.">
   <meta property="og:image" content="https://raw.githubusercontent.com/Wolfe-Jam/gemini-faf-mcp/main/assets/thumbnail.png">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍊</text></svg>">
+  <meta name="theme-color" content="#060606">
+  <link rel="icon" type="image/svg+xml" href="https://faf.one/orange-smiley.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:wght@400;500&family=Google+Sans+Code:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap');
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg: #060606;
+      --panel: #111214;
+      --panel-2: #1b1c1f;
+      --line: #23252a;
+      --line-2: #303238;
+      --text: #ffffff;
+      --body: #c4c7c5;
+      --muted: #999999;
+      --dim: #6f7175;
+      --blue: #4285f4;
+      --blue-text: #8ab4f8;
+      --orange: #ff6b35;
+      --green: #81c995;
+      --pink: #f28b82;
+      /* the Gemini sparkle gradient */
+      --gemini: linear-gradient(90deg, #4285f4 0%, #9b72cb 55%, #d96570 100%);
+      /* Google AI for Developers primary button */
+      --cta: linear-gradient(52deg, #0844ff 11.5%, #64b8fb 129.5%);
+      --sans: 'Google Sans Flex', 'Google Sans', Roboto, -apple-system, 'Segoe UI', sans-serif;
+      --mono: 'Google Sans Code', 'Roboto Mono', ui-monospace, Menlo, monospace;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { -webkit-text-size-adjust: 100%; }
     body {
-      font-family: 'Inter', -apple-system, sans-serif;
-      background: #0a0a0a;
-      color: #fff;
-      min-height: 100vh;
-      position: relative;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 16px; line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
     }
-    body::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: radial-gradient(ellipse at 50% 30%, rgba(255, 102, 0, 0.06) 0%, transparent 60%);
-      pointer-events: none;
-    }
-    .accent-line {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      height: 3px;
-      background: linear-gradient(90deg, transparent 0%, #333 20%, #ff6600 50%, #333 80%, transparent 100%);
-      z-index: 10;
-    }
-    .container {
-      position: relative;
-      z-index: 1;
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 60px 40px 40px;
-      text-align: center;
-    }
-    .logo {
-      font-size: 100px;
-      margin-bottom: 12px;
-      filter: drop-shadow(0 0 30px rgba(255, 165, 0, 0.3));
-      animation: pulse 2s ease-in-out infinite;
-    }
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.05); }
-    }
-    h1 {
-      font-size: 2.5rem;
-      font-weight: 900;
-      letter-spacing: -1px;
-      margin-bottom: 8px;
-      color: #fff;
-    }
-    .tagline {
-      font-size: 1.3rem;
-      color: #FFD700;
-      font-weight: 600;
-      margin: 0.5rem 0;
-    }
-    .registry-line {
-      font-size: 0.95rem;
-      color: #777;
-      margin: 0.5rem 0 2rem 0;
-    }
-    .registry-line a { color: #aaa; }
-    .registry-line code { color: #ff6600; background: rgba(0,0,0,0.4); padding: 2px 6px; border-radius: 3px; }
-    .stats {
-      display: flex;
-      justify-content: center;
-      gap: 48px;
-      margin-bottom: 32px;
-    }
-    .stat-value { font-size: 2rem; font-weight: 800; color: #fff; }
-    .stat-label { font-size: 11px; font-weight: 600; color: #555; text-transform: uppercase; letter-spacing: 1px; }
-    .install {
-      background: rgba(255, 102, 0, 0.04);
-      border: 1px solid rgba(255, 102, 0, 0.2);
-      border-radius: 12px;
-      padding: 24px;
-      margin-bottom: 32px;
-      text-align: left;
-    }
-    .install h2 { font-size: 14px; color: #ff6600; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 16px; }
-    .install pre {
-      background: rgba(0, 0, 0, 0.4);
-      border-radius: 6px;
-      padding: 14px 16px;
-      font-family: 'Courier New', monospace;
-      font-size: 13px;
-      color: #ddd;
-      overflow-x: auto;
-      line-height: 1.5;
-    }
-    .install .desc { font-size: 12px; color: #888; margin-bottom: 10px; }
-    .install .desc code { color: #ff6600; background: rgba(0,0,0,0.4); padding: 2px 6px; border-radius: 3px; }
-    .deploy { margin-bottom: 32px; }
-    .deploy h2 { font-size: 14px; color: #ff6600; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 16px; }
-    .deploy-grid {
-      display: flex;
-      gap: 16px;
-      justify-content: center;
-    }
-    .deploy-option {
-      background: rgba(255, 102, 0, 0.04);
-      border: 1px solid rgba(255, 102, 0, 0.15);
-      border-radius: 8px;
-      padding: 16px 24px;
-      flex: 1;
-      max-width: 220px;
-    }
-    .deploy-option .label { font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 4px; }
-    .deploy-option .desc { font-size: 12px; color: #666; margin-bottom: 6px; }
-    .deploy-option code { font-size: 12px; color: #ff6600; font-family: 'Courier New', monospace; }
-    .bottom-bar {
-      border-top: 1px solid rgba(255, 102, 0, 0.1);
-      padding-top: 24px;
-      text-align: center;
-      font-size: 12px;
-      color: #555;
-    }
-    .bottom-bar .links { margin-bottom: 8px; }
-    .bottom-bar .big-orange { color: #777; font-style: italic; }
-    a { color: #ff6600; text-decoration: none; }
-    a:hover { text-decoration: underline; }
+    a { color: inherit; text-decoration: none; }
+    code { font-family: var(--mono); }
+    .wrap { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
 
+    /* the soft blue glow at the top, as on geminicli.com / ai.google.dev */
+    .glow {
+      position: absolute; inset: 0 0 auto 0; height: 640px; pointer-events: none; z-index: 0;
+      background:
+        radial-gradient(60% 55% at 30% 0%, rgba(66, 133, 244, 0.22), transparent 70%),
+        radial-gradient(45% 45% at 75% 0%, rgba(155, 114, 203, 0.16), transparent 70%);
+    }
+    nav, main, footer { position: relative; z-index: 1; }
+
+    /* ── Nav ─────────────────────────────────────────── */
+    nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 68px; gap: 16px; }
+    .brand { display: flex; align-items: center; gap: 12px; font-size: 18px; font-weight: 500; white-space: nowrap; }
+    .tile-icon {
+      width: 30px; height: 30px; border-radius: 8px; padding: 1.5px;
+      background: var(--gemini); display: inline-flex;
+    }
+    .tile-icon > span {
+      flex: 1; border-radius: 6.5px; background: #0d0e10;
+      display: flex; align-items: center; justify-content: center; font-size: 16px;
+    }
     .version-badge {
-      display: inline-block;
-      background: #ff6600;
-      color: #000;
-      font-size: 0.85rem;
-      font-weight: 800;
-      padding: 4px 14px;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: background 0.2s, transform 0.15s;
-      user-select: none;
+      font-family: var(--mono); font-size: 12px; color: var(--muted);
+      border: 1px solid var(--line-2); border-radius: 999px; padding: 2px 8px;
     }
-    .version-badge:hover { background: #ff8833; transform: scale(1.05); }
+    .nav-links { display: flex; gap: 26px; font-family: var(--mono); font-size: 14px; color: var(--muted); }
+    .nav-links a:hover { color: var(--text); }
+    .nav-right { display: flex; align-items: center; gap: 18px; font-size: 14px; color: var(--blue-text); }
+    .nav-right a:hover { color: #aecbfa; }
 
-    .about-overlay {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0, 0, 0, 0.7);
-      z-index: 100;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s;
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px; height: 48px; padding: 0 24px;
+      border-radius: 999px; font-size: 16px; font-weight: 500; white-space: nowrap;
+      border: 1px solid transparent; cursor: pointer; font-family: var(--sans);
+      transition: filter 0.15s, background 0.15s, border-color 0.15s;
     }
-    .about-overlay.visible { opacity: 1; pointer-events: all; }
-    .about-box {
-      background: #141414;
-      border: 1px solid rgba(255, 102, 0, 0.3);
-      border-radius: 16px;
-      padding: 40px;
-      max-width: 480px;
-      width: 90%;
-      text-align: center;
-      position: relative;
-      transform: scale(0.9);
-      transition: transform 0.3s;
+    .btn-cta { background: var(--cta); color: #fff; }
+    .btn-cta:hover { filter: brightness(1.12); }
+    .btn-outline { background: transparent; color: var(--blue-text); border-color: var(--line-2); }
+    .btn-outline:hover { background: rgba(138, 180, 248, 0.08); border-color: #5f6368; }
+    .btn-sm { height: 36px; padding: 0 14px; font-size: 14px; }
+
+    /* ── Hero ────────────────────────────────────────── */
+    .hero { padding: 88px 0 56px; }
+    .chip {
+      display: inline-flex; align-items: center; gap: 10px;
+      border: 1px solid var(--line-2); border-radius: 8px; padding: 6px 12px;
+      font-size: 14px; color: var(--text); background: rgba(255, 255, 255, 0.02);
     }
-    .about-overlay.visible .about-box { transform: scale(1); }
-    .about-version {
-      display: inline-block;
-      background: #ff6600;
-      color: #000;
-      font-size: 1.1rem;
-      font-weight: 900;
-      padding: 6px 20px;
-      border-radius: 6px;
-      margin-bottom: 16px;
+    .chip:hover { border-color: #5f6368; }
+    .chip .new { color: var(--blue-text); font-size: 11px; font-weight: 500; letter-spacing: 0.08em; }
+    .chip .sub { color: var(--muted); }
+    .hero-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 48px; align-items: center; margin-top: 28px; }
+    h1 {
+      font-size: clamp(44px, 7.4vw, 92px); font-weight: 400;
+      letter-spacing: -0.035em; line-height: 1.02;
     }
-    .about-title { font-size: 1.4rem; font-weight: 800; color: #fff; margin-bottom: 8px; }
-    .about-subtitle { font-size: 0.95rem; color: #ff6600; font-weight: 600; margin-bottom: 20px; }
-    .about-items { text-align: left; margin: 0 auto 24px; max-width: 360px; }
-    .about-item {
-      padding: 8px 0;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-      font-size: 0.9rem;
-      color: #ccc;
+    .g { background: var(--gemini); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .lede { font-size: clamp(17px, 2vw, 19px); color: var(--body); margin-top: 24px; max-width: 540px; }
+    .hero-cta { display: flex; gap: 10px; margin-top: 32px; flex-wrap: wrap; }
+
+    /* terminal (Gemini CLI) */
+    .term {
+      background: #0d0e10; border: 1px solid var(--line-2); border-radius: 14px;
+      font-family: var(--mono); font-size: 13.5px; line-height: 1.8; overflow: hidden;
+      box-shadow: 0 0 0 1px rgba(66, 133, 244, 0.08), 0 30px 80px -30px rgba(66, 133, 244, 0.35);
     }
-    .about-item span { color: #ff6600; font-weight: 700; }
-    .about-close {
-      background: none;
-      border: 1px solid rgba(255, 102, 0, 0.3);
-      color: #888;
-      font-size: 0.8rem;
-      padding: 8px 24px;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: color 0.2s, border-color 0.2s;
+    .term-bar {
+      display: flex; align-items: center; gap: 7px; padding: 10px 14px;
+      border-bottom: 1px solid var(--line); color: var(--dim); font-size: 12px;
     }
-    .about-close:hover { color: #fff; border-color: #ff6600; }
-    .about-progress {
-      position: absolute;
-      bottom: 0; left: 0;
-      height: 3px;
-      background: #ff6600;
-      border-radius: 0 0 16px 16px;
-      transition: width 0.1s linear;
+    .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; background: #3c4043; }
+    .term-bar .title { margin-left: 8px; }
+    .term pre { padding: 14px 16px; white-space: pre-wrap; word-break: break-word; color: #dadce0; font-family: var(--mono); }
+    .t-dim { color: var(--dim); }
+    .t-blue { color: var(--blue-text); }
+    .t-green { color: var(--green); }
+    .t-orange { color: var(--orange); }
+    .t-white { color: #fff; }
+
+    /* ── Sections ────────────────────────────────────── */
+    .sec-head { margin: 88px 0 28px; }
+    .sec-head h2 { font-size: clamp(30px, 4.4vw, 48px); font-weight: 400; letter-spacing: -0.025em; line-height: 1.1; }
+    .sec-head p { color: var(--muted); margin-top: 10px; font-size: 17px; }
+
+    /* steps (Google docs pattern) */
+    .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .step {
+      background: var(--panel); border: 1px solid var(--line); border-radius: 16px;
+      padding: 22px; display: flex; flex-direction: column; gap: 14px;
+    }
+    .step .n {
+      width: 28px; height: 28px; border-radius: 999px; font-size: 14px; font-weight: 500;
+      display: inline-flex; align-items: center; justify-content: center;
+      background: rgba(66, 133, 244, 0.14); color: var(--blue-text);
+    }
+    .step h3 { font-size: 19px; font-weight: 500; }
+    .step p { color: var(--muted); font-size: 15px; }
+    .cmd {
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+      background: #0d0e10; border: 1px solid var(--line); border-radius: 10px;
+      padding: 10px 12px; font-family: var(--mono); font-size: 13px; color: #dadce0;
+      cursor: pointer; text-align: left; width: 100%; margin-top: auto;
+    }
+    .cmd:hover { border-color: #5f6368; }
+    .cmd span { word-break: break-all; }
+    .cmd .cp { color: var(--dim); flex-shrink: 0; }
+    .alt { color: var(--muted); font-size: 15px; margin-top: 16px; }
+    .alt code { color: var(--text); background: var(--panel-2); border-radius: 6px; padding: 2px 7px; font-size: 14px; }
+
+    /* bento */
+    .bento { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .card {
+      background: var(--panel); border: 1px solid var(--line); border-radius: 16px;
+      padding: 24px; display: flex; flex-direction: column; gap: 14px;
+    }
+    .span-2 { grid-column: span 2; }
+    .card h3 { font-size: 19px; font-weight: 500; }
+    .card p { color: var(--muted); font-size: 15px; }
+    .score-num { font-size: 64px; font-weight: 400; letter-spacing: -0.04em; line-height: 1; display: flex; align-items: center; gap: 10px; }
+    .score-num img { width: 44px; height: 44px; }
+    .slots { display: grid; grid-template-columns: repeat(11, 1fr); gap: 5px; max-width: 300px; }
+    .slots i { aspect-ratio: 1; border-radius: 3px; background: var(--orange); }
+    .slots i.ig { background: #3c4043; }
+    .glyph { font-family: 'Apple Symbols', 'Segoe UI Symbol', 'Noto Sans Symbols 2', sans-serif; }
+
+    .tools { display: flex; flex-direction: column; gap: 14px; }
+    .tools .grp { font-size: 13px; color: var(--muted); margin-bottom: 8px; }
+    .pills { display: flex; flex-wrap: wrap; gap: 6px; }
+    .pill {
+      font-family: var(--mono); font-size: 12.5px; border-radius: 999px; padding: 4px 10px;
+      background: var(--panel-2); border: 1px solid var(--line-2); color: #dadce0;
+    }
+    .pill.w { border-color: rgba(138, 180, 248, 0.35); color: var(--blue-text); }
+    .pill.d { border-color: rgba(242, 139, 130, 0.4); color: var(--pink); }
+
+    .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .compare .term pre { font-size: 13px; }
+    .tile-icon img { display: block; }
+
+    /* tiles */
+    .tiles { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+    .tile {
+      background: var(--panel); border: 1px solid var(--line); border-radius: 12px;
+      padding: 18px 16px; min-height: 104px; display: flex; flex-direction: column;
+      justify-content: space-between; gap: 10px; transition: border-color 0.15s;
+    }
+    .tile:hover { border-color: #5f6368; }
+    .tile .k { font-size: 13px; color: var(--muted); }
+    .tile .v { font-family: var(--mono); font-size: 13px; word-break: break-all; color: var(--blue-text); }
+
+    .strip {
+      display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap;
+      background: var(--panel); border: 1px solid var(--line); border-radius: 16px;
+      padding: 22px 24px; margin-top: 12px;
+    }
+    .strip p { color: var(--body); }
+
+    /* ── Footer ──────────────────────────────────────── */
+    footer { border-top: 1px solid var(--line); margin-top: 96px; padding: 40px 0 56px; color: var(--muted); font-size: 14px; }
+    .foot-grid { display: flex; justify-content: space-between; gap: 32px; flex-wrap: wrap; }
+    .foot-grid .col { display: flex; flex-direction: column; gap: 8px; }
+    .foot-grid .col a:hover { color: var(--text); }
+    .foot-title { color: var(--text); font-weight: 500; margin-bottom: 4px; }
+    .foot-brand { display: flex; align-items: center; gap: 8px; }
+    .foot-note { margin-top: 36px; display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; color: var(--dim); font-size: 13px; }
+
+    .share {
+      position: fixed; bottom: 20px; right: 20px; z-index: 60;
+      display: flex; align-items: center; gap: 6px;
+      background: var(--panel-2); color: #fff; border: 1px solid var(--line-2);
+      border-radius: 999px; padding: 8px 14px; font-size: 13px; font-weight: 500;
+    }
+    .share:hover { background: var(--blue); border-color: var(--blue); }
+    .toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px);
+      background: #e8eaed; color: #202124; border-radius: 8px; padding: 10px 16px;
+      font-size: 14px; opacity: 0; transition: all 0.2s; pointer-events: none; z-index: 70;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ── Responsive ──────────────────────────────────── */
+    @media (max-width: 960px) {
+      .hero-grid { grid-template-columns: 1fr; }
+      .steps, .bento { grid-template-columns: 1fr 1fr; }
+      .tiles { grid-template-columns: repeat(2, 1fr); }
+      .nav-links { display: none; }
+    }
+    @media (max-width: 640px) {
+      .wrap { padding: 0 16px; }
+      .hero { padding: 56px 0 32px; }
+      .steps, .bento, .compare { grid-template-columns: 1fr; }
+      .span-2 { grid-column: span 1; }
+      .tiles { grid-template-columns: 1fr; }
+      .chip .sub { display: none; }
+      .nav-right .hide-sm { display: none; }
     }
   </style>
 </head>
 <body>
-  <a class="version-badge" id="versionBadge" href="https://github.com/Wolfe-Jam/gemini-faf-mcp" target="_blank" rel="noopener" style="position:fixed;top:14px;left:14px;z-index:9999;text-decoration:none;" title="gemini-faf-mcp on GitHub">v2.5.1</a>
-  <div class="accent-line"></div>
-  <div class="container">
-    <div class="logo">🍊</div>
-    <h1>gemini-faf-mcp</h1>
-    <div class="tagline">✨ Google Gemini MCP <span class="version-badge" onclick="showAbout()">The Chameleon Edition</span></div>
-    <div class="registry-line"><a href="https://pypi.org/project/gemini-faf-mcp/">PyPI</a> · MCP Registry · IANA-registered <code>application/vnd.faf+yaml</code></div>
+  <div class="glow" aria-hidden="true"></div>
 
-    <div class="stats">
-      <div><div class="stat-value">0</div><div class="stat-label">Config Required</div></div>
-      <div><div class="stat-value">100%</div><div class="stat-label">Trophy Scored</div></div>
-      <div><div class="stat-value">IANA</div><div class="stat-label">Registered Format</div></div>
+  <nav>
+    <div class="wrap">
+      <a class="brand" href="./">
+        <span class="tile-icon"><span><img src="https://faf.one/orange-smiley.svg" alt="FAF" width="20" height="20"></span></span>
+        <span>gemini-faf-mcp</span>
+        <span id="versionBadge" class="version-badge" title="Latest on PyPI">v3.0.0</span>
+      </a>
+      <div class="nav-links">
+        <a href="#install">Install</a>
+        <a href="#antigravity">Antigravity</a>
+        <a href="#tools">Tools</a>
+        <a href="https://github.com/Wolfe-Jam/gemini-faf-mcp/blob/main/CHANGELOG.md">Changelog</a>
+        <a href="https://faf.one">faf.one</a>
+      </div>
+      <div class="nav-right">
+        <a class="hide-sm" href="https://pypi.org/project/gemini-faf-mcp/">PyPI</a>
+        <a href="https://github.com/Wolfe-Jam/gemini-faf-mcp">GitHub</a>
+      </div>
     </div>
+  </nav>
 
-    <div class="install">
-      <h2>MCP Config (Claude Desktop / Gemini CLI)</h2>
-      <div class="desc">Install with <code>pip install gemini-faf-mcp</code>, then add the server:</div>
+  <main>
+    <header class="hero wrap">
+      <a class="chip" href="https://github.com/Wolfe-Jam/gemini-faf-mcp/blob/main/CHANGELOG.md">
+        <span class="new">NEW</span>
+        <span>The Always33 Edition</span>
+        <span class="sub">One score, the same everywhere</span>
+        <span class="t-dim">›</span>
+      </a>
+      <div class="hero-grid">
+        <div>
+          <h1>Your project,<br>known to <span class="g">Gemini</span>.</h1>
+          <p class="lede">A Gemini CLI extension and MCP server that also works in Google Antigravity. Gemini reads your IANA-registered <code>project.faf</code> at the start of every session, so it already knows the stack, the goal and the rules.</p>
+          <div class="hero-cta">
+            <a class="btn btn-cta" href="#install">Install the extension</a>
+            <a class="btn btn-outline" href="https://github.com/Wolfe-Jam/gemini-faf-mcp#readme">Read the docs</a>
+          </div>
+        </div>
+        <div class="term">
+          <div class="term-bar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="title">gemini</span>
+          </div>
+<pre><span class="t-blue">&gt;</span> <span class="t-white">/faf:setup</span>
+  <span class="t-green">✓</span> created project.faf <span class="t-dim">— starter, scored</span>
+
+<span class="t-blue">&gt;</span> <span class="t-white">fill it in from this repo</span>
+  <span class="t-dim">faf_auto · package.json, pyproject.toml,</span>
+  <span class="t-dim">docker-compose, Makefile …</span>
+  <span class="t-green">✓</span> filled the empty slots <span class="t-dim">— facts from your files</span>
+
+<span class="t-blue">&gt;</span> <span class="t-white">/faf:score</span>
+  <span class="t-dim">score</span> <span class="t-orange">100%</span>  <span class="t-dim">tier</span> Trophy <span class="glyph">✪</span>
+  <span class="t-dim">slots</span> 33 of 33 <span class="t-dim">(populated or slotignored)</span>
+
+<span class="t-blue">&gt;</span> <span class="t-white">/faf:export</span>
+  <span class="t-green">✓</span> GEMINI.md + AGENTS.md <span class="t-dim">— your own text kept</span></pre>
+        </div>
+      </div>
+    </header>
+
+    <div class="wrap">
+
+      <div class="sec-head" id="install">
+        <h2>Get started in three steps</h2>
+        <p>Works in Gemini CLI and Google Antigravity. Runs on Python through <code>uvx</code>.</p>
+      </div>
+      <div class="steps">
+        <div class="step">
+          <span class="n">1</span>
+          <h3>Install the extension</h3>
+          <p>One command adds the MCP server and the <code>/faf</code> commands to Gemini CLI.</p>
+          <button class="cmd" data-copy="gemini extensions install https://github.com/Wolfe-Jam/gemini-faf-mcp"><span>gemini extensions install https://github.com/Wolfe-Jam/gemini-faf-mcp</span><span class="cp">⧉</span></button>
+        </div>
+        <div class="step">
+          <span class="n">2</span>
+          <h3>Create your project.faf</h3>
+          <p>Writes a starter file and scores it. Then ask Gemini to fill it in from your repo.</p>
+          <button class="cmd" data-copy="/faf:setup"><span>/faf:setup</span><span class="cp">⧉</span></button>
+        </div>
+        <div class="step">
+          <span class="n">3</span>
+          <h3>Check the score</h3>
+          <p>See what's filled and what's missing, then take it to 100%.</p>
+          <button class="cmd" data-copy="/faf:score"><span>/faf:score</span><span class="cp">⧉</span></button>
+        </div>
+      </div>
+      <p class="alt">Using another MCP client? Run <code>uvx gemini-faf-mcp</code>, or <code>pip install gemini-faf-mcp</code>.</p>
+
+      <div class="sec-head" id="antigravity">
+        <h2>Works in Google <span class="g">Antigravity</span></h2>
+        <p>Antigravity reads one MCP config file, and it takes both modes. <a class="t-blue" href="https://faf.one/blog/chameleon-edition">Read how it works ›</a></p>
+      </div>
+      <div class="compare">
+        <div class="term">
+          <div class="term-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="title">~/.gemini/config/mcp_config.json · local</span></div>
 <pre>{
   "mcpServers": {
-    "gemini-faf": {
-      "command": "uvx",
-      "args": ["gemini-faf-mcp"]
-    }
+    "gemini-faf": { "command": "uvx", "args": ["gemini-faf-mcp"] }
   }
 }</pre>
-    </div>
-
-    <div class="deploy">
-      <h2>Three Ways to Install</h2>
-      <div class="deploy-grid">
-        <div class="deploy-option">
-          <div class="label">pip</div>
-          <div class="desc">PyPI install</div>
-          <code>pip install gemini-faf-mcp</code>
         </div>
-        <div class="deploy-option">
-          <div class="label">uvx</div>
-          <div class="desc">No install</div>
-          <code>uvx gemini-faf-mcp</code>
-        </div>
-        <div class="deploy-option">
-          <div class="label">Gemini CLI</div>
-          <div class="desc">Add MCP config</div>
-          <code>~/.gemini config</code>
+        <div class="term">
+          <div class="term-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="title">~/.gemini/config/mcp_config.json · hosted</span></div>
+<pre>{
+  "mcpServers": {
+    "gemini-faf": { "serverUrl": "https://mcpaas.live/gemini/mcp/v1" }
+  }
+}</pre>
         </div>
       </div>
-    </div>
+      <p class="alt">Antigravity expects <code>serverUrl</code>, not <code>url</code> or <code>httpUrl</code>.</p>
 
-    <div style="display:flex;justify-content:center;margin:1.5rem 0;">
-      <iframe src="https://ghbtns.com/github-btn.html?user=Wolfe-Jam&repo=gemini-faf-mcp&type=star&count=false"
-              frameborder="0" scrolling="0" width="80" height="20"
-              title="Star Wolfe-Jam/gemini-faf-mcp on GitHub"></iframe>
-    </div>
-
-    <div style="margin:1.5rem 0;padding:0.75rem 1rem;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.1);border-radius:8px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.5rem;">
-      <div style="font-size:0.85rem;color:#aaa;">Your <span style="color:#fff;">@handle</span> is your namepoint on MCPaaS™. You're here, you're early — <a href="https://mcpaas.live/claim" style="color:#fff;text-decoration:none;">get yours</a>.</div>
-    </div>
-
-    <div class="bottom-bar">
-      <div class="links"><span class="version-badge" onclick="showAbout()" style="font-size:0.75rem;padding:3px 10px;">The Chameleon Edition</span> &bull; <a href="https://github.com/Wolfe-Jam/gemini-faf-mcp">GitHub</a> &bull; <a href="https://pypi.org/project/gemini-faf-mcp/">PyPI</a> &bull; <a href="https://faf.one">faf.one</a> &bull; <a href="https://mcpaas.live">mcpaas.live</a></div>
-      <div class="big-orange">Part of the FAF MCP family 🍊</div>
-      <div style="margin-top:0.5rem;font-size:0.75rem;"><a href="https://mcpaas.live/privacy" style="color:#666;text-decoration:none;">Privacy</a> · <a href="https://mcpaas.live/terms" style="color:#666;text-decoration:none;">Terms</a> · <a href="mailto:team@faf.one" style="color:#666;text-decoration:none;">team@faf.one</a></div>
-      <div style="margin-top:0.75rem;padding-top:0.75rem;border-top:1px solid rgba(255,255,255,0.1);font-size:0.8rem;color:#fff;">Part of the <a href="https://faf.one" style="color:#ff6600;text-decoration:none;">FAF.one Family</a> · <a href="https://mcpaas.live" style="color:#888;text-decoration:none;">MCPaaS</a> · <a href="https://radiofaf.com" style="color:#888;text-decoration:none;">RadioFAF</a> · <a href="https://devtools.faf.one" style="color:#888;text-decoration:none;">devtools.faf.one</a></div>
-    </div>
-  </div>
-  <div class="about-overlay" id="aboutOverlay" onclick="if(event.target===this)hideAbout()">
-    <div class="about-box">
-      <div class="about-version">The Chameleon Edition</div>
-      <div class="about-title">Persistent Context for Gemini</div>
-      <div class="about-subtitle">Google MCP Bridge · Python</div>
-      <div class="about-items">
-        <div class="about-item"><span>Platform:</span> Google Gemini (Gemini CLI + MCP clients)</div>
-        <div class="about-item"><span>Runtime:</span> Python (pip / uvx)</div>
-        <div class="about-item"><span>Format:</span> IANA-registered .faf (application/vnd.faf+yaml)</div>
-        <div class="about-item"><span>Registry:</span> PyPI + MCP Registry (io.github.Wolfe-Jam/gemini-faf-mcp)</div>
-        <div class="about-item"><span>Scoring:</span> 0-100% Trophy, type-aware slots</div>
+      <div class="sec-head" id="tools">
+        <h2>Thirteen tools. You can see what each one does.</h2>
+        <p>Reading tools never touch your files. Writing tools say so.</p>
       </div>
-      <button class="about-close" onclick="hideAbout()">Got it</button>
-      <div class="about-progress" id="aboutProgress"></div>
-    </div>
-  </div>
+      <div class="bento">
+        <div class="card span-2 tools">
+          <div>
+            <div class="grp">Read only</div>
+            <div class="pills">
+              <span class="pill">faf_read</span><span class="pill">faf_validate</span><span class="pill">faf_score</span><span class="pill">faf_discover</span>
+              <span class="pill">faf_context</span><span class="pill">faf_stringify</span><span class="pill">faf_model</span><span class="pill">faf_about</span>
+            </div>
+          </div>
+          <div>
+            <div class="grp">Write without losing anything</div>
+            <div class="pills">
+              <span class="pill w">faf_init</span><span class="pill w">faf_auto</span><span class="pill w">faf_gemini</span><span class="pill w">faf_agents</span>
+            </div>
+          </div>
+          <div>
+            <div class="grp">Rewrites the file</div>
+            <div class="pills"><span class="pill d">faf_migrate</span></div>
+          </div>
+          <p><code>faf_init</code> never overwrites. <code>faf_auto</code> fills empty slots only. <code>faf_gemini</code> and <code>faf_agents</code> update their own section of GEMINI.md and AGENTS.md and keep the rest. <code>faf_migrate</code> re-saves the file, so YAML comments are not kept.</p>
+        </div>
+        <div class="card">
+          <div class="score-num">100%<img src="https://faf.one/trophy.svg" alt="Trophy" width="44" height="44"></div>
+          <div class="slots" aria-label="33 slots">
+            <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+            <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="ig"></i>
+            <i class="ig"></i><i class="ig"></i><i class="ig"></i><i class="ig"></i><i class="ig"></i><i class="ig"></i><i class="ig"></i><i class="ig"></i><i class="ig"></i><i class="ig"></i><i class="ig"></i>
+          </div>
+          <h3>One score, everywhere</h3>
+          <p>Always-33: every app is scored on the same 33 slots, the same number faf-cli gives. Slots that don't apply are marked <code>slotignored</code>, so they still count. Trophy <span class="glyph">✪</span> = 100%: AI is optimized to code.</p>
+        </div>
+      </div>
 
-  <a href="https://twitter.com/intent/tweet?text=gemini-faf-mcp%20%E2%80%94%20persistent%20project%20context%20for%20Google%20Gemini.%20IANA-registered%20.faf%20format.%20pip%20install%20gemini-faf-mcp.&url=https%3A%2F%2Fpypi.org%2Fproject%2Fgemini-faf-mcp%2F" target="_blank" rel="noopener"
-     style="position:fixed;bottom:20px;right:20px;z-index:9999;display:flex;align-items:center;gap:6px;background:#1a1a1a;color:#fff;border:1px solid #333;border-radius:20px;padding:8px 14px;font-size:0.8rem;font-weight:600;text-decoration:none;transition:all 0.2s;font-family:-apple-system,BlinkMacSystemFont,sans-serif;box-shadow:0 2px 8px rgba(0,0,0,0.3);"
-     onmouseover="this.style.background='#ff6600';this.style.borderColor='#ff6600';"
-     onmouseout="this.style.background='#1a1a1a';this.style.borderColor='#333';">
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+      <div class="sec-head">
+        <h2>Stop re-explaining your project</h2>
+        <p><code>.faf</code> is read once at session start. Every prompt lands on a Gemini that already knows your project.</p>
+      </div>
+      <div class="compare">
+        <div class="term">
+          <div class="term-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="title">without FAF</span></div>
+<pre><span class="t-dim">You:</span>    I'm using FastAPI with PostgreSQL,
+        pytest, and…
+<span class="t-blue">Gemini:</span> Got it. What's the codebase like?
+<span class="t-dim">You:</span>    It's a REST API for…
+<span class="t-dim">        [5 minutes of re-explaining]</span></pre>
+        </div>
+        <div class="term">
+          <div class="term-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="title">with FAF</span></div>
+<pre><span class="t-dim">You:</span>    Add a /users/me endpoint
+<span class="t-blue">Gemini:</span> <span class="t-green">[writes the code with your auth</span>
+<span class="t-green">         pattern and your test style]</span></pre>
+        </div>
+      </div>
+
+      <div class="sec-head">
+        <h2>Open. Checkable.</h2>
+        <p>Every surface is public.</p>
+      </div>
+      <div class="tiles">
+        <a class="tile" href="https://pypi.org/project/gemini-faf-mcp/"><span class="k">PyPI</span><span class="v">gemini-faf-mcp</span></a>
+        <a class="tile" href="https://registry.modelcontextprotocol.io/v0/servers?search=one.faf/gemini-faf-mcp"><span class="k">MCP Registry</span><span class="v">one.faf/gemini-faf-mcp</span></a>
+        <a class="tile" href="https://github.com/Wolfe-Jam/gemini-faf-mcp/blob/main/gemini-extension.json"><span class="k">Gemini CLI extension</span><span class="v">gemini-extension.json</span></a>
+        <a class="tile" href="https://www.iana.org/assignments/media-types/application/vnd.faf+yaml"><span class="k">IANA-registered format</span><span class="v">application/vnd.faf+yaml</span></a>
+        <a class="tile" href="https://github.com/Wolfe-Jam/gemini-faf-mcp"><span class="k">Source · MIT</span><span class="v">Wolfe-Jam/gemini-faf-mcp</span></a>
+      </div>
+
+      <div class="strip">
+        <p>Your <strong>@handle</strong> is your namepoint on MCPaaS™. You're here, you're early.</p>
+        <a class="btn btn-cta btn-sm" href="https://mcpaas.live/claim">Get yours</a>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <div class="foot-grid">
+        <div class="col">
+          <span class="foot-title foot-brand"><img src="https://faf.one/orange-smiley.svg" alt="" width="18" height="18"> gemini-faf-mcp</span>
+          <span>Part of the FAF MCP family</span>
+        </div>
+        <div class="col">
+          <span class="foot-title">Project</span>
+          <a href="https://github.com/Wolfe-Jam/gemini-faf-mcp">GitHub</a>
+          <a href="https://pypi.org/project/gemini-faf-mcp/">PyPI</a>
+          <a href="https://github.com/Wolfe-Jam/gemini-faf-mcp/blob/main/CHANGELOG.md">Changelog</a>
+        </div>
+        <div class="col">
+          <span class="foot-title">FAF.one Family</span>
+          <a href="https://faf.one">faf.one</a>
+          <a href="https://mcpaas.live">MCPaaS</a>
+          <a href="https://devtools.faf.one">devtools.faf.one</a>
+          <a href="https://radiofaf.com">RadioFAF</a>
+        </div>
+        <div class="col">
+          <span class="foot-title">Legal</span>
+          <a href="https://mcpaas.live/privacy">Privacy</a>
+          <a href="https://mcpaas.live/terms">Terms</a>
+          <a href="mailto:team@faf.one">team@faf.one</a>
+        </div>
+      </div>
+      <div class="foot-note">
+        <span>An independent open-source project. Not affiliated with or endorsed by Google. Gemini is a trademark of Google LLC.</span>
+        <iframe src="https://ghbtns.com/github-btn.html?user=Wolfe-Jam&repo=gemini-faf-mcp&type=star&count=false&size=small"
+                frameborder="0" scrolling="0" width="60" height="20"
+                title="Star Wolfe-Jam/gemini-faf-mcp on GitHub"></iframe>
+      </div>
+    </div>
+  </footer>
+
+  <a class="share" href="https://twitter.com/intent/tweet?text=gemini-faf-mcp%20%E2%80%94%20Gemini%20reads%20your%20project.faf%20at%20the%20start%20of%20every%20session.%20One%20command%20to%20install.&url=https%3A%2F%2Fwolfe-jam.github.io%2Fgemini-faf-mcp%2F" target="_blank" rel="noopener">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
     Share
   </a>
+  <div class="toast" id="toast">Copied</div>
 
   <script>
-    var aboutTimer, progressInterval;
-    function showAbout(autoLaunch) {
-      clearTimeout(aboutTimer);
-      clearInterval(progressInterval);
-      var el = document.getElementById('aboutOverlay');
-      var bar = document.getElementById('aboutProgress');
-      el.classList.add('visible');
-      if (autoLaunch) {
-        bar.style.width = '100%';
-        bar.style.display = '';
-        var start = Date.now();
-        var duration = 6000;
-        progressInterval = setInterval(function() {
-          var elapsed = Date.now() - start;
-          var pct = Math.max(0, 100 - (elapsed / duration) * 100);
-          bar.style.width = pct + '%';
-          if (pct <= 0) clearInterval(progressInterval);
-        }, 50);
-        aboutTimer = setTimeout(hideAbout, duration);
-      } else {
-        bar.style.display = 'none';
-      }
-    }
-    function hideAbout() {
-      clearTimeout(aboutTimer);
-      clearInterval(progressInterval);
-      document.getElementById('aboutOverlay').classList.remove('visible');
-    }
-    window.addEventListener('load', function() { setTimeout(function() { showAbout(true); }, 500); });
-  </script>
-  <script>
-    fetch('https://pypi.org/pypi/gemini-faf-mcp/json').then(r=>r.json()).then(d=>{var v=d&&d.info&&d.info.version; if(v) document.getElementById('versionBadge').textContent='v'+v;}).catch(()=>{});
+    document.querySelectorAll('[data-copy]').forEach(function (el) {
+      el.addEventListener('click', function () {
+        var text = el.getAttribute('data-copy');
+        var toast = document.getElementById('toast');
+        try {
+          navigator.clipboard.writeText(text).then(function () {
+            toast.textContent = 'Copied: ' + text;
+            toast.classList.add('show');
+            setTimeout(function () { toast.classList.remove('show'); }, 1600);
+          }, function () {});
+        } catch (e) {}
+      });
+    });
+
+    // Live version sync: the badge shows the version on PyPI, so the page
+    // never drifts behind a publish. ONE display spot per surface (the badge);
+    // everywhere else shows the Edition name. Offline: keep the static value.
+    (function syncVersionFromPyPI() {
+      try {
+        fetch('https://pypi.org/pypi/gemini-faf-mcp/json')
+          .then(function (r) { return r.ok ? r.json() : null; })
+          .then(function (data) {
+            if (!data || !data.info || !data.info.version) return;
+            var badge = document.getElementById('versionBadge');
+            if (badge) { badge.textContent = 'v' + data.info.version; }
+          })
+          .catch(function () {});
+      } catch (e) {}
+    })();
   </script>
 </body>
 </html>
