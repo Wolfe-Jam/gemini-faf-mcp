@@ -216,6 +216,8 @@
     .foot-brand { display: flex; align-items: center; gap: 8px; }
     .foot-note { margin-top: 36px; display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; color: var(--dim); font-size: 13px; }
 
+    .bookmark { color: var(--muted); white-space: nowrap; }
+    .bookmark kbd { font-family: var(--mono); font-size: 12px; border: 1px solid var(--line-2); border-radius: 6px; padding: 1px 6px; color: var(--text); }
     .share {
       position: fixed; bottom: 20px; right: 20px; z-index: 60;
       display: flex; align-items: center; gap: 6px;
@@ -470,9 +472,7 @@
       </div>
       <div class="foot-note">
         <span>An independent open-source project. Not affiliated with or endorsed by Google. Gemini is a trademark of Google LLC.</span>
-        <iframe src="https://ghbtns.com/github-btn.html?user=Wolfe-Jam&repo=gemini-faf-mcp&type=star&count=false&size=small"
-                frameborder="0" scrolling="0" width="60" height="20"
-                title="Star Wolfe-Jam/gemini-faf-mcp on GitHub"></iframe>
+        <span class="bookmark">☆ Bookmark this page for later · <kbd id="bmKey">⌘D</kbd></span>
       </div>
     </div>
   </footer>
@@ -484,6 +484,12 @@
   <div class="toast" id="toast">Copied</div>
 
   <script>
+    // Bookmark hint: Ctrl+D on Windows/Linux, ⌘D on Mac.
+    (function () {
+      var k = document.getElementById('bmKey');
+      if (k && !/Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent)) { k.textContent = 'Ctrl+D'; }
+    })();
+
     document.querySelectorAll('[data-copy]').forEach(function (el) {
       el.addEventListener('click', function () {
         var text = el.getAttribute('data-copy');
