@@ -32,7 +32,7 @@ from interrogate import interrogate_repo
 from models import get_model, list_models
 from safe_path import PathConfinementError, confine_file_op, confine_path
 
-__version__ = "3.1.0"
+__version__ = "3.1.0rc1"
 
 # The .faf FORMAT version this server writes (distinct from __version__, the
 # server's own release). Matches faf-cli's FAF_VERSION / faf-python-sdk.
