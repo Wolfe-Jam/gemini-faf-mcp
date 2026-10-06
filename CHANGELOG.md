@@ -1,15 +1,26 @@
 <!-- faf: gemini-faf-mcp | Python | mcp-server | FAF MCP server for Google Gemini — persistent project context via PyPI -->
-<!-- faf: doc=changelog | latest=v3.0.0 | canonical=project.faf | family=FAF -->
+<!-- faf: doc=changelog | latest=v3.1.0 | canonical=project.faf | family=FAF -->
 
 # Changelog
 
 All notable changes to gemini-faf-mcp are documented here.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
-## [Unreleased]
+## [3.1.0] - 2026-10-05 — The New Era Edition
+
+**Glass-box tools: every Gemini tool now says what it does — reads, writes or rewrites — so your client knows when to ask first. In Gemini CLI and Google Antigravity.**
+
+275 tests pass, 0 fail.
 
 ### Added
+- **Its own card, refreshed.** `agent.fafa` is written with faf-cli 8.2's `faf card init` (3.1.0, all 13 tools, the hosted MCP endpoint), and the MCP Server Card (`server-card`) is rebuilt from it with `faf cards --target mcp`: 3.1.0, the hosted remote, FAF's context. Both were at 2.8.0 with 12 tools.
+- **README: Google Antigravity**, with the local (`uvx`) and hosted (`serverUrl`) configs.
 - **Tool annotations on all 13 tools**, checked against each tool's code: read-only `faf_read`, `faf_validate`, `faf_score`, `faf_discover`, `faf_stringify`, `faf_context`, `faf_about`, `faf_model`; non-destructive writers `faf_init` (refuses to overwrite), `faf_auto` (fills empty slots only), `faf_gemini` and `faf_agents` (update faf's own block, keep the rest); destructive `faf_migrate`. None is open-world. New `TestToolAnnotations` tests.
+
+### Changed
+- Every mention of the slash commands uses their real names, `/faf:setup`, `/faf:score` and `/faf:export` (Gemini CLI names `commands/faf/setup.toml` as `/faf:setup`): in `/faf:score` and `/faf:export` themselves, `docs/SETUP.md`, `docs/SYS-REQS.md` and `project.faf`. They said `/gemini-faf-mcp:setup` and `/gemini-faf-mcp:score`.
+- README: the setup step shows the real flow (starter file → fill it from your repo → `/faf:score`) instead of a fixed score; header tagline is "FAF defines. AGENTS.md instructs. AI codes."
+- Removed `.well-known/ai-catalog.json`: its entry pointed to `faf.one/.well-known/fafa`, which is FAFA's passport, not Gemini's. A catalog entry returns when Gemini's passport has its own served address.
 
 ### Fixed
 - `faf_migrate` re-serializes the whole file, so YAML comments and formatting are lost; its description now says so, and it is annotated as destructive. A test checks a comment does not survive, so the label stays earned.

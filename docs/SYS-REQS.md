@@ -152,7 +152,7 @@ gemini-faf-mcp is a Gemini Extensions Gallery MCP server that gives Gemini CLI n
 
 ### FR-013: Onboarding Wizard Command
 **Priority:** MUST
-**Description:** `/gemini-faf-mcp:setup` walks users through discovering, creating, scoring, and exporting project DNA.
+**Description:** `/faf:setup` walks users through discovering, creating, scoring, and exporting project DNA.
 **Acceptance Criteria:**
 - [ ] `commands/gemini-faf-mcp/setup.toml` exists with `description` and `prompt`
 - [ ] Prompt instructs Gemini to use FAF MCP tools (not built-in file tools)
@@ -161,19 +161,19 @@ gemini-faf-mcp is a Gemini Extensions Gallery MCP server that gives Gemini CLI n
 
 ### FR-014: Score Command
 **Priority:** SHOULD
-**Description:** `/gemini-faf-mcp:score` provides quick score check with improvement suggestions.
+**Description:** `/faf:score` provides quick score check with improvement suggestions.
 **Acceptance Criteria:**
 - [ ] `commands/gemini-faf-mcp/score.toml` exists with `description` and `prompt`
-- [ ] Suggests `/gemini-faf-mcp:setup` if no .faf found
+- [ ] Suggests `/faf:setup` if no .faf found
 - [ ] Shows tier meaning and improvement suggestions below Bronze
 
 ### FR-015: Export Command
 **Priority:** SHOULD
-**Description:** `/gemini-faf-mcp:export` offers format choices and writes export files.
+**Description:** `/faf:export` offers format choices and writes export files.
 **Acceptance Criteria:**
 - [ ] `commands/gemini-faf-mcp/export.toml` exists with `description` and `prompt`
 - [ ] Offers GEMINI.md, AGENTS.md, or both
-- [ ] Suggests `/gemini-faf-mcp:setup` if no .faf found
+- [ ] Suggests `/faf:setup` if no .faf found
 
 ---
 

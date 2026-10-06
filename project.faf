@@ -35,7 +35,7 @@ project:
   main_language: Python
   type: mcp-server
   framework: fastmcp
-  version: 3.0.0
+  version: 3.1.0
 ai_instructions:
   priority_order:
   - 1. Read THIS .faf file first
@@ -90,7 +90,7 @@ preferences:
   documentation: as_needed
 state:
   phase: production
-  version: 3.0.0
+  version: 3.1.0
   focus: Mk4 Championship Scoring Engine parity
   status: green_flag
   next_milestone: gallery_listing
@@ -116,7 +116,7 @@ human_context:
   why: Eliminate re-explaining your project every Gemini session
   where: Gemini CLI via Extensions Gallery, local MCP server
   when: "Every coding session \u2014 context loads automatically via GEMINI.md"
-  how: Install extension, run /gemini-faf-mcp:setup, project DNA flows to Gemini
+  how: Install extension, run /faf:setup, project DNA flows to Gemini
 ai_scoring_details:
   system_date: 2025-09-20
   slot_based_percentage: 100
