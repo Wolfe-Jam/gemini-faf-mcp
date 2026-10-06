@@ -4,7 +4,7 @@
 
 # GEMINI.md — gemini-faf-mcp
 
-> Authored from project.faf — refresh with the `faf_gemini` MCP tool or `faf export --gemini`.
+> Authored from project.faf — refresh with `faf export --gemini`.
 
 Project: gemini-faf-mcp
 Goal: MCP server for FAF — read, validate, auto-detect, score, and export IANA-registered .faf project DNA from Gemini CLI

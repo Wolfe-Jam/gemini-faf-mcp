@@ -1,111 +1,85 @@
-# gemini-faf-mcp — FAF Agent Card (.fafa)
-# Authored from pyproject.toml + server.json. Capabilities = the live MCP tools (server.py).
-# Provenance is the canonical FAF context block (one context, every door).
-
-version: "0.1"
+version: "1.0"
 agent:
   name: gemini-faf-mcp
-  id: did:web:faf.one:gemini-faf-mcp
-  vendor: WolfeJAM
-  version: 2.8.0
-  description: Persistent Project Context for Google Gemini. IANA-registered .faf format, MCP server + Cloud Run REST API, unifies CLAUDE.md, GEMINI.md, AGENTS.md.
+  displayName: Gemini FAF
+  id: urn:air:faf.one:agent:gemini-faf-mcp
+  version: 3.1.0
+  description: "Persistent project context for Google Gemini, from your IANA-registered project.faf."
   homepage: https://faf.one
-  license: MIT
 capabilities:
   - name: faf_read
     type: tool
-    description: Read project DNA from a .faf file. Returns the full parsed structure.
-    cites_spec: application/vnd.faf+yaml
+    description: Read project DNA from a .faf file
     tags:
-      - faf
+      - faf_read
   - name: faf_validate
     type: tool
-    description: Validate a .faf file and return score, tier, and issues.
-    cites_spec: application/vnd.faf+yaml
+    description: Validate a .faf file and return score, tier and issues
     tags:
-      - faf
+      - faf_validate
   - name: faf_score
     type: tool
-    description: Quick Mk4 score check — returns score (0-100%), tier, and slot counts.
-    cites_spec: application/vnd.faf+yaml
+    description: Score a .faf file on the always-33 engine
     tags:
-      - faf
+      - faf_score
   - name: faf_discover
     type: tool
-    description: Find .faf files in the project tree by walking up from start_dir.
-    cites_spec: application/vnd.faf+yaml
+    description: Find the project.faf by walking up from a folder
     tags:
-      - faf
+      - faf_discover
   - name: faf_init
     type: tool
-    description: Create a starter .faf file with project name, goal, and language.
-    cites_spec: application/vnd.faf+yaml
+    description: Create a starter project.faf (never overwrites)
     tags:
-      - faf
+      - faf_init
   - name: faf_stringify
     type: tool
-    description: Convert parsed FAF data back to YAML string.
-    cites_spec: application/vnd.faf+yaml
+    description: Re-serialize a .faf file as clean YAML
     tags:
-      - faf
+      - faf_stringify
   - name: faf_context
     type: tool
-    description: Get Gemini-optimized context from a .faf file.
-    cites_spec: application/vnd.faf+yaml
+    description: Gemini-optimized context from a .faf file
     tags:
-      - faf
+      - faf_context
   - name: faf_gemini
     type: tool
-    description: Export and write GEMINI.md from a .faf file (non-destructive).
-    cites_spec: application/vnd.faf+yaml
+    description: Write GEMINI.md from project.faf, keeping your own text
     tags:
-      - faf
+      - faf_gemini
   - name: faf_agents
     type: tool
-    description: Export and write AGENTS.md from a .faf file (non-destructive).
-    cites_spec: application/vnd.faf+yaml
+    description: Write AGENTS.md from project.faf, keeping your own text
     tags:
-      - faf
+      - faf_agents
+  - name: faf_migrate
+    type: tool
+    description: Bring a .faf file to the current format version
+    tags:
+      - faf_migrate
   - name: faf_about
     type: tool
-    description: FAF format info — IANA registration, version, ecosystem.
-    cites_spec: application/vnd.faf+yaml
+    description: FAF format and server info
     tags:
-      - faf
+      - faf_about
   - name: faf_model
     type: tool
-    description: Get a 100% Trophy-scored example .faf file for a specific project type.
-    cites_spec: application/vnd.faf+yaml
+    description: A 100% Trophy example .faf for a project type
     tags:
-      - faf
+      - faf_model
   - name: faf_auto
     type: tool
-    description: Auto-detect project stack — grounded in docker-compose services and Makefile targets — and author/update a .faf file.
-    cites_spec: application/vnd.faf+yaml
+    description: Detect the stack from the repo and fill empty slots
     tags:
-      - faf
+      - faf_auto
 endpoints:
   - protocol: mcp
-    version: 2025-06-18
-    transport: stdio
-    location: gemini-faf-mcp
-  - protocol: mcp
-    version: 2025-06-18
     transport: http
     location: https://mcpaas.live/gemini/mcp/v1
-provenance:
-  faf: ./project.faf
-  mediaType: application/vnd.faf+yaml
-  iana: https://www.iana.org/assignments/media-types/application/vnd.faf+yaml
-  deterministic: true
-  generated: 2026-08-20T00:00:00Z
 metadata:
-  repository: https://github.com/Wolfe-Jam/gemini-faf-mcp
-  privacy: Runs locally. No telemetry, no analytics, no data leaves the machine.
-  tool_tiers:
-    status: flat
-    model: 12 core tools, no tier split (smaller surface than the JS fleet — no fabricated split)
-  trinity:
-    context: ./project.faf (live)
-    memory: none — no .fafm soul file in this repo
-    agent: this card
+  cards:
+    domain: faf.one
+    examples:
+      - What's my project's AI-readiness score?
+      - Write GEMINI.md from my project.faf
+      - Fill my project.faf from this repo

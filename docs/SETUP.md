@@ -33,7 +33,7 @@ gemini
 Then in Gemini CLI:
 
 ```
-/gemini-faf-mcp:setup
+/faf:setup
 ```
 
 This creates a `project.faf` file and scores it. If one already exists, it scores the existing file.
@@ -62,9 +62,9 @@ gemini
 
 | Command | What It Does |
 |---------|-------------|
-| `/gemini-faf-mcp:setup` | Create or score project.faf |
-| `/gemini-faf-mcp:score` | Quick score check with improvement suggestions |
-| `/gemini-faf-mcp:export` | Export to GEMINI.md, AGENTS.md, or both |
+| `/faf:setup` | Create or score project.faf |
+| `/faf:score` | Quick score check with improvement suggestions |
+| `/faf:export` | Export to GEMINI.md, AGENTS.md, or both |
 
 ## Troubleshooting
 

@@ -1,13 +1,13 @@
 <!-- faf: gemini-faf-mcp | Python | mcp-server | FAF MCP server for Google Gemini — persistent project context via PyPI -->
 <!-- faf: doc=readme | canonical=project.faf | score=100 | family=FAF -->
 
-# gemini-faf-mcp — The Full-Facts Edition
+# gemini-faf-mcp v3.1 — The New Era Edition
 
 **Persistent Project Context for Google Gemini. Define once. Sync everywhere.**
 
-**FAF defines. MD instructs. AI codes.**
+**FAF defines. AGENTS.md instructs. AI codes.**
 
-⭐ **A star helps other devs discover gemini-faf-mcp** — despite the downloads, ~3 of 4 devs check stars first.
+☆ Bookmark [the gemini-faf-mcp page](https://wolfe-jam.github.io/gemini-faf-mcp/) for later.
 
 Stop re-explaining your project to every new Gemini session. Every Gemini conversation starts cold — you re-state your stack, your goals, your conventions every single time. `.faf` is one structured file that captures all of it. This package is the MCP server that lets Gemini read it.
 
@@ -15,7 +15,7 @@ Stop re-explaining your project to every new Gemini session. Every Gemini conver
 
 [![PyPI](https://img.shields.io/pypi/v/gemini-faf-mcp?style=for-the-badge&logo=pypi&logoColor=white)](https://pypi.org/project/gemini-faf-mcp/)
 [![FAF Trophy 100%](https://img.shields.io/badge/FAF-%F0%9F%8F%86%20100%25-000000?labelColor=FF6B35)](https://faf.one)
-[![Tests](https://img.shields.io/badge/Tests-266%20passing-brightgreen?style=for-the-badge)](https://github.com/Wolfe-Jam/gemini-faf-mcp)
+[![Tests](https://img.shields.io/badge/Tests-275%20passing-brightgreen?style=for-the-badge)](https://github.com/Wolfe-Jam/gemini-faf-mcp)
 [![IANA: vnd.faf+yaml](https://img.shields.io/badge/IANA-vnd.faf%2Byaml-00D4D4?style=for-the-badge)](https://www.iana.org/assignments/media-types/application/vnd.faf+yaml)
 [![IANA: vnd.fafm+yaml](https://img.shields.io/badge/IANA-vnd.fafm%2Byaml-00D4D4?style=for-the-badge)](https://www.iana.org/assignments/media-types/application/vnd.fafm+yaml)
 [![DOI: Context paper](https://img.shields.io/badge/DOI-Context%20paper-FF6B35?style=for-the-badge)](https://doi.org/10.5281/zenodo.18251362)
@@ -25,7 +25,7 @@ Stop re-explaining your project to every new Gemini session. Every Gemini conver
 ### Before and after
 
 ```
-Without FAF                           With FAF (.faf at 85%+ Bronze)
+Without FAF                           With FAF (project.faf filled in) 
 ─────────────────────────             ─────────────────────────
 You: "I'm using FastAPI with...       You: "Add a /users/me endpoint"
       PostgreSQL, pytest, and..."     Gemini: [writes correct code,
@@ -38,11 +38,17 @@ Gemini: [now ready to help]
 
 `.faf` is read once at session start. Every tool call lands on a Gemini that already knows your project.
 
-### What's New in v3.0.0 — The Always33 Edition
+### What's New in v3.1.0 — The New Era Edition
 
-One engine, one number: gemini-faf-mcp scores with the always-33 engine, exactly like faf-kernel — the same score faf-cli 8, claude-faf-mcp 7, faf-mcp 4 and grok-faf-mcp 2 give.
+**Glass-box tools: every Gemini tool now says what it does — reads, writes or rewrites — so your client knows when to ask first. In Gemini CLI and Google Antigravity.**
 
-Built on `faf-python-sdk>=2.0.0`. The 12 enterprise slots count unless marked `slotignored`: 21 slots filled with no markers scores 64% (21/33); the same file plus the 12 markers scores 100% (21/21). `faf auto` (faf-cli) writes the markers. The 15 `faf_model` templates carry them and stay 100% Trophy.
+- **Every tool is labelled.** All 13 tools carry MCP tool annotations, matched to what each one does: 8 read only, 4 write without losing anything (`faf_init` never overwrites, `faf_auto` fills empty slots only, `faf_gemini` and `faf_agents` keep your own text), and `faf_migrate` rewrites the file. None reaches the network. Clients that read the labels can let reads run and ask before writes.
+- **Its own card.** A refreshed FAF passport (`agent.fafa`, written with faf-cli 8.2's `card init`) and MCP Server Card, both 3.1.0 with all 13 tools and FAF's context.
+- **Works in Google Antigravity**, local (`uvx`) or hosted (`serverUrl`). See [Google Antigravity](#google-antigravity) below.
+- **A new look:** [the gemini-faf-mcp page](https://wolfe-jam.github.io/gemini-faf-mcp/), redesigned to feel at home for Google developers.
+- **The hosted function scores always-33**, the same engine as everything else.
+
+> Earlier: v3.0.0 — **The Always33 Edition** — one engine, one number: the same score as faf-cli 8, claude-faf-mcp 7, faf-mcp 4 and grok-faf-mcp 2.
 
 #### v2.8.2 — The Full-Facts Edition
 
@@ -85,9 +91,9 @@ In your Gemini CLI:
 > /faf:setup
 ```
 
-You should see: `Created project.faf — Score: 85% (BRONZE)`. From this point, every Gemini session in this project reads it automatically.
+That writes a starter `project.faf` and scores it. Then ask Gemini to fill it in from your repo (it calls `faf_auto`), and run `/faf:score` to see what's left. From then on, every Gemini session in this project reads it automatically.
 
-> **Tip:** A score of 85% (BRONZE) is the minimum where Gemini stops guessing. Run `/faf:score` to see what's missing and how to push to 100% (TROPHY).
+> **Tip:** Trophy ✪ = 100%: AI is optimized to code. `/faf:score` shows exactly which slots are still empty.
 
 ---
 
@@ -174,7 +180,27 @@ You don't replace it. `.faf` **authors** it. Run `faf_gemini` and you get a fres
 
 ---
 
+## Google Antigravity
+
+Antigravity reads one MCP config file, `~/.gemini/config/mcp_config.json`, and takes both modes.
+
+Local (stdio):
+
+```json
+{ "mcpServers": { "gemini-faf": { "command": "uvx", "args": ["gemini-faf-mcp"] } } }
+```
+
+Hosted:
+
+```json
+{ "mcpServers": { "gemini-faf": { "serverUrl": "https://mcpaas.live/gemini/mcp/v1" } } }
+```
+
+Antigravity expects `serverUrl`, not `url` or `httpUrl`.
+
 ## All 13 Tools
+
+Every tool carries MCP tool annotations: **read only** (`faf_read`, `faf_validate`, `faf_score`, `faf_discover`, `faf_stringify`, `faf_context`, `faf_about`, `faf_model`), **writes without losing anything** (`faf_init`, `faf_auto`, `faf_gemini`, `faf_agents`), **rewrites the file** (`faf_migrate`).
 
 ### Create & Detect
 
@@ -259,7 +285,7 @@ Your `.faf` file is scored on completeness — how many slots are filled with re
 ## Architecture
 
 ```
-gemini-faf-mcp v3.0.0
+gemini-faf-mcp v3.1.0
 ├── server.py              → FastMCP MCP server (13 tools, dual-transport, Mk4 scoring)
 ├── safe_path.py           → path confinement for caller-supplied `path` args
 ├── inject.py              → non-destructive faf-managed-block injection
@@ -280,7 +306,7 @@ pip3 install -e ".[dev]"
 python -m pytest tests/ -v
 ```
 
-266 tests passing across the FastMCP server, Cloud Function, Mk4 WJTTC championship, Full-Facts grounding, path-confinement, write-guard, model-parity, Dart detection, and client-telemetry suites. Championship-grade test coverage — [WJTTC certified](https://github.com/Wolfe-Jam/WJTTC).
+275 tests passing across the FastMCP server, Cloud Function, Mk4 WJTTC championship, Full-Facts grounding, path-confinement, write-guard, model-parity, Dart detection, and client-telemetry suites. Championship-grade test coverage — [WJTTC certified](https://github.com/Wolfe-Jam/WJTTC).
 
 ---
 

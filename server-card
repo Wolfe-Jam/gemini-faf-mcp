@@ -1,17 +1,24 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/v1/server-card.schema.json",
   "name": "one.faf/gemini-faf-mcp",
-  "version": "2.8.0",
-  "description": "MCP server for FAF — read, validate, auto-detect, score, and export IANA-registered .faf project...",
+  "version": "3.1.0",
+  "description": "Persistent project context for Google Gemini, from your IANA-registered project.faf.",
   "title": "Gemini FAF",
   "websiteUrl": "https://faf.one",
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://mcpaas.live/gemini/mcp/v1"
+    }
+  ],
   "_meta": {
+    "one.faf/render": "sha256:06ae4d911db6e15febc54a554e57977e49b5c7318dc056b76b0b36787a906567",
     "one.faf/context": {
       "faf": "./project.faf",
       "mediaType": "application/vnd.faf+yaml",
       "iana": "https://www.iana.org/assignments/media-types/application/vnd.faf+yaml",
       "deterministic": true,
-      "generated": "2026-08-20T15:59:03.000Z"
+      "generated": "2026-09-30T11:26:47.055417Z"
     }
   }
 }

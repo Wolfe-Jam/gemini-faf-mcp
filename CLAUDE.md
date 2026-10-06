@@ -34,9 +34,9 @@ MCP server for FAF — read, validate, auto-detect, score, and export IANA-regis
 - **Why:** Eliminate re-explaining your project every Gemini session
 - **Where:** Gemini CLI via Extensions Gallery, local MCP server
 - **When:** Every coding session — context loads automatically via GEMINI.md
-- **How:** Install extension, run /gemini-faf-mcp:setup, project DNA flows to Gemini
+- **How:** Install extension, run /faf:setup, project DNA flows to Gemini
 
 ---
 
-*STATUS: SYNC ACTIVE — 2026-09-29T11:52:40.180Z*
+*STATUS: SYNC ACTIVE — 2026-10-06T02:22:28.418Z*
 <!-- faf:end -->

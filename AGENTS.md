@@ -4,9 +4,9 @@
 
 # AGENTS.md — gemini-faf-mcp
 
-MCP server for FAF — read, validate, auto-detect, score, and export IANA-registered .faf project DNA from Gemini CLI — Python · type: mcp-server · v3.0.0
+MCP server for FAF — read, validate, auto-detect, score, and export IANA-registered .faf project DNA from Gemini CLI — Python · type: mcp-server · v3.1.0
 
-> Authored by faf — do not edit the managed block; refresh with `faf export --agents` or the `faf_agents` MCP tool. Hand-written content outside it is preserved.
+> Authored by faf — do not edit the managed block; refresh with `faf export --agents`. Hand-written content outside the managed block is preserved.
 
 ## Setup & build
 
@@ -41,6 +41,7 @@ mypy server.py models.py safe_path.py inject.py src/
 
 - **Quality Bar:** zero_errors
 - **Testing:** required
+- Style enforced by ruff · mypy — obey the configs
 
 ## Guardrails
 
@@ -63,7 +64,7 @@ Ask a clarifying question, propose a short plan, or open a draft PR with notes �
 
 - Commit style: conventional
 - Branch off `main` and open a PR — never commit to `main` directly.
-- If build/test scripts or layout change, refresh this file in the **same PR**.
+- If build/test scripts or layout change, refresh this file in the **same PR** (`faf export --agents`).
 
 ## Stack
 
@@ -79,7 +80,7 @@ Ask a clarifying question, propose a short plan, or open a draft PR with notes �
 - **Hosting:** Google Cloud Run
 - **CI/CD:** GitHub Actions
 
-*Context authored: 2026-08-20 15:59:03+00:00*
+*Context authored: 2026-09-30T11:26:47.055417Z*
 <!-- faf:end -->
 
 

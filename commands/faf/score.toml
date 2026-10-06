@@ -8,7 +8,7 @@ You are running the FAF Score command. Quickly check the project's FAF score and
 1. Use `faf_discover` to find the .faf file in the current project.
 
 2. If no .faf file is found:
-   - Tell the user: "No .faf file found. Run `/gemini-faf-mcp:setup` to create one."
+   - Tell the user: "No .faf file found. Run `/faf:setup` to create one."
    - Stop here.
 
 3. Use `faf_score` to get the quick score, then `faf_validate` for full details.
@@ -38,7 +38,7 @@ You are running the FAF Score command. Quickly check the project's FAF score and
 8. If score is below 85% (Bronze), provide 2-3 specific suggestions to improve:
    - Missing sections to add (human_context, stack, instant_context)
    - Empty fields to fill in
-   - "Run `/gemini-faf-mcp:setup` for guided improvements"
+   - "Run `/faf:setup` for guided improvements"
 
 ## Rules
 

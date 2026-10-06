@@ -8,7 +8,7 @@ You are running the FAF Export command. Export the project's .faf DNA to context
 1. Use `faf_discover` to find the .faf file.
 
 2. If no .faf file found:
-   - Tell the user: "No .faf file found. Run `/gemini-faf-mcp:setup` to create one first."
+   - Tell the user: "No .faf file found. Run `/faf:setup` to create one first."
    - Stop here.
 
 3. Use `faf_read` to load the project data and `faf_score` for the current score.
@@ -52,7 +52,7 @@ You are running the FAF Export command. Export the project's .faf DNA to context
    ```
 
 8. If the score is below 85%, add:
-   "Tip: Your score is {score}%. Run `/gemini-faf-mcp:score` to see how to improve it."
+   "Tip: Your score is {score}%. Run `/faf:score` to see how to improve it."
 
 ## File Format Notes
 
