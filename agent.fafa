@@ -78,6 +78,7 @@ endpoints:
     location: https://mcpaas.live/gemini/mcp/v1
 metadata:
   cards:
+    accent: "#4F87ED" # key colour: Gemini blue, from its official mark
     domain: faf.one
     examples:
       - What's my project's AI-readiness score?
