@@ -21,6 +21,7 @@ Stop re-explaining your project to every new Gemini session. Every Gemini conver
 [![DOI: Context paper](https://img.shields.io/badge/DOI-Context%20paper-FF6B35?style=for-the-badge)](https://doi.org/10.5281/zenodo.18251362)
 [![DOI: Memory paper](https://img.shields.io/badge/DOI-Memory%20paper-FF6B35?style=for-the-badge)](https://doi.org/10.5281/zenodo.20348942)
 [![DOI: Agents paper](https://img.shields.io/badge/DOI-Agents%20paper-FF6B35?style=for-the-badge)](https://doi.org/10.5281/zenodo.21951641)
+[![Business card · Get yours →](https://wolfe-jam.github.io/agent-business-card/badge.svg)](https://wolfe-jam.github.io/agent-business-card/?repo=Wolfe-Jam/gemini-faf-mcp)
 
 ### Before and after
 
