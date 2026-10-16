@@ -10,6 +10,8 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
 **`gemini-faf-mcp --version` and `--help` answer and exit. Before, both started the server.**
 
+281 tests pass, 0 fail.
+
 ### Fixed
 - `--version` / `-V` prints `gemini-faf-mcp 3.1.1` and exits 0; `--help` / `-h` prints usage and a client config and exits 0. Both used to start the server, print the FastMCP banner and wait for a client, with no version on stdout. Any other argument still starts the server, so client configs don't change. New `tests/test_cli_flags.py` runs each flag with stdin closed and a time limit.
 
