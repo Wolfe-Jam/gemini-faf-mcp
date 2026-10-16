@@ -35,7 +35,7 @@ project:
   main_language: Python
   type: mcp-server
   framework: fastmcp
-  version: 3.1.0
+  version: 3.1.1
 ai_instructions:
   priority_order:
   - 1. Read THIS .faf file first
@@ -90,7 +90,7 @@ preferences:
   documentation: as_needed
 state:
   phase: production
-  version: 3.1.0
+  version: 3.1.1
   focus: Mk4 Championship Scoring Engine parity
   status: green_flag
   next_milestone: gallery_listing

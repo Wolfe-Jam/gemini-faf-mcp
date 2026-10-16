@@ -3,7 +3,7 @@ agent:
   name: gemini-faf-mcp
   displayName: Gemini FAF
   id: urn:air:faf.one:agent:gemini-faf-mcp
-  version: 3.1.0
+  version: 3.1.1
   description: "Persistent project context for Google Gemini, from your IANA-registered project.faf."
   homepage: https://faf.one
 capabilities:
