@@ -39,7 +39,13 @@ Gemini: [now ready to help]
 
 `.faf` is read once at session start. Every tool call lands on a Gemini that already knows your project.
 
-### What's New in v3.1.0 — The New Era Edition
+### What's New in v3.1.1
+
+**`gemini-faf-mcp --version` and `--help` answer and exit. Before, both started the server.**
+
+- `--version` (`-V`) prints the version; `--help` (`-h`) prints usage and a client config. Anything else starts the server as before, so your client config doesn't change.
+
+#### v3.1.0 — The New Era Edition
 
 **Glass-box tools: every Gemini tool now says what it does — reads, writes or rewrites — so your client knows when to ask first. In Gemini CLI and Google Antigravity.**
 
@@ -286,7 +292,7 @@ Your `.faf` file is scored on completeness — how many slots are filled with re
 ## Architecture
 
 ```
-gemini-faf-mcp v3.1.0
+gemini-faf-mcp v3.1.1
 ├── server.py              → FastMCP MCP server (13 tools, dual-transport, Mk4 scoring)
 ├── safe_path.py           → path confinement for caller-supplied `path` args
 ├── inject.py              → non-destructive faf-managed-block injection

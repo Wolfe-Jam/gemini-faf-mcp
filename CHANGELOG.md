@@ -1,10 +1,20 @@
 <!-- faf: gemini-faf-mcp | Python | mcp-server | FAF MCP server for Google Gemini — persistent project context via PyPI -->
-<!-- faf: doc=changelog | latest=v3.1.0 | canonical=project.faf | family=FAF -->
+<!-- faf: doc=changelog | latest=v3.1.1 | canonical=project.faf | family=FAF -->
 
 # Changelog
 
 All notable changes to gemini-faf-mcp are documented here.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
+
+## [3.1.1] - 2026-10-16
+
+**`gemini-faf-mcp --version` and `--help` answer and exit. Before, both started the server.**
+
+### Fixed
+- `--version` / `-V` prints `gemini-faf-mcp 3.1.1` and exits 0; `--help` / `-h` prints usage and a client config and exits 0. Both used to start the server, print the FastMCP banner and wait for a client, with no version on stdout. Any other argument still starts the server, so client configs don't change. New `tests/test_cli_flags.py` runs each flag with stdin closed and a time limit.
+
+### Changed
+- `pyproject.toml` lists a `Repository` URL, so PyPI shows where the source lives.
 
 ## [3.1.0] - 2026-10-05 — The New Era Edition
 

@@ -1,7 +1,7 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/v1/server-card.schema.json",
   "name": "one.faf/gemini-faf-mcp",
-  "version": "3.1.0",
+  "version": "3.1.1",
   "description": "Persistent project context for Google Gemini, from your IANA-registered project.faf.",
   "title": "Gemini FAF",
   "websiteUrl": "https://faf.one",

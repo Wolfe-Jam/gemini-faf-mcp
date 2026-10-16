@@ -1,5 +1,5 @@
 """
-gemini-faf-mcp v3.1.0 — FastMCP Server
+gemini-faf-mcp v3.1.1 — FastMCP Server
 
 Native MCP server for FAF (Foundational AI-context Format).
 Powered by faf-python-sdk with Mk4 Championship Scoring Engine.
@@ -11,6 +11,7 @@ Spec: https://faf.one
 
 import functools
 import os
+import sys
 from pathlib import Path
 
 from faf_sdk import (
@@ -32,7 +33,7 @@ from interrogate import interrogate_repo
 from models import get_model, list_models
 from safe_path import PathConfinementError, confine_file_op, confine_path
 
-__version__ = "3.1.0"
+__version__ = "3.1.1"
 
 # The .faf FORMAT version this server writes (distinct from __version__, the
 # server's own release). Matches faf-cli's FAF_VERSION / faf-python-sdk.
@@ -875,6 +876,37 @@ state:
         return {"success": False, "error": str(e)}
 
 
+HELP = """\
+gemini-faf-mcp — MCP server for FAF (project.faf, IANA application/vnd.faf+yaml)
+
+Usage:
+  gemini-faf-mcp              Serve MCP over stdio (what MCP clients run)
+  gemini-faf-mcp --version    Print the version (-V)
+  gemini-faf-mcp --help       Print this help (-h)
+
+Run on its own, it waits silently for an MCP client. That's correct; Ctrl+C to quit.
+
+Add it to a client:
+  gemini extensions install https://github.com/Wolfe-Jam/gemini-faf-mcp
+  { "mcpServers": { "gemini-faf": { "command": "uvx", "args": ["gemini-faf-mcp"] } } }
+
+https://github.com/Wolfe-Jam/gemini-faf-mcp"""
+
+
+def _handle_flags(argv: list[str]) -> int | None:
+    """`--version` / `--help` answer and exit before the server starts, so
+    stdout carries only the answer. Any other argument starts the server as
+    before, so existing client configs don't change."""
+    arg = argv[1] if len(argv) > 1 else None
+    if arg in ("--version", "-V"):
+        print(f"gemini-faf-mcp {__version__}")
+        return 0
+    if arg in ("--help", "-h"):
+        print(HELP)
+        return 0
+    return None
+
+
 def main() -> None:
     """Single entry for both the console script (`gemini-faf-mcp`, via
     pyproject [project.scripts]) and `python server.py`.
@@ -889,6 +921,9 @@ def main() -> None:
     MCP_TRANSPORT=http, serve modern Streamable HTTP instead — same tools,
     just a hosted transport.
     """
+    code = _handle_flags(sys.argv)
+    if code is not None:
+        sys.exit(code)
     _port = os.environ.get("PORT")
     _raw = os.environ.get("MCP_TRANSPORT", "http" if _port else "stdio")
     if _raw == "stdio":
