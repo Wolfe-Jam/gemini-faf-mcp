@@ -40,6 +40,7 @@ gemini-faf-mcp = "server:main"
 
 [project.urls]
 "Homepage" = "https://github.com/Wolfe-Jam/gemini-faf-mcp"
+"Repository" = "https://github.com/Wolfe-Jam/gemini-faf-mcp"
 "FAF Specification" = "https://faf.one"
 "IANA Registration" = "https://www.iana.org/assignments/media-types/application/vnd.faf+yaml"
 "Bug Tracker" = "https://github.com/Wolfe-Jam/gemini-faf-mcp/issues"
