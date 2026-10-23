@@ -65,10 +65,22 @@ def _parse_faf(path: str):
     """Confine a caller path to a .faf/.fafm context file, then parse it."""
     return parse_file(str(confine_path(path)))
 
+# InitializeResult.instructions: how the tools fit together, for the model.
+# Relationships and rules only; each tool's own description covers what it does.
+# Keep it under 1,000 characters: tests/test_server_instructions.py checks the
+# length and that every tool named here is registered.
+SERVER_INSTRUCTIONS = "\n".join([
+    "Find the project's .faf with faf_discover, then faf_read for the full file or faf_context for a summary.",
+    "faf_score is the quick check; faf_validate adds the issues.",
+    "No .faf yet: faf_auto detects the stack and writes one; faf_init writes a starter; faf_model shows a complete example for a project type.",
+    "project.faf is the source: faf_gemini and faf_agents write GEMINI.md and AGENTS.md from it, leaving hand-written content alone.",
+    "faf_migrate rewrites a file to format 3.0; run faf_validate first.",
+])
+
 mcp = FastMCP(
     "gemini-faf-mcp",
     version=__version__,
-    instructions="FAF — Universal AI context from IANA-registered .faf files",
+    instructions=SERVER_INSTRUCTIONS,
 )
 
 # --- Mk4 scoring helper ---
