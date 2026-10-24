@@ -4,7 +4,7 @@
 
 # AGENTS.md — gemini-faf-mcp
 
-MCP server for FAF — read, validate, auto-detect, score, and export IANA-registered .faf project DNA from Gemini CLI — Python · type: mcp-server · v3.1.1
+MCP server for FAF — read, validate, auto-detect, score, and export IANA-registered .faf project DNA from Gemini CLI — Python · type: mcp · v3.1.1
 
 > Authored by faf — do not edit the managed block; refresh with `faf export --agents`. Hand-written content outside the managed block is preserved.
 
