@@ -1,4 +1,4 @@
-<!-- faf: gemini-faf-mcp | Python | mcp-server | FAF MCP server for Google Gemini — persistent project context via PyPI -->
+<!-- faf: gemini-faf-mcp | Python | mcp | FAF MCP server for Google Gemini — persistent project context via PyPI -->
 <!-- faf: doc=changelog | latest=v3.1.1 | canonical=project.faf | family=FAF -->
 
 # Changelog

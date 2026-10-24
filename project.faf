@@ -33,7 +33,7 @@ project:
   goal: "MCP server for FAF \u2014 read, validate, auto-detect, score, and export\
     \ IANA-registered .faf project DNA from Gemini CLI"
   main_language: Python
-  type: mcp-server
+  type: mcp
   framework: fastmcp
   version: 3.1.1
 ai_instructions:

@@ -1,5 +1,5 @@
 <!-- faf:start -->
-<!-- faf: gemini-faf-mcp | Python | mcp-server | MCP server for FAF — read, validate, auto-detect, score, and export IANA-registered .faf project DNA from Gemini CLI -->
+<!-- faf: gemini-faf-mcp | Python | mcp | MCP server for FAF — read, validate, auto-detect, score, and export IANA-registered .faf project DNA from Gemini CLI -->
 <!-- faf: claim=project.faf | family=FAF -->
 
 # GEMINI.md — gemini-faf-mcp
