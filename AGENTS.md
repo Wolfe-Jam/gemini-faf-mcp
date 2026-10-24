@@ -1,5 +1,5 @@
 <!-- faf:start -->
-<!-- faf: gemini-faf-mcp | Python | mcp-server | MCP server for FAF — read, validate, auto-detect, score, and export IANA-registered .faf project DNA from Gemini CLI -->
+<!-- faf: gemini-faf-mcp | Python | mcp | MCP server for FAF — read, validate, auto-detect, score, and export IANA-registered .faf project DNA from Gemini CLI -->
 <!-- faf: claim=project.faf | family=FAF -->
 
 # AGENTS.md — gemini-faf-mcp
@@ -80,7 +80,7 @@ Ask a clarifying question, propose a short plan, or open a draft PR with notes �
 - **Hosting:** Google Cloud Run
 - **CI/CD:** GitHub Actions
 
-*Context authored: 2026-09-30T11:26:47.055417Z*
+*Context authored: 2026-10-17T17:57:31.692558Z*
 <!-- faf:end -->
 
 
