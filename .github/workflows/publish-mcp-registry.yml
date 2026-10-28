@@ -22,22 +22,30 @@ concurrency:
   group: mcp-registry-publish
   cancel-in-progress: false
 
+env:
+  MCP_PUBLISHER_VERSION: v1.8.6
+  # sha256 of mcp-publisher_linux_amd64.tar.gz at v1.8.6 (registry_1.8.6_checksums.txt)
+  MCP_PUBLISHER_SHA256: 1fbe93fc0783c2394d8012c8d6e50a59e98cb2cc2d216264cc69f405d0e21340
+
 jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
 
-      - name: Install mcp-publisher
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22.x'
+
+      - name: Install mcp-publisher (pinned, checksum verified)
         run: |
           set -euo pipefail
-          TAG=$(curl -fsSL https://api.github.com/repos/modelcontextprotocol/registry/releases/latest \
-                  | grep -o '"tag_name"[[:space:]]*:[[:space:]]*"[^"]*"' | head -1 | cut -d'"' -f4)
-          echo "mcp-publisher ${TAG}"
           # Asset name carries NO version: mcp-publisher_<os>_<arch>.tar.gz
-          curl -fsSL "https://github.com/modelcontextprotocol/registry/releases/download/${TAG}/mcp-publisher_linux_amd64.tar.gz" \
-            | tar -xz mcp-publisher
+          curl -fsSL "https://github.com/modelcontextprotocol/registry/releases/download/${MCP_PUBLISHER_VERSION}/mcp-publisher_linux_amd64.tar.gz" -o mcp-publisher.tar.gz
+          echo "${MCP_PUBLISHER_SHA256}  mcp-publisher.tar.gz" | sha256sum -c -
+          tar -xzf mcp-publisher.tar.gz mcp-publisher
           chmod +x mcp-publisher
+          ./mcp-publisher --version
 
       - name: Validate server.json
         run: ./mcp-publisher validate
@@ -98,7 +106,9 @@ jobs:
 
       - name: Authenticate (DNS — one.faf namespace)
         if: steps.ver.outputs.publish == 'true'
-        run: ./mcp-publisher login dns --domain faf.one --private-key "${{ secrets.FAF_ONE_MCP_PRIVATE_KEY }}"
+        env:
+          MCP_PRIVATE_KEY: ${{ secrets.FAF_ONE_MCP_PRIVATE_KEY }}
+        run: node .github/scripts/registry-login.mjs --domain faf.one   # the key from the environment, never argv
 
       - name: Publish to MCP Registry
         if: steps.ver.outputs.publish == 'true'
