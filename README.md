@@ -5,6 +5,8 @@
 
 **Persistent Project Context for Google Gemini. Define once. Sync everywhere.**
 
+⭐ [Star it on GitHub](https://github.com/Wolfe-Jam/gemini-faf-mcp): bookmarks it for you, helps other devs find it too.
+
 **FAF defines. AGENTS.md instructs. AI codes.**
 
 ☆ Bookmark [the gemini-faf-mcp page](https://wolfe-jam.github.io/gemini-faf-mcp/) for later.
