@@ -41,7 +41,13 @@ Gemini: [now ready to help]
 
 `.faf` is read once at session start. Every tool call lands on a Gemini that already knows your project.
 
-### What's New in v3.1.1
+### What's New in v3.1.2
+
+**faf_gemini and faf_agents keep your hand-written GEMINI.md and AGENTS.md, and tell you what they couldn't write.**
+
+- GEMINI.md and AGENTS.md are now written by faf-cli's rules: only faf's own block changes, your text stays, and a file faf can't safely write (not UTF-8, a link out of the project, read-only) is left as it is and named in the reply.
+
+#### v3.1.1
 
 **`gemini-faf-mcp --version` and `--help` answer and exit. Before, both started the server.**
 
@@ -294,7 +300,7 @@ Your `.faf` file is scored on completeness — how many slots are filled with re
 ## Architecture
 
 ```
-gemini-faf-mcp v3.1.1
+gemini-faf-mcp v3.1.2
 ├── server.py              → FastMCP MCP server (13 tools, dual-transport, Mk4 scoring)
 ├── safe_path.py           → path confinement for caller-supplied `path` args
 ├── inject.py              → non-destructive faf-managed-block injection
