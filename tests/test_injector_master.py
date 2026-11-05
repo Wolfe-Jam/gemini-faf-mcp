@@ -272,3 +272,23 @@ def test_utf16_without_bom_is_refused(tmp_path):
     with pytest.raises(InjectRefused):
         inject_faf_block(p, "block")
     assert p.read_bytes() == data
+
+
+# ── From the re-check of #45 ──────────────────────────────────────────────
+
+def test_recheck_n1_project_faf_inside_git_creates_nothing_there(tmp_path, monkeypatch):
+    git = tmp_path / ".git"
+    git.mkdir()
+    monkeypatch.chdir(git)
+    (git / "project.faf").write_text(FAF, encoding="utf-8")
+    r = _tool("faf_agents")(path=str(git / "project.faf"))
+    assert r["success"] is False
+    assert not (git / "AGENTS.md").exists()
+
+
+def test_recheck_n3_missing_project_faf_is_reported_as_not_found(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    r = _tool("faf_gemini")(path=str(tmp_path / "project.faf"))
+    assert r["success"] is False
+    assert "not found" in r["error"].lower()
+    assert not r["error"].startswith("Not written")

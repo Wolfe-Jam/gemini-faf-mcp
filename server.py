@@ -336,10 +336,10 @@ def faf_gemini(path: str = "project.faf") -> dict:
         }
     except InjectRefused as e:
         return {"success": False, "error": str(e)}
-    except OSError as e:
-        return {"success": False, "error": f"Not written: {e.strerror or e}"}
     except FileNotFoundError:
         return {"success": False, "error": f"File not found: {path}"}
+    except OSError as e:
+        return {"success": False, "error": f"Not written: {e.strerror or e}"}
     except FafParseError as e:
         return {"success": False, "error": str(e)}
 
@@ -369,10 +369,10 @@ def faf_agents(path: str = "project.faf") -> dict:
         }
     except InjectRefused as e:
         return {"success": False, "error": str(e)}
-    except OSError as e:
-        return {"success": False, "error": f"Not written: {e.strerror or e}"}
     except FileNotFoundError:
         return {"success": False, "error": f"File not found: {path}"}
+    except OSError as e:
+        return {"success": False, "error": f"Not written: {e.strerror or e}"}
     except FafParseError as e:
         return {"success": False, "error": str(e)}
 

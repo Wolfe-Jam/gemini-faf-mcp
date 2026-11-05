@@ -36,6 +36,17 @@ LEGACY_NOTE = (
 CONTEXT_FILES = {"CLAUDE.md", "AGENTS.md", "GEMINI.md", ".cursorrules", ".windsurfrules", ".clinerules"}
 
 
+def _read_umask() -> int:
+    # Read once, at import (single-threaded): setting the umask to read it would
+    # briefly change it for every thread.
+    m = os.umask(0)
+    os.umask(m)
+    return m
+
+
+_UMASK = _read_umask()
+
+
 class InjectRefused(Exception):
     """faf would not write this file; it is left exactly as it was."""
 
@@ -140,7 +151,7 @@ def _resolve_target(p: Path, root: Path) -> Path:
         rel = real.relative_to(root_real)
     except ValueError:
         raise InjectRefused(f"{p.name} leads outside the project — refused.") from None
-    if ".git" in rel.parts:
+    if ".git" in rel.parts or ".git" in real.parts:
         raise InjectRefused(f"{p.name} is inside .git/ — refused.")
     # faf-cli's rule: a link to a file of the same name, or between AI context
     # files (CLAUDE.md -> AGENTS.md), is written through; a link to any other
@@ -174,12 +185,12 @@ def _atomic_write(real: Path, text: str) -> None:
         mode = stat.S_IMODE(real.stat().st_mode)
         # Mode bits, not os.access: root can write anything, and faf still
         # leaves a file someone marked read-only alone.
-        if not mode & (stat.S_IWUSR | stat.S_IWGRP | stat.S_IWOTH):
+        # Both: no write bit at all (root can still write it, faf won't), and no
+        # write permission for this user (owning the folder isn't enough).
+        if not mode & (stat.S_IWUSR | stat.S_IWGRP | stat.S_IWOTH) or not os.access(real, os.W_OK):
             raise InjectRefused(f"{real.name} is read-only — faf left it unchanged.")
     else:
-        umask = os.umask(0)
-        os.umask(umask)
-        mode = 0o666 & ~umask
+        mode = 0o666 & ~_UMASK
     try:
         fd, tmp = tempfile.mkstemp(prefix=".faf-tmp-", dir=str(real.parent))
     except OSError as e:
