@@ -10,7 +10,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
 **faf_gemini and faf_agents keep your hand-written GEMINI.md and AGENTS.md, and tell you what they couldn't write.**
 
-TESTCOUNT tests pass, 0 fail.
+308 tests pass, 0 fail.
 
 ### Fixed
 - **GEMINI.md and AGENTS.md are written by faf-cli's rules** ([#45](https://github.com/Wolfe-Jam/gemini-faf-mcp/pull/45)), the same ones faf-cli, faf-mcp, claude-faf-mcp and grok-faf-mcp follow. faf replaces only the block between its own marker lines; a file whose first line looks like a faf stamp is never reclaimed, and a START with no END cuts nothing.
