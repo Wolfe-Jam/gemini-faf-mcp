@@ -154,3 +154,99 @@ def test_7b_tool_reports_a_refusal(tmp_path, monkeypatch):
     assert r["success"] is False
     assert "not UTF-8" in r["error"]
     assert (tmp_path / "GEMINI.md").read_bytes() == data
+
+
+# ── From the independent review of #45 ──────────────────────────────────
+
+@pytest.mark.skipif(os.name == "nt", reason="symlinks need privileges on Windows")
+def test_review_f1_tool_refuses_link_into_git(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    (tmp_path / "project.faf").write_text(FAF, encoding="utf-8")
+    git = tmp_path / ".git"
+    git.mkdir()
+    cfg = git / "config"
+    cfg.write_text("[core]\n\tbare = false\n", encoding="utf-8")
+    (tmp_path / "GEMINI.md").symlink_to(cfg)
+    r = _tool("faf_gemini")(path=str(tmp_path / "project.faf"))
+    assert r["success"] is False
+    assert cfg.read_text(encoding="utf-8") == "[core]\n\tbare = false\n"
+
+
+@pytest.mark.skipif(os.name == "nt", reason="symlinks need privileges on Windows")
+def test_review_f1_tool_refuses_link_out_of_the_project(tmp_path, monkeypatch):
+    proj = tmp_path / "proj"
+    proj.mkdir()
+    monkeypatch.chdir(proj)
+    (proj / "project.faf").write_text(FAF, encoding="utf-8")
+    outside = tmp_path / "theirs.md"
+    outside.write_text("theirs\n", encoding="utf-8")
+    (proj / "AGENTS.md").symlink_to(outside)
+    r = _tool("faf_agents")(path=str(proj / "project.faf"))
+    assert r["success"] is False
+    assert outside.read_text(encoding="utf-8") == "theirs\n"
+
+
+def test_review_f2_info_string_line_does_not_close_a_fence(tmp_path):
+    p = tmp_path / "AGENTS.md"
+    p.write_text(
+        f"```\nnot closed by the next line\n```bash\n{FAF_START}\nexample to keep\n{FAF_END}\n```\n\nTail.\n",
+        encoding="utf-8",
+    )
+    inject_faf_block(p, "real block")
+    out = p.read_text(encoding="utf-8")
+    assert "example to keep" in out
+    assert out.startswith(FAF_START + "\nreal block")
+
+
+def test_review_f2_shorter_fence_inside_a_longer_one(tmp_path):
+    p = tmp_path / "AGENTS.md"
+    p.write_text(f"````md\n```\n{FAF_START}\nexample to keep\n{FAF_END}\n```\n````\n", encoding="utf-8")
+    inject_faf_block(p, "real block")
+    assert "example to keep" in p.read_text(encoding="utf-8")
+
+
+@pytest.mark.skipif(os.name == "nt", reason="no Unix mode bits on Windows")
+def test_review_f3_new_file_follows_the_umask(tmp_path):
+    old = os.umask(0o022)
+    try:
+        p = tmp_path / "GEMINI.md"
+        inject_faf_block(p, "block")
+        assert oct(p.stat().st_mode & 0o777) == oct(0o644)
+    finally:
+        os.umask(old)
+
+
+@pytest.mark.skipif(os.name == "nt", reason="no Unix mode bits on Windows")
+def test_review_f5_read_only_file_refused_by_its_mode(tmp_path):
+    p = tmp_path / "AGENTS.md"
+    p.write_text("# Mine\n", encoding="utf-8")
+    p.chmod(0o444)
+    try:
+        with pytest.raises(InjectRefused):
+            inject_faf_block(p, "block")
+        assert p.read_text(encoding="utf-8") == "# Mine\n"
+    finally:
+        p.chmod(0o644)
+
+
+def test_review_f4_export_command_does_not_tell_the_model_to_write_files():
+    toml = (Path(__file__).resolve().parent.parent / "commands" / "faf" / "export.toml").read_text(encoding="utf-8")
+    assert "Write the content to" not in toml
+    assert "Do not write `GEMINI.md` yourself" in toml
+
+
+def test_review_f7_crlf_file_stays_crlf(tmp_path):
+    p = tmp_path / "AGENTS.md"
+    p.write_bytes(b"# mine\r\nline two\r\n")
+    inject_faf_block(p, "a\nb")
+    data = p.read_bytes()
+    assert b"\r\n" in data
+    assert b"\n" not in data.replace(b"\r\n", b"")
+
+
+def test_review_f9_block_containing_a_marker_line_is_refused(tmp_path):
+    p = tmp_path / "AGENTS.md"
+    p.write_text("# Mine\n", encoding="utf-8")
+    with pytest.raises(InjectRefused):
+        inject_faf_block(p, f"x\n{FAF_END}\ny")
+    assert p.read_text(encoding="utf-8") == "# Mine\n"

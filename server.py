@@ -321,8 +321,11 @@ def faf_gemini(path: str = "project.faf") -> dict:
         faf = _parse_faf(path)
         mk4 = _mk4_score_file(path)
         md = author_gemini_md(faf.data.raw)
-        target = confine_file_op(str(Path(path).parent / "GEMINI.md"))
-        note = inject_faf_block(target, md)
+        raw = Path(path).parent / "GEMINI.md"
+        target = confine_file_op(str(raw))  # inside the allowed roots
+        # Give the injector the path as typed, not the resolved one: it must see
+        # a link to refuse a link out of the project or into .git/.
+        note = inject_faf_block(raw, md, root=raw.parent)
         return {
             "success": True,
             "path": str(target),
@@ -333,6 +336,8 @@ def faf_gemini(path: str = "project.faf") -> dict:
         }
     except InjectRefused as e:
         return {"success": False, "error": str(e)}
+    except OSError as e:
+        return {"success": False, "error": f"Not written: {e.strerror or e}"}
     except FileNotFoundError:
         return {"success": False, "error": f"File not found: {path}"}
     except FafParseError as e:
@@ -351,8 +356,11 @@ def faf_agents(path: str = "project.faf") -> dict:
     try:
         faf = _parse_faf(path)
         md = author_agents_md(faf.data.raw)
-        target = confine_file_op(str(Path(path).parent / "AGENTS.md"))
-        note = inject_faf_block(target, md)
+        raw = Path(path).parent / "AGENTS.md"
+        target = confine_file_op(str(raw))  # inside the allowed roots
+        # Give the injector the path as typed, not the resolved one: it must see
+        # a link to refuse a link out of the project or into .git/.
+        note = inject_faf_block(raw, md, root=raw.parent)
         return {
             "success": True,
             "path": str(target),
@@ -361,6 +369,8 @@ def faf_agents(path: str = "project.faf") -> dict:
         }
     except InjectRefused as e:
         return {"success": False, "error": str(e)}
+    except OSError as e:
+        return {"success": False, "error": f"Not written: {e.strerror or e}"}
     except FileNotFoundError:
         return {"success": False, "error": f"File not found: {path}"}
     except FafParseError as e:

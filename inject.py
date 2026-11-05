@@ -45,42 +45,73 @@ def _strip_end(line: str) -> str:
     return line.rstrip("\r\n")
 
 
+def _fence_open(bare: str) -> tuple[str, int] | None:
+    """A CommonMark fence opener: up to 3 spaces, then 3+ backticks or tildes.
+    A backtick fence's info string may not contain a backtick."""
+    indent = len(bare) - len(bare.lstrip(" "))
+    if indent > 3:
+        return None
+    rest = bare[indent:]
+    for ch in ("`", "~"):
+        n = len(rest) - len(rest.lstrip(ch))
+        if n >= 3:
+            if ch == "`" and "`" in rest[n:]:
+                return None
+            return (ch, n)
+    return None
+
+
+def _fence_closes(bare: str, fence: tuple[str, int]) -> bool:
+    """A closing fence: up to 3 spaces, the same character at least as many
+    times as the opener, then only whitespace (no info string)."""
+    ch, n = fence
+    indent = len(bare) - len(bare.lstrip(" "))
+    if indent > 3:
+        return False
+    rest = bare[indent:]
+    run = len(rest) - len(rest.lstrip(ch))
+    return run >= n and rest[run:].strip() == ""
+
+
+def _marker_lines(text: str):
+    """Yield (offset, bom, bare) for every line outside fenced code."""
+    offset = 0
+    fence: tuple[str, int] | None = None
+    for i, line in enumerate(_lines_with_ends(text)):
+        bare = _strip_end(line)
+        bom = 0
+        if i == 0 and bare.startswith("\ufeff"):
+            bom = 1
+            bare = bare[1:]
+        if fence is not None:
+            if _fence_closes(bare, fence):
+                fence = None
+        else:
+            opened = _fence_open(bare)
+            if opened is not None:
+                fence = opened
+            else:
+                yield offset, bom, bare
+        offset += len(line)
+
+
 def _find_block(text: str, start: str, end: str) -> tuple[int, int] | None:
     """faf's marked range: the last whole-line START before the first whole-line
     END after it, both outside fenced code. Returns the char range covering both
     marker lines (the END line's terminator excluded), or None.
 
     A leading BOM on line 1 stays outside the range."""
-    offset = 0
-    in_fence: str | None = None
     start_at: int | None = None
-    for i, line in enumerate(_lines_with_ends(text)):
-        bare = _strip_end(line)
-        if i == 0 and bare.startswith("﻿"):
-            bom = len("﻿")
-            bare = bare[1:]
-        else:
-            bom = 0
-        fence = bare.lstrip(" ")[:3]
-        if in_fence is None and fence in ("```", "~~~") and len(bare) - len(bare.lstrip(" ")) <= 3:
-            in_fence = fence
-        elif in_fence is not None and bare.lstrip(" ").startswith(in_fence):
-            in_fence = None
-        elif in_fence is None:
-            if bare == start:
-                start_at = offset + bom
-            elif bare == end and start_at is not None:
-                return (start_at, offset + bom + len(bare))
-        offset += len(line)
+    for offset, bom, bare in _marker_lines(text):
+        if bare == start:
+            start_at = offset + bom
+        elif bare == end and start_at is not None:
+            return (start_at, offset + bom + len(bare))
     return None
 
 
 def _has_unpaired_marker(text: str, start: str, end: str) -> bool:
-    for line in _lines_with_ends(text):
-        bare = _strip_end(line).lstrip("﻿")
-        if bare in (start, end):
-            return True
-    return False
+    return any(bare in (start, end) for _, _, bare in _marker_lines(text))
 
 
 def legacy_stamp_note(label: str, existing: str | None, start: str = FAF_START, end: str = FAF_END) -> str | None:
@@ -125,17 +156,29 @@ def _read_utf8(real: Path, label: str) -> str | None:
 
 
 def _atomic_write(real: Path, text: str) -> None:
-    mode = None
+    """Temp file in the same folder, fsync, rename. Keeps an existing file's
+    permissions; a new file gets the usual 0666 minus the umask. The rename
+    gives the path a new inode, so other hard links keep the old text."""
     if real.exists():
         mode = stat.S_IMODE(real.stat().st_mode)
-        if not os.access(real, os.W_OK):
+        # Mode bits, not os.access: root can write anything, and faf still
+        # leaves a file someone marked read-only alone.
+        if not mode & (stat.S_IWUSR | stat.S_IWGRP | stat.S_IWOTH):
             raise InjectRefused(f"{real.name} is read-only — faf left it unchanged.")
-    fd, tmp = tempfile.mkstemp(prefix=".faf-tmp-", dir=str(real.parent))
+    else:
+        umask = os.umask(0)
+        os.umask(umask)
+        mode = 0o666 & ~umask
+    try:
+        fd, tmp = tempfile.mkstemp(prefix=".faf-tmp-", dir=str(real.parent))
+    except OSError as e:
+        raise InjectRefused(f"{real.name}: can't write in its folder ({e.strerror}) — nothing changed.") from None
     try:
         with os.fdopen(fd, "w", encoding="utf-8", newline="") as f:
             f.write(text)
-        if mode is not None:
-            os.chmod(tmp, mode)
+            f.flush()
+            os.fsync(f.fileno())
+        os.chmod(tmp, mode)
         os.replace(tmp, real)
     except BaseException:
         try:
@@ -162,11 +205,16 @@ def inject_faf_block(
     project = Path(root) if root is not None else p.parent
     real = _resolve_target(p, project)
     label = p.name
-    wrapped = f"{start}\n{block.strip()}\n{end}"
+    body = block.strip()
+    if any(_strip_end(line) in (start, end) for line in _lines_with_ends(body)):
+        raise InjectRefused(f"{label}: the generated block contains a faf marker line — nothing written.")
 
     existing = _read_utf8(real, label)
+    # Match the file's line endings, so a CRLF file stays CRLF.
+    nl = "\r\n" if existing and existing.count("\r\n") > existing.count("\n") / 2 else "\n"
+    wrapped = nl.join([start, *body.splitlines(), end])
     if existing is None:
-        _atomic_write(real, wrapped + "\n")
+        _atomic_write(real, wrapped + nl)
         return None
 
     note = legacy_stamp_note(label, existing, start, end)
@@ -179,5 +227,5 @@ def inject_faf_block(
     # No block faf can prove it wrote: put the block on top, keep everything.
     bom = "﻿" if existing.startswith("﻿") else ""
     rest = existing[len(bom):]
-    _atomic_write(real, bom + wrapped + "\n\n" + rest)
+    _atomic_write(real, bom + wrapped + nl + nl + rest)
     return note
