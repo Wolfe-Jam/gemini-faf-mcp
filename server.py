@@ -28,7 +28,7 @@ from faf_sdk.parser import FafParseError
 from fastmcp import FastMCP
 from mcp.types import ToolAnnotations
 
-from inject import inject_faf_block
+from inject import InjectRefused, inject_faf_block
 from interrogate import interrogate_repo
 from models import get_model, list_models
 from safe_path import PathConfinementError, confine_file_op, confine_path
@@ -321,18 +321,25 @@ def faf_gemini(path: str = "project.faf") -> dict:
         faf = _parse_faf(path)
         mk4 = _mk4_score_file(path)
         md = author_gemini_md(faf.data.raw)
-        target = confine_file_op(str(Path(path).parent / "GEMINI.md"))
-        inject_faf_block(target, md)
+        raw = Path(path).parent / "GEMINI.md"
+        target = confine_file_op(str(raw))  # inside the allowed roots
+        # Give the injector the path as typed, not the resolved one: it must see
+        # a link to refuse a link out of the project or into .git/.
+        note = inject_faf_block(raw, md, root=raw.parent)
         return {
             "success": True,
             "path": str(target),
             "content": md,
             "score": mk4.score,
             "tier": mk4.tier,
-            "message": "GEMINI.md updated — faf block injected, existing content preserved",
+            "message": note or "GEMINI.md updated — faf block written, the rest of the file kept",
         }
+    except InjectRefused as e:
+        return {"success": False, "error": str(e)}
     except FileNotFoundError:
         return {"success": False, "error": f"File not found: {path}"}
+    except OSError as e:
+        return {"success": False, "error": f"Not written: {e.strerror or e}"}
     except FafParseError as e:
         return {"success": False, "error": str(e)}
 
@@ -349,16 +356,23 @@ def faf_agents(path: str = "project.faf") -> dict:
     try:
         faf = _parse_faf(path)
         md = author_agents_md(faf.data.raw)
-        target = confine_file_op(str(Path(path).parent / "AGENTS.md"))
-        inject_faf_block(target, md)
+        raw = Path(path).parent / "AGENTS.md"
+        target = confine_file_op(str(raw))  # inside the allowed roots
+        # Give the injector the path as typed, not the resolved one: it must see
+        # a link to refuse a link out of the project or into .git/.
+        note = inject_faf_block(raw, md, root=raw.parent)
         return {
             "success": True,
             "path": str(target),
             "content": md,
-            "message": "AGENTS.md updated — faf block injected, existing content preserved",
+            "message": note or "AGENTS.md updated — faf block written, the rest of the file kept",
         }
+    except InjectRefused as e:
+        return {"success": False, "error": str(e)}
     except FileNotFoundError:
         return {"success": False, "error": f"File not found: {path}"}
+    except OSError as e:
+        return {"success": False, "error": f"Not written: {e.strerror or e}"}
     except FafParseError as e:
         return {"success": False, "error": str(e)}
 

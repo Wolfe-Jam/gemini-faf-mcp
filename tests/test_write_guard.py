@@ -41,5 +41,5 @@ def test_no_raw_context_file_write():
 def test_export_tools_use_the_injector():
     """faf_agents / faf_gemini must enhance, not overwrite — they go through inject_faf_block."""
     server = (ROOT / "server.py").read_text()
-    assert "from inject import inject_faf_block" in server
+    assert re.search(r"^from inject import .*\binject_faf_block\b", server, re.M)
     assert server.count("inject_faf_block(") >= 2  # faf_agents + faf_gemini
