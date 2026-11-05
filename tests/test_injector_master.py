@@ -250,3 +250,25 @@ def test_review_f9_block_containing_a_marker_line_is_refused(tmp_path):
     with pytest.raises(InjectRefused):
         inject_faf_block(p, f"x\n{FAF_END}\ny")
     assert p.read_text(encoding="utf-8") == "# Mine\n"
+
+
+@pytest.mark.skipif(os.name == "nt", reason="symlinks need privileges on Windows")
+def test_link_to_another_file_refused_context_files_allowed(tmp_path):
+    (tmp_path / "README.md").write_text("readme\n", encoding="utf-8")
+    (tmp_path / "GEMINI.md").symlink_to("README.md")
+    with pytest.raises(InjectRefused):
+        inject_faf_block(tmp_path / "GEMINI.md", "block")
+    assert (tmp_path / "README.md").read_text(encoding="utf-8") == "readme\n"
+    (tmp_path / "AGENTS.md").write_text("agents\n", encoding="utf-8")
+    (tmp_path / "CLAUDE.md").symlink_to("AGENTS.md")
+    inject_faf_block(tmp_path / "CLAUDE.md", "block")
+    assert "agents" in (tmp_path / "AGENTS.md").read_text(encoding="utf-8")
+
+
+def test_utf16_without_bom_is_refused(tmp_path):
+    p = tmp_path / "GEMINI.md"
+    data = "# notes\n".encode("utf-16-le")
+    p.write_bytes(data)
+    with pytest.raises(InjectRefused):
+        inject_faf_block(p, "block")
+    assert p.read_bytes() == data

@@ -33,6 +33,9 @@ LEGACY_NOTE = (
 )
 
 
+CONTEXT_FILES = {"CLAUDE.md", "AGENTS.md", "GEMINI.md", ".cursorrules", ".windsurfrules", ".clinerules"}
+
+
 class InjectRefused(Exception):
     """faf would not write this file; it is left exactly as it was."""
 
@@ -139,6 +142,11 @@ def _resolve_target(p: Path, root: Path) -> Path:
         raise InjectRefused(f"{p.name} leads outside the project — refused.") from None
     if ".git" in rel.parts:
         raise InjectRefused(f"{p.name} is inside .git/ — refused.")
+    # faf-cli's rule: a link to a file of the same name, or between AI context
+    # files (CLAUDE.md -> AGENTS.md), is written through; a link to any other
+    # file (GEMINI.md -> README.md) is refused.
+    if p.is_symlink() and real.name != p.name and not (p.name in CONTEXT_FILES and real.name in CONTEXT_FILES):
+        raise InjectRefused(f"{p.name} is a link to {real.name}, not an AI context file — refused.")
     if real.exists() and not real.is_file():
         raise InjectRefused(f"{p.name} is not a file — refused.")
     return real
@@ -149,6 +157,9 @@ def _read_utf8(real: Path, label: str) -> str | None:
         raw = real.read_bytes()
     except FileNotFoundError:
         return None
+    if b"\x00" in raw:
+        # UTF-16 with no BOM is ASCII plus NUL bytes, which decodes as UTF-8.
+        raise InjectRefused(f"{label} is not UTF-8 text — faf left it unchanged.")
     try:
         return raw.decode("utf-8")
     except UnicodeDecodeError:
