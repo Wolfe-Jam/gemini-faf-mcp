@@ -1,10 +1,23 @@
 <!-- faf: gemini-faf-mcp | Python | mcp | FAF MCP server for Google Gemini — persistent project context via PyPI -->
-<!-- faf: doc=changelog | latest=v3.1.1 | canonical=project.faf | family=FAF -->
+<!-- faf: doc=changelog | latest=v3.1.2 | canonical=project.faf | family=FAF -->
 
 # Changelog
 
 All notable changes to gemini-faf-mcp are documented here.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
+
+## [3.1.2] - 2026-11-05
+
+**faf_gemini and faf_agents keep your hand-written GEMINI.md and AGENTS.md, and tell you what they couldn't write.**
+
+308 tests pass, 0 fail.
+
+### Fixed
+- **GEMINI.md and AGENTS.md are written by faf-cli's rules** ([#45](https://github.com/Wolfe-Jam/gemini-faf-mcp/pull/45)), the same ones faf-cli, faf-mcp, claude-faf-mcp and grok-faf-mcp follow. faf replaces only the block between its own marker lines; a file whose first line looks like a faf stamp is never reclaimed, and a START with no END cuts nothing.
+- **Markers count only as whole lines outside code** (CommonMark fences), never as text in prose or an example.
+- **Refused, nothing written:** a file that isn't UTF-8 text (incl. UTF-16 without a BOM), a dangling link, a link out of the project or into `.git/`, a link to a differently named file (except between AI context files), a read-only file. `faf_gemini` / `faf_agents` reply `success: false` with the reason; they used to say "existing content preserved" either way.
+- **Atomic writes** that keep permissions, a CRLF file's line endings and a leading BOM; new files follow your umask.
+- **`/faf:export`** no longer tells the model to write GEMINI.md / AGENTS.md itself (which would replace the whole file); the tools write them.
 
 ## [3.1.1] - 2026-10-16
 
