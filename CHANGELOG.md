@@ -6,6 +6,11 @@
 All notable changes to gemini-faf-mcp are documented here.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
+## [Unreleased]
+
+### Fixed
+- **A tool that answers `success: false` now sets MCP's `isError`.** A missing file, invalid YAML, a refused write, a path outside the project: each used to come back as an ordinary result, so a client that reads `isError` saw success. The dict is unchanged (same content and structured content), and calling the tool functions directly is unchanged. One middleware, `_FailureIsError` in `server.py`. Python clients on FastMCP's `Client.call_tool` now get a `ToolError` for these calls unless they pass `raise_on_error=False`; the tests do.
+
 ## [3.1.2] - 2026-11-05
 
 **faf_gemini and faf_agents keep your hand-written GEMINI.md and AGENTS.md, and tell you what they couldn't write.**

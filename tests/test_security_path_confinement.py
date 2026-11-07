@@ -22,6 +22,11 @@ from server import mcp
 def _parse(result):
     if hasattr(result, "data") and isinstance(result.data, dict):
         return result.data
+    # an error result (isError) carries the dict as structured content / text, not .data
+    if isinstance(getattr(result, "structured_content", None), dict):
+        return result.structured_content
+    if hasattr(result, "content"):
+        return json.loads(result.content[0].text)
     return json.loads(result[0].text)
 
 
@@ -79,13 +84,13 @@ class TestConfineUnit:
 
 class TestToolConfinement:
     async def test_faf_read_etc_passwd_refused(self, client):
-        result = await client.call_tool("faf_read", {"path": "/etc/passwd"})
+        result = await client.call_tool("faf_read", {"path": "/etc/passwd"}, raise_on_error=False)
         data = _parse(result)
         assert data.get("success") is False
         assert "root:" not in json.dumps(data)
 
     async def test_faf_score_secret_refused(self, client, secret):
-        result = await client.call_tool("faf_score", {"path": secret})
+        result = await client.call_tool("faf_score", {"path": secret}, raise_on_error=False)
         data = _parse(result)
         # faf_score has its own error shape; the invariant is no leak + no success.
         assert data.get("success") is not True
@@ -93,7 +98,7 @@ class TestToolConfinement:
 
     async def test_faf_init_outside_root_refused(self, client):
         target = os.path.expanduser("~/.gemfaf_should_not_be_written.faf")
-        result = await client.call_tool("faf_init", {"name": "x", "path": target})
+        result = await client.call_tool("faf_init", {"name": "x", "path": target}, raise_on_error=False)
         data = _parse(result)
         assert data.get("success") is False
         assert not os.path.exists(target)
