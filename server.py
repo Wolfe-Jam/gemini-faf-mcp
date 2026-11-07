@@ -87,7 +87,8 @@ mcp = FastMCP(
 
 
 class _FailureIsError(Middleware):
-    """A tool that answers ``success: false`` is an error to the client too:
+    """A tool that answers ``success: false`` (or ``error`` with no ``success``)
+    is an error to the client too:
     MCP's ``isError`` is set, so a client can tell a refusal or a missing file
     from a result. The dict the tool returns is unchanged (same content, same
     structured content), and calling the tool functions directly is unchanged."""
@@ -95,7 +96,13 @@ class _FailureIsError(Middleware):
     async def on_call_tool(self, context, call_next):
         result = await call_next(context)
         data = result.structured_content
-        if isinstance(data, dict) and data.get("success") is False and not result.is_error:
+        failed = isinstance(data, dict) and (
+            data.get("success") is False
+            # faf_score and faf_model report failure as {"error": ...} with no
+            # "success" key; no successful result carries "error".
+            or ("error" in data and data.get("success") is not True)
+        )
+        if failed and not result.is_error:
             return ToolResult(
                 content=result.content,
                 structured_content=data,

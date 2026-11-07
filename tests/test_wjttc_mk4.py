@@ -139,6 +139,13 @@ def _parse(result):
     return json.loads(result[0].text)
 
 
+async def _call_error(client, tool, args):
+    """A call that must fail: MCP isError is set, and the tool's dict comes back."""
+    result = await client.call_tool(tool, args, raise_on_error=False)
+    assert result.is_error is True, f"{tool} should set isError"
+    return result
+
+
 @pytest.fixture
 async def client():
     async with Client(transport=mcp) as c:
@@ -182,7 +189,7 @@ class TestWJTTCTier1Brake:
     """Mk4 scoring engine must be correctly wired into server."""
 
     async def test_faf_score_returns_mk4_fields(self, client, trophy_faf):
-        data = _parse(await client.call_tool("faf_score", {"path": trophy_faf}, raise_on_error=False))
+        data = _parse(await client.call_tool("faf_score", {"path": trophy_faf}))
         assert "score" in data
         assert "tier" in data
         assert "populated" in data
@@ -190,7 +197,7 @@ class TestWJTTCTier1Brake:
         assert "total" in data
 
     async def test_faf_score_trophy_is_100(self, client, trophy_faf):
-        data = _parse(await client.call_tool("faf_score", {"path": trophy_faf}, raise_on_error=False))
+        data = _parse(await client.call_tool("faf_score", {"path": trophy_faf}))
         assert data["score"] == 100
         assert data["tier"] == "TROPHY"
         assert data["populated"] == 21
@@ -198,12 +205,12 @@ class TestWJTTCTier1Brake:
         assert data["total"] == 33
 
     async def test_faf_score_minimal_low(self, client, minimal_faf):
-        data = _parse(await client.call_tool("faf_score", {"path": minimal_faf}, raise_on_error=False))
+        data = _parse(await client.call_tool("faf_score", {"path": minimal_faf}))
         assert data["score"] < 20
         assert data["populated"] == 1  # only name
 
     async def test_faf_validate_includes_mk4_score(self, client, trophy_faf):
-        data = _parse(await client.call_tool("faf_validate", {"path": trophy_faf}, raise_on_error=False))
+        data = _parse(await client.call_tool("faf_validate", {"path": trophy_faf}))
         assert data["score"] == 100
         assert data["populated"] == 21
         assert data["total"] == 33
@@ -211,15 +218,15 @@ class TestWJTTCTier1Brake:
 
     async def test_faf_score_and_validate_agree(self, client, trophy_faf):
         """Score from faf_score must equal score from faf_validate."""
-        score_data = _parse(await client.call_tool("faf_score", {"path": trophy_faf}, raise_on_error=False))
-        validate_data = _parse(await client.call_tool("faf_validate", {"path": trophy_faf}, raise_on_error=False))
+        score_data = _parse(await client.call_tool("faf_score", {"path": trophy_faf}))
+        validate_data = _parse(await client.call_tool("faf_validate", {"path": trophy_faf}))
         assert score_data["score"] == validate_data["score"]
         assert score_data["tier"] == validate_data["tier"]
 
     async def test_server_version_is_current(self, client):
         """Server reports the current __version__ (sourced from client.py)."""
         from gemini_faf_mcp.client import __version__ as expected_version
-        data = _parse(await client.call_tool("faf_about", {}, raise_on_error=False))
+        data = _parse(await client.call_tool("faf_about", {}))
         assert data["server_version"] == expected_version, (
             f"server_version drift: tool reports {data['server_version']!r}, "
             f"client.__version__ is {expected_version!r}. Version sync broken."
@@ -240,17 +247,17 @@ class TestWJTTCTier2Engine:
     """Every tool that returns a score must use Mk4."""
 
     async def test_faf_context_has_mk4_score(self, client, trophy_faf):
-        data = _parse(await client.call_tool("faf_context", {"path": trophy_faf}, raise_on_error=False))
+        data = _parse(await client.call_tool("faf_context", {"path": trophy_faf}))
         assert data["context"]["score"] == 100
         assert data["context"]["tier"] == "TROPHY"
 
     async def test_faf_gemini_has_mk4_score(self, client, trophy_faf):
-        data = _parse(await client.call_tool("faf_gemini", {"path": trophy_faf}, raise_on_error=False))
+        data = _parse(await client.call_tool("faf_gemini", {"path": trophy_faf}))
         assert data["score"] == 100
         assert "100%" in data["content"]
 
     async def test_faf_agents_has_mk4_score(self, client, trophy_faf):
-        data = _parse(await client.call_tool("faf_agents", {"path": trophy_faf}, raise_on_error=False))
+        data = _parse(await client.call_tool("faf_agents", {"path": trophy_faf}))
         assert "100%" in data["content"]
 
     async def test_faf_auto_scores_with_mk4(self, client, tmp_path):
@@ -260,7 +267,7 @@ class TestWJTTCTier2Engine:
         target = str(tmp_path / "project.faf")
         data = _parse(await client.call_tool("faf_auto", {
             "directory": str(tmp_path), "path": target
-        }, raise_on_error=False))
+        }))
         assert data["success"] is True
         assert isinstance(data["score"], int)
         assert data["score"] >= 0
@@ -279,7 +286,7 @@ class TestWJTTCTier2Engine:
         target = tmp_path / "project.faf"
         data = _parse(await client.call_tool("faf_auto", {
             "directory": str(tmp_path), "path": str(target)
-        }, raise_on_error=False))
+        }))
         assert data["success"] is True
         result = score_faf(target.read_text())
         enterprise = SLOTS[21:]
@@ -289,13 +296,13 @@ class TestWJTTCTier2Engine:
         assert result.score == data["score"]
 
     async def test_slotignored_adjusts_denominator(self, client, slotignored_faf):
-        data = _parse(await client.call_tool("faf_score", {"path": slotignored_faf}, raise_on_error=False))
+        data = _parse(await client.call_tool("faf_score", {"path": slotignored_faf}))
         assert data["total"] == 33
         assert data["active"] == 17  # 4 frontend + 12 enterprise slots ignored
         assert data["score"] == 100  # all active slots populated
 
     async def test_empty_slots_score_low(self, client, empty_slots_faf):
-        data = _parse(await client.call_tool("faf_score", {"path": empty_slots_faf}, raise_on_error=False))
+        data = _parse(await client.call_tool("faf_score", {"path": empty_slots_faf}))
         assert data["score"] == 0  # null, empty, "unknown" all rejected
         assert data["populated"] == 0
 
@@ -309,34 +316,34 @@ class TestWJTTCTier3Aero:
     """Tools must handle hostile/unusual inputs gracefully."""
 
     async def test_score_missing_file_returns_zero(self, client):
-        data = _parse(await client.call_tool("faf_score", {"path": "/no/such/file.faf"}, raise_on_error=False))
+        data = _parse(await _call_error(client, "faf_score", {"path": "/no/such/file.faf"}))
         assert data["score"] == 0
         assert "error" in data
 
     async def test_score_invalid_yaml(self, client, tmp_path):
         bad = tmp_path / "bad.faf"
         bad.write_text("key: [unterminated")
-        data = _parse(await client.call_tool("faf_score", {"path": str(bad)}, raise_on_error=False))
+        data = _parse(await client.call_tool("faf_score", {"path": str(bad)}))
         assert data["score"] == 0
 
     async def test_score_empty_file(self, client, tmp_path):
         empty = tmp_path / "empty.faf"
         empty.write_text("")
-        data = _parse(await client.call_tool("faf_score", {"path": str(empty)}, raise_on_error=False))
+        data = _parse(await client.call_tool("faf_score", {"path": str(empty)}))
         assert data["score"] == 0
 
     async def test_score_binary_content(self, client, tmp_path):
         binary = tmp_path / "binary.faf"
         binary.write_bytes(b"\x00\x01\x02\xff\xfe\xfd")
-        data = _parse(await client.call_tool("faf_score", {"path": str(binary)}, raise_on_error=False))
+        data = _parse(await _call_error(client, "faf_score", {"path": str(binary)}))
         assert data["score"] == 0
 
     async def test_validate_missing_file(self, client):
-        data = _parse(await client.call_tool("faf_validate", {"path": "/no.faf"}, raise_on_error=False))
+        data = _parse(await _call_error(client, "faf_validate", {"path": "/no.faf"}))
         assert data["success"] is False
 
     async def test_auto_nonexistent_directory(self, client):
-        data = _parse(await client.call_tool("faf_auto", {"directory": "/nonexistent"}, raise_on_error=False))
+        data = _parse(await _call_error(client, "faf_auto", {"directory": "/nonexistent"}))
         assert data["success"] is False
 
     async def test_auto_malformed_pyproject(self, client, tmp_path):
@@ -345,7 +352,7 @@ class TestWJTTCTier3Aero:
         target = str(tmp_path / "project.faf")
         data = _parse(await client.call_tool("faf_auto", {
             "directory": str(tmp_path), "path": target
-        }, raise_on_error=False))
+        }))
         assert data["success"] is True  # should still create a .faf
 
     async def test_auto_malformed_package_json(self, client, tmp_path):
@@ -354,7 +361,7 @@ class TestWJTTCTier3Aero:
         target = str(tmp_path / "project.faf")
         data = _parse(await client.call_tool("faf_auto", {
             "directory": str(tmp_path), "path": target
-        }, raise_on_error=False))
+        }))
         assert data["success"] is True
 
     async def test_auto_empty_pyproject(self, client, tmp_path):
@@ -363,24 +370,24 @@ class TestWJTTCTier3Aero:
         target = str(tmp_path / "project.faf")
         data = _parse(await client.call_tool("faf_auto", {
             "directory": str(tmp_path), "path": target
-        }, raise_on_error=False))
+        }))
         assert data["success"] is True
 
     async def test_init_unicode_name(self, client, tmp_path):
         target = str(tmp_path / "project.faf")
         data = _parse(await client.call_tool("faf_init", {
             "name": "\u30d7\u30ed\u30b8\u30a7\u30af\u30c8", "path": target
-        }, raise_on_error=False))
+        }))
         assert data["success"] is True
         content = open(target).read()
         assert "\u30d7\u30ed\u30b8\u30a7\u30af\u30c8" in content
 
     async def test_model_unknown_type(self, client):
-        data = _parse(await client.call_tool("faf_model", {"project_type": "nonexistent"}, raise_on_error=False))
+        data = _parse(await _call_error(client, "faf_model", {"project_type": "nonexistent"}))
         assert "error" in data
 
     async def test_model_empty_lists_types(self, client):
-        data = _parse(await client.call_tool("faf_model", {}, raise_on_error=False))
+        data = _parse(await client.call_tool("faf_model", {}))
         assert "available_types" in data
         assert len(data["available_types"]) >= 10
 
@@ -399,7 +406,7 @@ class TestWJTTCTier3Aero:
     async def test_model_returns_full_21_slot_stack(self, client):
         """A returned model fills all 12 scored stack slots (populated or
         slotignored — never null / missing)."""
-        data = _parse(await client.call_tool("faf_model", {"project_type": "web-app"}, raise_on_error=False))
+        data = _parse(await client.call_tool("faf_model", {"project_type": "web-app"}))
         faf = data["model"]["faf"] if "model" in data else data.get("faf", "")
         for slot in ("frontend", "css_framework", "ui_library", "state_management",
                      "backend", "api_type", "runtime", "database", "connection",
@@ -420,7 +427,7 @@ class TestWJTTCTier4Stress:
         """20 sequential score calls — all must return identical results."""
         scores = []
         for _ in range(20):
-            data = _parse(await client.call_tool("faf_score", {"path": trophy_faf}, raise_on_error=False))
+            data = _parse(await client.call_tool("faf_score", {"path": trophy_faf}))
             scores.append(data["score"])
         assert all(s == 100 for s in scores)
 
@@ -431,7 +438,7 @@ class TestWJTTCTier4Stress:
             lines.append(f"extra_field_{i}: value_{i}")
         large = tmp_path / "large.faf"
         large.write_text("\n".join(lines))
-        data = _parse(await client.call_tool("faf_score", {"path": str(large)}, raise_on_error=False))
+        data = _parse(await client.call_tool("faf_score", {"path": str(large)}))
         assert data["score"] == 100  # extra fields don't affect Mk4 scoring
 
     async def test_score_after_auto_create(self, client, tmp_path):
@@ -443,9 +450,9 @@ class TestWJTTCTier4Stress:
         target = str(tmp_path / "project.faf")
         auto = _parse(await client.call_tool("faf_auto", {
             "directory": str(tmp_path), "path": target
-        }, raise_on_error=False))
+        }))
         assert auto["success"]
-        score = _parse(await client.call_tool("faf_score", {"path": target}, raise_on_error=False))
+        score = _parse(await client.call_tool("faf_score", {"path": target}))
         assert score["score"] == auto["score"]
 
 
@@ -458,37 +465,37 @@ class TestWJTTCTier5Security:
     """Must resist hostile inputs."""
 
     async def test_path_traversal_blocked(self, client):
-        data = _parse(await client.call_tool("faf_score", {
+        data = _parse(await _call_error(client, "faf_score", {
             "path": "../../../etc/passwd"
-        }, raise_on_error=False))
+        }))
         assert data["score"] == 0
         assert "error" in data
 
     async def test_null_byte_in_path(self, client):
         """Null bytes in path should not cause issues."""
         try:
-            data = _parse(await client.call_tool("faf_score", {
+            data = _parse(await _call_error(client, "faf_score", {
                 "path": "project\x00.faf"
-            }, raise_on_error=False))
+            }))
             assert data["score"] == 0
         except Exception:
             pass  # Any clean failure is acceptable
 
     async def test_very_long_path(self, client):
-        data = _parse(await client.call_tool("faf_score", {
+        data = _parse(await _call_error(client, "faf_score", {
             "path": "a" * 10000 + ".faf"
-        }, raise_on_error=False))
+        }))
         assert data["score"] == 0
         assert "error" in data
 
     async def test_init_refuses_overwrite(self, client, trophy_faf):
-        data = _parse(await client.call_tool("faf_init", {"path": trophy_faf}, raise_on_error=False))
+        data = _parse(await _call_error(client, "faf_init", {"path": trophy_faf}))
         assert data["success"] is False
 
     async def test_init_preserves_existing_content(self, client, trophy_faf):
         """Overwrite refusal must not corrupt the original."""
         original = open(trophy_faf).read()
-        await client.call_tool("faf_init", {"path": trophy_faf}, raise_on_error=False)
+        await _call_error(client, "faf_init", {"path": trophy_faf})
         assert open(trophy_faf).read() == original
 
 
@@ -501,7 +508,7 @@ class TestWJTTCTier6Contract:
     """Server Mk4 scores must exactly match SDK Mk4 scores."""
 
     async def test_trophy_parity(self, client, trophy_faf):
-        server = _parse(await client.call_tool("faf_score", {"path": trophy_faf}, raise_on_error=False))
+        server = _parse(await client.call_tool("faf_score", {"path": trophy_faf}))
         sdk = score_faf(TROPHY_FAF)
         assert server["score"] == sdk.score
         assert server["tier"] == sdk.tier
@@ -510,33 +517,33 @@ class TestWJTTCTier6Contract:
         assert server["total"] == sdk.total
 
     async def test_minimal_parity(self, client, minimal_faf):
-        server = _parse(await client.call_tool("faf_score", {"path": minimal_faf}, raise_on_error=False))
+        server = _parse(await client.call_tool("faf_score", {"path": minimal_faf}))
         sdk = score_faf(MINIMAL_FAF)
         assert server["score"] == sdk.score
         assert server["populated"] == sdk.populated
 
     async def test_slotignored_parity(self, client, slotignored_faf):
-        server = _parse(await client.call_tool("faf_score", {"path": slotignored_faf}, raise_on_error=False))
+        server = _parse(await client.call_tool("faf_score", {"path": slotignored_faf}))
         sdk = score_faf(SLOTIGNORED_FAF)
         assert server["score"] == sdk.score
         assert server["tier"] == sdk.tier
         assert server["active"] == sdk.active
 
     async def test_empty_slots_parity(self, client, empty_slots_faf):
-        server = _parse(await client.call_tool("faf_score", {"path": empty_slots_faf}, raise_on_error=False))
+        server = _parse(await client.call_tool("faf_score", {"path": empty_slots_faf}))
         sdk = score_faf(EMPTY_SLOTS_FAF)
         assert server["score"] == sdk.score
         assert server["populated"] == sdk.populated
 
     async def test_validate_schema_complete(self, client, trophy_faf):
         """faf_validate response must have all required Mk4 fields."""
-        data = _parse(await client.call_tool("faf_validate", {"path": trophy_faf}, raise_on_error=False))
+        data = _parse(await client.call_tool("faf_validate", {"path": trophy_faf}))
         required = {"success", "valid", "score", "tier", "populated", "active", "total", "errors", "warnings"}
         assert required == set(data.keys())
 
     async def test_score_schema_complete(self, client, trophy_faf):
         """faf_score response must have all required Mk4 fields."""
-        data = _parse(await client.call_tool("faf_score", {"path": trophy_faf}, raise_on_error=False))
+        data = _parse(await client.call_tool("faf_score", {"path": trophy_faf}))
         required = {"score", "tier", "populated", "active", "total"}
         assert required == set(data.keys())
 
@@ -556,7 +563,7 @@ class TestWJTTCTier6Contract:
         ]:
             f = Path(tempfile.mktemp(suffix=".faf"))
             f.write_text(faf_content)
-            data = _parse(await client.call_tool("faf_score", {"path": str(f)}, raise_on_error=False))
+            data = _parse(await client.call_tool("faf_score", {"path": str(f)}))
             empty = data["total"] - data["populated"] - (data["total"] - data["active"])
             assert data["populated"] + (data["total"] - data["active"]) + empty == data["total"]
             f.unlink()

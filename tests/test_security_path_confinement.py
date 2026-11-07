@@ -30,6 +30,13 @@ def _parse(result):
     return json.loads(result[0].text)
 
 
+async def _call_error(client, tool, args):
+    """A call that must fail: MCP isError is set, and the tool's dict comes back."""
+    result = await client.call_tool(tool, args, raise_on_error=False)
+    assert result.is_error is True, f"{tool} should set isError"
+    return result
+
+
 @pytest.fixture
 async def client():
     async with Client(transport=mcp) as c:
@@ -84,13 +91,13 @@ class TestConfineUnit:
 
 class TestToolConfinement:
     async def test_faf_read_etc_passwd_refused(self, client):
-        result = await client.call_tool("faf_read", {"path": "/etc/passwd"}, raise_on_error=False)
+        result = await _call_error(client, "faf_read", {"path": "/etc/passwd"})
         data = _parse(result)
         assert data.get("success") is False
         assert "root:" not in json.dumps(data)
 
     async def test_faf_score_secret_refused(self, client, secret):
-        result = await client.call_tool("faf_score", {"path": secret}, raise_on_error=False)
+        result = await _call_error(client, "faf_score", {"path": secret})
         data = _parse(result)
         # faf_score has its own error shape; the invariant is no leak + no success.
         assert data.get("success") is not True
@@ -98,7 +105,7 @@ class TestToolConfinement:
 
     async def test_faf_init_outside_root_refused(self, client):
         target = os.path.expanduser("~/.gemfaf_should_not_be_written.faf")
-        result = await client.call_tool("faf_init", {"name": "x", "path": target}, raise_on_error=False)
+        result = await _call_error(client, "faf_init", {"name": "x", "path": target})
         data = _parse(result)
         assert data.get("success") is False
         assert not os.path.exists(target)

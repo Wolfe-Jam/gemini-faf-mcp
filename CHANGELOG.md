@@ -9,7 +9,10 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 ## [Unreleased]
 
 ### Fixed
-- **A tool that answers `success: false` now sets MCP's `isError`.** A missing file, invalid YAML, a refused write, a path outside the project: each used to come back as an ordinary result, so a client that reads `isError` saw success. The dict is unchanged (same content and structured content), and calling the tool functions directly is unchanged. One middleware, `_FailureIsError` in `server.py`. Python clients on FastMCP's `Client.call_tool` now get a `ToolError` for these calls unless they pass `raise_on_error=False`; the tests do.
+- **A tool that answers `success: false` now sets MCP's `isError`.** A missing file, invalid YAML, a refused write, a path outside the project: each used to come back as an ordinary result, so a client that reads `isError` saw success. The dict is unchanged (same content and structured content), and calling the tool functions directly is unchanged. It covers both failure shapes: `{"success": false, ...}` (22 returns) and `{"error": ...}` with no `success` (`faf_score`'s missing file and path outside the project, `faf_model`'s unknown type). One middleware, `_FailureIsError` in `server.py`.
+
+### Changed
+- **Who sees the difference:** an MCP client that reads `isError` now takes its error path for these calls (the text is the same). A Python caller of FastMCP's `Client.call_tool` now gets a `ToolError` for them unless it passes `raise_on_error=False`. A success is unchanged, byte for byte.
 
 ## [3.1.2] - 2026-11-05
 
