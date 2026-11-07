@@ -13,6 +13,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
 ### Changed
 - **Who sees the difference:** an MCP client that reads `isError` now takes its error path for these calls (the text is the same). A Python caller of FastMCP's `Client.call_tool` now gets a `ToolError` for them unless it passes `raise_on_error=False`. A success is unchanged, byte for byte.
+- **`/faf:setup` checks before it creates.** It runs `faf_discover` first and scores an existing `project.faf` in this directory; `faf_init` runs only when there is none. Before, it always called `faf_init` and read "file already exists" as the normal path, which is now an error result.
 
 ## [3.1.2] - 2026-11-05
 
