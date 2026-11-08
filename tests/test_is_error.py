@@ -112,3 +112,21 @@ async def test_discover_not_found_is_a_result(tmp_path, monkeypatch):
     r = await _call("faf_discover", {"start_dir": str(tmp_path)})
     assert r.is_error is False
     assert r.structured_content["found"] is False
+
+
+async def test_score_duplicate_keys_is_an_error(project):
+    # The kernel rejects duplicate keys (faf-cli parity); it used to score 0 silently.
+    dup = project / "dup.faf"
+    dup.write_text('faf_version: "3.3"\nproject:\n  name: p\n  goal: g\n  name: q\n')
+    r = await _call("faf_score", {"path": str(dup)})
+    assert r.is_error is True
+    assert "Invalid YAML" in r.structured_content["error"]
+
+
+async def test_score_tagged_yaml_is_a_result(project):
+    # The kernel reads YAML tags; a stricter parser must not call this invalid.
+    tag = project / "tag.faf"
+    tag.write_text('faf_version: "3.3"\nproject: !custom\n  name: p\n  goal: g\n')
+    r = await _call("faf_score", {"path": str(tag)})
+    assert r.is_error is False
+    assert r.structured_content["score"] > 0

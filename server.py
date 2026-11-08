@@ -14,8 +14,8 @@ import os
 import sys
 from pathlib import Path
 
-import yaml
 from faf_sdk import (
+    _kernel_yaml,  # the kernel's YAML loader; private in faf-python-sdk 2.0.0
     author_agents_md,
     author_gemini_md,
     detect_dart_project,
@@ -188,13 +188,16 @@ def faf_score(path: str = "project.faf") -> dict:
     Uses the Mk4 always-33 scoring engine (faf-kernel parity) for universal parity.
     Use this for status checks; use faf_validate when you need error details."""
     try:
-        # The scorer alone scores unparseable YAML as 0 and never says why.
-        # An empty file is not a failure: it scores 0, White (empty).
+        # The scorer alone scores YAML the kernel can't read as 0 and never
+        # says why. Check with the kernel's own loader (what score_faf uses,
+        # faf-cli parity: tags are fine, duplicate keys are not), on the same
+        # text that gets scored. An empty file is not a failure: 0, White.
+        text = Path(confine_path(path)).read_text()
         try:
-            yaml.safe_load(Path(confine_path(path)).read_text())
-        except yaml.YAMLError as e:
+            _kernel_yaml.load(text)
+        except _kernel_yaml.KernelYamlError as e:
             return {"score": 0, "tier": "WHITE", "error": f"Invalid YAML: {e}"}
-        mk4 = _mk4_score_file(path)
+        mk4 = score_faf(text)
         return {
             "score": mk4.score,
             "tier": mk4.tier,
@@ -214,7 +217,8 @@ def faf_discover(start_dir: str = ".") -> dict:
     Searches the current directory and parent directories for project.faf.
     Use this before faf_read to locate the file automatically."""
     result = find_faf_file(start_dir)
-    searched_from = os.path.abspath(start_dir)
+    # Resolved like the path find_faf_file returns, so the two compare.
+    searched_from = str(Path(start_dir).resolve())
     if result and Path(result).is_file():
         return {"found": True, "path": result, "searched_from": searched_from}
     return {"found": False, "searched_from": searched_from}
