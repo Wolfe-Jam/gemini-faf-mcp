@@ -1,12 +1,18 @@
 <!-- faf: gemini-faf-mcp | Python | mcp | FAF MCP server for Google Gemini — persistent project context via PyPI -->
-<!-- faf: doc=changelog | latest=v3.1.2 | canonical=project.faf | family=FAF -->
+<!-- faf: doc=changelog | latest=v3.2.0 | canonical=project.faf | family=FAF -->
 
 # Changelog
 
 All notable changes to gemini-faf-mcp are documented here.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
-## [Unreleased]
+## [3.2.0] - 2026-11-08 — The Straight Answers Edition
+
+**Every gemini-faf-mcp failure now reaches your client as an error: MCP's isError is set, the reason text is unchanged, and /faf:setup checks before it creates.**
+
+**Heads up:** Python scripts that call these tools through FastMCP's `Client.call_tool` now get a `ToolError` on a failure unless they pass `raise_on_error=False`. MCP clients that read `isError` now take their error path, with the same text.
+
+320 tests pass, 0 fail.
 
 ### Fixed
 - **A tool that answers `success: false` now sets MCP's `isError`.** A missing file, invalid YAML, a refused write, a path outside the project: each used to come back as an ordinary result, so a client that reads `isError` saw success. The dict is unchanged (same content and structured content), and calling the tool functions directly is unchanged. It covers both failure shapes: `{"success": false, ...}` (22 returns) and `{"error": ...}` with no `success` (`faf_score`'s missing file and path outside the project, `faf_model`'s unknown type). One middleware, `_FailureIsError` in `server.py`.

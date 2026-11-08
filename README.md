@@ -1,7 +1,7 @@
 <!-- faf: gemini-faf-mcp | Python | mcp | FAF MCP server for Google Gemini — persistent project context via PyPI -->
 <!-- faf: doc=readme | canonical=project.faf | score=100 | family=FAF -->
 
-# gemini-faf-mcp v3.1 — The New Era Edition
+# gemini-faf-mcp v3.2 — The Straight Answers Edition
 
 **Persistent Project Context for Google Gemini. Define once. Sync everywhere.**
 
@@ -17,7 +17,7 @@ Stop re-explaining your project to every new Gemini session. Every Gemini conver
 
 [![PyPI](https://img.shields.io/pypi/v/gemini-faf-mcp?style=for-the-badge&logo=pypi&logoColor=white)](https://pypi.org/project/gemini-faf-mcp/)
 [![FAF Trophy 100%](https://img.shields.io/badge/FAF-%F0%9F%8F%86%20100%25-000000?labelColor=FF6B35)](https://faf.one)
-[![Tests](https://img.shields.io/badge/Tests-308%20passing-brightgreen?style=for-the-badge)](https://github.com/Wolfe-Jam/gemini-faf-mcp)
+[![Tests](https://img.shields.io/badge/Tests-320%20passing-brightgreen?style=for-the-badge)](https://github.com/Wolfe-Jam/gemini-faf-mcp)
 [![IANA: vnd.faf+yaml](https://img.shields.io/badge/IANA-vnd.faf%2Byaml-00D4D4?style=for-the-badge)](https://www.iana.org/assignments/media-types/application/vnd.faf+yaml)
 [![IANA: vnd.fafm+yaml](https://img.shields.io/badge/IANA-vnd.fafm%2Byaml-00D4D4?style=for-the-badge)](https://www.iana.org/assignments/media-types/application/vnd.fafm+yaml)
 [![DOI: Context paper](https://img.shields.io/badge/DOI-Context%20paper-FF6B35?style=for-the-badge)](https://doi.org/10.5281/zenodo.18251362)
@@ -41,7 +41,17 @@ Gemini: [now ready to help]
 
 `.faf` is read once at session start. Every tool call lands on a Gemini that already knows your project.
 
-### What's New in v3.1.2
+### What's New in v3.2.0 — The Straight Answers Edition
+
+**Every gemini-faf-mcp failure now reaches your client as an error: MCP's isError is set, the reason text is unchanged, and /faf:setup checks before it creates.**
+
+- A missing file, invalid YAML, a refused write, a path outside the project, an unknown model: each now comes back to your client as an error (MCP `isError`), with the same reason text as before. A success is unchanged.
+- `faf_score` says when a file isn't valid YAML, using the same reader as the score (faf-cli parity). An empty file still scores 0, White.
+- `/faf:setup` looks for a `project.faf` in this folder first, and only creates one when there is none.
+
+**Heads up:** Python scripts that call these tools through FastMCP's `Client.call_tool` now get a `ToolError` on a failure unless they pass `raise_on_error=False`. MCP clients that read `isError` now take their error path, with the same text.
+
+#### v3.1.2
 
 **faf_gemini and faf_agents keep your hand-written GEMINI.md and AGENTS.md, and tell you what they couldn't write.**
 
@@ -300,7 +310,7 @@ Your `.faf` file is scored on completeness — how many slots are filled with re
 ## Architecture
 
 ```
-gemini-faf-mcp v3.1.2
+gemini-faf-mcp v3.2.0
 ├── server.py              → FastMCP MCP server (13 tools, dual-transport, Mk4 scoring)
 ├── safe_path.py           → path confinement for caller-supplied `path` args
 ├── inject.py              → non-destructive faf-managed-block injection
@@ -321,7 +331,7 @@ pip3 install -e ".[dev]"
 python -m pytest tests/ -v
 ```
 
-308 tests passing across the FastMCP server, CLI flags, Cloud Function, Mk4 WJTTC championship, Full-Facts grounding, path-confinement, write-guard, model-parity, Dart detection, and client-telemetry suites. Championship-grade test coverage — [WJTTC certified](https://github.com/Wolfe-Jam/WJTTC).
+320 tests passing across the FastMCP server, CLI flags, Cloud Function, Mk4 WJTTC championship, Full-Facts grounding, path-confinement, write-guard, model-parity, Dart detection, and client-telemetry suites. Championship-grade test coverage — [WJTTC certified](https://github.com/Wolfe-Jam/WJTTC).
 
 ---
 
