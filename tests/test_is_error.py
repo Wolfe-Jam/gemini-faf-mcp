@@ -89,6 +89,18 @@ async def test_model_unknown_type_is_an_error(project):
 
 async def test_validation_report_is_a_result(project):
     # success: true with valid: false is a report, not a failure.
-    r = await _call("faf_validate", {"path": str(project / "project.faf")})
+    thin = project / "thin.faf"
+    thin.write_text('faf_version: "3.3"\nstack:\n  backend: x\n')
+    r = await _call("faf_validate", {"path": str(thin)})
     assert r.is_error is False
     assert r.structured_content["success"] is True
+    assert r.structured_content["valid"] is False
+
+
+async def test_score_invalid_yaml_is_an_error(project):
+    bad = project / "bad.faf"
+    bad.write_text("project: [unclosed\n")
+    r = await _call("faf_score", {"path": str(bad)})
+    assert r.is_error is True
+    assert r.structured_content["score"] == 0
+    assert "Invalid YAML" in r.structured_content["error"]

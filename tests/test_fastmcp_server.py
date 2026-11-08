@@ -370,7 +370,7 @@ class TestTier3Aero:
         assert data["tier"] == "WHITE"
 
     async def test_score_invalid_yaml(self, client, invalid_faf):
-        data = _parse(await client.call_tool("faf_score", {"path": invalid_faf}))
+        data = _parse(await _call_error(client, "faf_score", {"path": invalid_faf}))
         assert data["score"] == 0
         assert data["tier"] == "WHITE"
 
@@ -662,7 +662,7 @@ class TestTier7Contract:
     async def test_discover_found_schema(self, client, full_faf):
         search_dir = str(Path(full_faf).parent)
         data = _parse(await client.call_tool("faf_discover", {"start_dir": search_dir}))
-        assert set(data.keys()) == {"found", "path"}
+        assert set(data.keys()) == {"found", "path", "searched_from"}
 
     async def test_discover_not_found_schema(self, client, empty_dir):
         data = _parse(await client.call_tool("faf_discover", {"start_dir": empty_dir}))

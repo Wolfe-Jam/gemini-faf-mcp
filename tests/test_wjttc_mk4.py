@@ -323,7 +323,7 @@ class TestWJTTCTier3Aero:
     async def test_score_invalid_yaml(self, client, tmp_path):
         bad = tmp_path / "bad.faf"
         bad.write_text("key: [unterminated")
-        data = _parse(await client.call_tool("faf_score", {"path": str(bad)}))
+        data = _parse(await _call_error(client, "faf_score", {"path": str(bad)}))
         assert data["score"] == 0
 
     async def test_score_empty_file(self, client, tmp_path):

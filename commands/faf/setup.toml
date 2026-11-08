@@ -7,7 +7,7 @@ Set up FAF project DNA in the current directory. Use FAF MCP tools only.
 
 Run `faf_discover` (no arguments) to check for a project.faf first.
 
-**If it finds `project.faf` in the current directory** (`found: true` and the path is this directory's `project.faf`): run `faf_score` on it and show the result.
+**If it finds `project.faf` in the current directory** (`found: true`, and the returned `path` is `project.faf` directly inside `searched_from`): run `faf_score` on it and show the result.
 ```
 Found: project.faf
 Score: {score}% ({tier})

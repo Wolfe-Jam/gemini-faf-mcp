@@ -9,10 +9,12 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 ## [Unreleased]
 
 ### Fixed
-- **A tool that answers `success: false` now sets MCP's `isError`.** A missing file, invalid YAML, a refused write, a path outside the project: each used to come back as an ordinary result, so a client that reads `isError` saw success. The dict is unchanged (same content and structured content), and calling the tool functions directly is unchanged. It covers both failure shapes: `{"success": false, ...}` (22 returns) and `{"error": ...}` with no `success` (`faf_score`'s missing file and path outside the project, `faf_model`'s unknown type). One middleware, `_FailureIsError` in `server.py`.
+- **A tool that answers `success: false` now sets MCP's `isError`.** A missing file, invalid YAML, a refused write, a path outside the project: each used to come back as an ordinary result, so a client that reads `isError` saw success. The dict is unchanged (same content and structured content), and calling the tool functions directly is unchanged. It covers both failure shapes: `{"success": false, ...}` (22 returns) and `{"error": ...}` with no `success` (`faf_score`'s missing file and path outside the project, `faf_model`'s unknown type).
+- **`faf_score` on a file that isn't valid YAML says so.** It used to score it 0, White, with no error; now it returns `error: "Invalid YAML: …"` (and `isError`), like `faf_read` and `faf_validate`. An empty file is not a failure: it still scores 0, White. One middleware, `_FailureIsError` in `server.py`.
 
 ### Changed
 - **Who sees the difference:** an MCP client that reads `isError` now takes its error path for these calls (the text is the same). A Python caller of FastMCP's `Client.call_tool` now gets a `ToolError` for them unless it passes `raise_on_error=False`. A success is unchanged, byte for byte.
+- **`faf_discover` also returns `searched_from` when it finds a file** (it already did when it found none), so a caller can tell this directory's `project.faf` from a parent's.
 - **`/faf:setup` checks before it creates.** It runs `faf_discover` first and scores an existing `project.faf` in this directory; `faf_init` runs only when there is none. Before, it always called `faf_init` and read "file already exists" as the normal path, which is now an error result.
 
 ## [3.1.2] - 2026-11-05
