@@ -6,6 +6,17 @@
 All notable changes to gemini-faf-mcp are documented here.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
+## [Unreleased]
+
+### Fixed
+- **A tool that answers `success: false` now sets MCP's `isError`.** A missing file, invalid YAML, a refused write, a path outside the project: each used to come back as an ordinary result, so a client that reads `isError` saw success. The dict is unchanged (same content and structured content), and calling the tool functions directly is unchanged. It covers both failure shapes: `{"success": false, ...}` (22 returns) and `{"error": ...}` with no `success` (`faf_score`'s missing file and path outside the project, `faf_model`'s unknown type). One middleware, `_FailureIsError` in `server.py`.
+- **`faf_score` on a file the kernel can't read says so.** Syntax errors, duplicate keys and more than one document used to score 0, White, with no error; now they return `error: "Invalid YAML: …"` (and `isError`). The check uses the kernel's own YAML loader, the one the score uses (faf-cli parity), so a file faf-cli scores is never called invalid (a YAML tag is fine). An empty file, or YAML that isn't a mapping, still scores 0, White, as a result, as the kernel scores it; `faf_read` and `faf_validate` reject a non-mapping.
+
+### Changed
+- **Who sees the difference:** an MCP client that reads `isError` now takes its error path for these calls (the text is the same). A Python caller of FastMCP's `Client.call_tool` now gets a `ToolError` for them unless it passes `raise_on_error=False`. A success is unchanged, byte for byte.
+- **`faf_discover` also returns `searched_from` when it finds a file** (it already did when it found none), so a caller can tell this directory's `project.faf` from a parent's.
+- **`/faf:setup` checks before it creates.** It runs `faf_discover` first and scores an existing `project.faf` in this directory; `faf_init` runs only when there is none. Before, it always called `faf_init` and read "file already exists" as the normal path, which is now an error result.
+
 ## [3.1.2] - 2026-11-05
 
 **faf_gemini and faf_agents keep your hand-written GEMINI.md and AGENTS.md, and tell you what they couldn't write.**

@@ -131,7 +131,19 @@ def _parse(result):
     """Extract dict from FastMCP tool result."""
     if hasattr(result, "data") and isinstance(result.data, dict):
         return result.data
+    # an error result (isError) carries the dict as structured content / text, not .data
+    if isinstance(getattr(result, "structured_content", None), dict):
+        return result.structured_content
+    if hasattr(result, "content"):
+        return json.loads(result.content[0].text)
     return json.loads(result[0].text)
+
+
+async def _call_error(client, tool, args):
+    """A call that must fail: MCP isError is set, and the tool's dict comes back."""
+    result = await client.call_tool(tool, args, raise_on_error=False)
+    assert result.is_error is True, f"{tool} should set isError"
+    return result
 
 
 @pytest.fixture
@@ -304,14 +316,14 @@ class TestWJTTCTier3Aero:
     """Tools must handle hostile/unusual inputs gracefully."""
 
     async def test_score_missing_file_returns_zero(self, client):
-        data = _parse(await client.call_tool("faf_score", {"path": "/no/such/file.faf"}))
+        data = _parse(await _call_error(client, "faf_score", {"path": "/no/such/file.faf"}))
         assert data["score"] == 0
         assert "error" in data
 
     async def test_score_invalid_yaml(self, client, tmp_path):
         bad = tmp_path / "bad.faf"
         bad.write_text("key: [unterminated")
-        data = _parse(await client.call_tool("faf_score", {"path": str(bad)}))
+        data = _parse(await _call_error(client, "faf_score", {"path": str(bad)}))
         assert data["score"] == 0
 
     async def test_score_empty_file(self, client, tmp_path):
@@ -323,15 +335,15 @@ class TestWJTTCTier3Aero:
     async def test_score_binary_content(self, client, tmp_path):
         binary = tmp_path / "binary.faf"
         binary.write_bytes(b"\x00\x01\x02\xff\xfe\xfd")
-        data = _parse(await client.call_tool("faf_score", {"path": str(binary)}))
+        data = _parse(await _call_error(client, "faf_score", {"path": str(binary)}))
         assert data["score"] == 0
 
     async def test_validate_missing_file(self, client):
-        data = _parse(await client.call_tool("faf_validate", {"path": "/no.faf"}))
+        data = _parse(await _call_error(client, "faf_validate", {"path": "/no.faf"}))
         assert data["success"] is False
 
     async def test_auto_nonexistent_directory(self, client):
-        data = _parse(await client.call_tool("faf_auto", {"directory": "/nonexistent"}))
+        data = _parse(await _call_error(client, "faf_auto", {"directory": "/nonexistent"}))
         assert data["success"] is False
 
     async def test_auto_malformed_pyproject(self, client, tmp_path):
@@ -371,7 +383,7 @@ class TestWJTTCTier3Aero:
         assert "\u30d7\u30ed\u30b8\u30a7\u30af\u30c8" in content
 
     async def test_model_unknown_type(self, client):
-        data = _parse(await client.call_tool("faf_model", {"project_type": "nonexistent"}))
+        data = _parse(await _call_error(client, "faf_model", {"project_type": "nonexistent"}))
         assert "error" in data
 
     async def test_model_empty_lists_types(self, client):
@@ -453,7 +465,7 @@ class TestWJTTCTier5Security:
     """Must resist hostile inputs."""
 
     async def test_path_traversal_blocked(self, client):
-        data = _parse(await client.call_tool("faf_score", {
+        data = _parse(await _call_error(client, "faf_score", {
             "path": "../../../etc/passwd"
         }))
         assert data["score"] == 0
@@ -462,7 +474,7 @@ class TestWJTTCTier5Security:
     async def test_null_byte_in_path(self, client):
         """Null bytes in path should not cause issues."""
         try:
-            data = _parse(await client.call_tool("faf_score", {
+            data = _parse(await _call_error(client, "faf_score", {
                 "path": "project\x00.faf"
             }))
             assert data["score"] == 0
@@ -470,20 +482,20 @@ class TestWJTTCTier5Security:
             pass  # Any clean failure is acceptable
 
     async def test_very_long_path(self, client):
-        data = _parse(await client.call_tool("faf_score", {
+        data = _parse(await _call_error(client, "faf_score", {
             "path": "a" * 10000 + ".faf"
         }))
         assert data["score"] == 0
         assert "error" in data
 
     async def test_init_refuses_overwrite(self, client, trophy_faf):
-        data = _parse(await client.call_tool("faf_init", {"path": trophy_faf}))
+        data = _parse(await _call_error(client, "faf_init", {"path": trophy_faf}))
         assert data["success"] is False
 
     async def test_init_preserves_existing_content(self, client, trophy_faf):
         """Overwrite refusal must not corrupt the original."""
         original = open(trophy_faf).read()
-        await client.call_tool("faf_init", {"path": trophy_faf})
+        await _call_error(client, "faf_init", {"path": trophy_faf})
         assert open(trophy_faf).read() == original
 
 

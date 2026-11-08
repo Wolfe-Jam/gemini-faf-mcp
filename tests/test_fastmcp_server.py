@@ -83,7 +83,19 @@ def _parse(result):
     """Extract dict from FastMCP tool result."""
     if hasattr(result, "data") and isinstance(result.data, dict):
         return result.data
+    # an error result (isError) carries the dict as structured content / text, not .data
+    if isinstance(getattr(result, "structured_content", None), dict):
+        return result.structured_content
+    if hasattr(result, "content"):
+        return json.loads(result.content[0].text)
     return json.loads(result[0].text)
+
+
+async def _call_error(client, tool, args):
+    """A call that must fail: MCP isError is set, and the tool's dict comes back."""
+    result = await client.call_tool(tool, args, raise_on_error=False)
+    assert result.is_error is True, f"{tool} should set isError"
+    return result
 
 
 @pytest.fixture
@@ -336,29 +348,29 @@ class TestTier3Aero:
     """Every tool must fail gracefully, never crash."""
 
     async def test_read_missing_file(self, client):
-        data = _parse(await client.call_tool("faf_read", {"path": "/nonexistent.faf"}))
+        data = _parse(await _call_error(client, "faf_read", {"path": "/nonexistent.faf"}))
         assert data["success"] is False
         assert "error" in data
 
     async def test_read_invalid_yaml(self, client, invalid_faf):
-        data = _parse(await client.call_tool("faf_read", {"path": invalid_faf}))
+        data = _parse(await _call_error(client, "faf_read", {"path": invalid_faf}))
         assert data["success"] is False
 
     async def test_validate_missing_file(self, client):
-        data = _parse(await client.call_tool("faf_validate", {"path": "/nonexistent.faf"}))
+        data = _parse(await _call_error(client, "faf_validate", {"path": "/nonexistent.faf"}))
         assert data["success"] is False
 
     async def test_validate_invalid_yaml(self, client, invalid_faf):
-        data = _parse(await client.call_tool("faf_validate", {"path": invalid_faf}))
+        data = _parse(await _call_error(client, "faf_validate", {"path": invalid_faf}))
         assert data["success"] is False
 
     async def test_score_missing_returns_zero(self, client):
-        data = _parse(await client.call_tool("faf_score", {"path": "/nonexistent.faf"}))
+        data = _parse(await _call_error(client, "faf_score", {"path": "/nonexistent.faf"}))
         assert data["score"] == 0
         assert data["tier"] == "WHITE"
 
     async def test_score_invalid_yaml(self, client, invalid_faf):
-        data = _parse(await client.call_tool("faf_score", {"path": invalid_faf}))
+        data = _parse(await _call_error(client, "faf_score", {"path": invalid_faf}))
         assert data["score"] == 0
         assert data["tier"] == "WHITE"
 
@@ -367,23 +379,23 @@ class TestTier3Aero:
         assert data["found"] is False
 
     async def test_stringify_missing_file(self, client):
-        data = _parse(await client.call_tool("faf_stringify", {"path": "/nonexistent.faf"}))
+        data = _parse(await _call_error(client, "faf_stringify", {"path": "/nonexistent.faf"}))
         assert data["success"] is False
 
     async def test_stringify_invalid_yaml(self, client, invalid_faf):
-        data = _parse(await client.call_tool("faf_stringify", {"path": invalid_faf}))
+        data = _parse(await _call_error(client, "faf_stringify", {"path": invalid_faf}))
         assert data["success"] is False
 
     async def test_context_missing_file(self, client):
-        data = _parse(await client.call_tool("faf_context", {"path": "/nonexistent.faf"}))
+        data = _parse(await _call_error(client, "faf_context", {"path": "/nonexistent.faf"}))
         assert data["success"] is False
 
     async def test_gemini_missing_file(self, client):
-        data = _parse(await client.call_tool("faf_gemini", {"path": "/nonexistent.faf"}))
+        data = _parse(await _call_error(client, "faf_gemini", {"path": "/nonexistent.faf"}))
         assert data["success"] is False
 
     async def test_agents_missing_file(self, client):
-        data = _parse(await client.call_tool("faf_agents", {"path": "/nonexistent.faf"}))
+        data = _parse(await _call_error(client, "faf_agents", {"path": "/nonexistent.faf"}))
         assert data["success"] is False
 
     async def test_context_minimal_no_crash(self, client, minimal_faf):
@@ -569,14 +581,14 @@ class TestTier6Safety:
 
     async def test_init_refuses_overwrite(self, client, full_faf):
         """faf_init refuses to overwrite existing file."""
-        data = _parse(await client.call_tool("faf_init", {"path": full_faf}))
+        data = _parse(await _call_error(client, "faf_init", {"path": full_faf}))
         assert data["success"] is False
         assert "already exists" in data["error"]
 
     async def test_init_original_unchanged(self, client, full_faf):
         """After refused overwrite, original file is untouched."""
         original = Path(full_faf).read_text()
-        await client.call_tool("faf_init", {"path": full_faf})
+        await _call_error(client, "faf_init", {"path": full_faf})
         assert Path(full_faf).read_text() == original
 
     async def test_read_does_not_modify_file(self, client, full_faf):
@@ -612,7 +624,7 @@ class TestTier6Safety:
         tools_with_path = ["faf_read", "faf_validate", "faf_stringify",
                            "faf_context", "faf_gemini", "faf_agents"]
         for tool_name in tools_with_path:
-            data = _parse(await client.call_tool(tool_name, {"path": "/nonexistent.faf"}))
+            data = _parse(await _call_error(client, tool_name, {"path": "/nonexistent.faf"}))
             assert "error" in data, f"{tool_name} missing 'error' on failure"
 
 
@@ -629,7 +641,7 @@ class TestTier7Contract:
         assert isinstance(data["data"], dict)
 
     async def test_read_error_schema(self, client):
-        data = _parse(await client.call_tool("faf_read", {"path": "/x.faf"}))
+        data = _parse(await _call_error(client, "faf_read", {"path": "/x.faf"}))
         assert set(data.keys()) == {"success", "error"}
 
     async def test_validate_success_schema(self, client, full_faf):
@@ -642,7 +654,7 @@ class TestTier7Contract:
         assert set(data.keys()) == {"score", "tier", "populated", "active", "total"}
 
     async def test_score_error_schema(self, client):
-        data = _parse(await client.call_tool("faf_score", {"path": "/x.faf"}))
+        data = _parse(await _call_error(client, "faf_score", {"path": "/x.faf"}))
         assert "score" in data
         assert "tier" in data
         assert "error" in data
@@ -650,7 +662,7 @@ class TestTier7Contract:
     async def test_discover_found_schema(self, client, full_faf):
         search_dir = str(Path(full_faf).parent)
         data = _parse(await client.call_tool("faf_discover", {"start_dir": search_dir}))
-        assert set(data.keys()) == {"found", "path"}
+        assert set(data.keys()) == {"found", "path", "searched_from"}
 
     async def test_discover_not_found_schema(self, client, empty_dir):
         data = _parse(await client.call_tool("faf_discover", {"start_dir": empty_dir}))
@@ -662,7 +674,7 @@ class TestTier7Contract:
         assert set(data.keys()) == {"success", "path", "message"}
 
     async def test_init_error_schema(self, client, full_faf):
-        data = _parse(await client.call_tool("faf_init", {"path": full_faf}))
+        data = _parse(await _call_error(client, "faf_init", {"path": full_faf}))
         assert set(data.keys()) == {"success", "error"}
 
     async def test_stringify_success_schema(self, client, full_faf):
@@ -955,7 +967,7 @@ class TestAutoTier3Aero:
 
     async def test_auto_invalid_directory(self, client):
         """Nonexistent dir → success=False."""
-        data = _parse(await client.call_tool("faf_auto", {"directory": "/nonexistent/dir/xyz"}))
+        data = _parse(await _call_error(client, "faf_auto", {"directory": "/nonexistent/dir/xyz"}))
         assert data["success"] is False
         assert "error" in data
 
@@ -979,7 +991,7 @@ class TestAutoTier7Contract:
 
     async def test_auto_error_schema(self, client):
         """Error return keys match expected schema."""
-        data = _parse(await client.call_tool("faf_auto", {"directory": "/nonexistent"}))
+        data = _parse(await _call_error(client, "faf_auto", {"directory": "/nonexistent"}))
         assert set(data.keys()) == {"success", "error"}
 
 

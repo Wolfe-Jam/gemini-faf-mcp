@@ -15,6 +15,7 @@ import sys
 from pathlib import Path
 
 from faf_sdk import (
+    _kernel_yaml,  # the kernel's YAML loader; private in faf-python-sdk 2.0.0
     author_agents_md,
     author_gemini_md,
     detect_dart_project,
@@ -26,6 +27,8 @@ from faf_sdk import (
 )
 from faf_sdk.parser import FafParseError
 from fastmcp import FastMCP
+from fastmcp.server.middleware import Middleware
+from fastmcp.tools.base import ToolResult
 from mcp.types import ToolAnnotations
 
 from inject import InjectRefused, inject_faf_block
@@ -82,6 +85,35 @@ mcp = FastMCP(
     version=__version__,
     instructions=SERVER_INSTRUCTIONS,
 )
+
+
+class _FailureIsError(Middleware):
+    """A tool that answers ``success: false`` (or ``error`` with no ``success``)
+    is an error to the client too:
+    MCP's ``isError`` is set, so a client can tell a refusal or a missing file
+    from a result. The dict the tool returns is unchanged (same content, same
+    structured content), and calling the tool functions directly is unchanged."""
+
+    async def on_call_tool(self, context, call_next):
+        result = await call_next(context)
+        data = result.structured_content
+        failed = isinstance(data, dict) and (
+            data.get("success") is False
+            # faf_score and faf_model report failure as {"error": ...} with no
+            # "success" key; no successful result carries "error".
+            or ("error" in data and data.get("success") is not True)
+        )
+        if failed and not result.is_error:
+            return ToolResult(
+                content=result.content,
+                structured_content=data,
+                meta=result.meta,
+                is_error=True,
+            )
+        return result
+
+
+mcp.add_middleware(_FailureIsError())
 
 # --- Mk4 scoring helper ---
 
@@ -156,7 +188,16 @@ def faf_score(path: str = "project.faf") -> dict:
     Uses the Mk4 always-33 scoring engine (faf-kernel parity) for universal parity.
     Use this for status checks; use faf_validate when you need error details."""
     try:
-        mk4 = _mk4_score_file(path)
+        # The scorer alone scores YAML the kernel can't read as 0 and never
+        # says why. Check with the kernel's own loader (what score_faf uses,
+        # faf-cli parity: tags are fine, duplicate keys are not), on the same
+        # text that gets scored. An empty file is not a failure: 0, White.
+        text = Path(confine_path(path)).read_text()
+        try:
+            _kernel_yaml.load(text)
+        except _kernel_yaml.KernelYamlError as e:
+            return {"score": 0, "tier": "WHITE", "error": f"Invalid YAML: {e}"}
+        mk4 = score_faf(text)
         return {
             "score": mk4.score,
             "tier": mk4.tier,
@@ -176,9 +217,11 @@ def faf_discover(start_dir: str = ".") -> dict:
     Searches the current directory and parent directories for project.faf.
     Use this before faf_read to locate the file automatically."""
     result = find_faf_file(start_dir)
+    # Resolved like the path find_faf_file returns, so the two compare.
+    searched_from = str(Path(start_dir).resolve())
     if result and Path(result).is_file():
-        return {"found": True, "path": result}
-    return {"found": False, "searched_from": os.path.abspath(start_dir)}
+        return {"found": True, "path": result, "searched_from": searched_from}
+    return {"found": False, "searched_from": searched_from}
 
 
 @mcp.tool(annotations=WRITES)
