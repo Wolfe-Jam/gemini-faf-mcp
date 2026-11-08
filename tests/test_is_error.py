@@ -104,3 +104,11 @@ async def test_score_invalid_yaml_is_an_error(project):
     assert r.is_error is True
     assert r.structured_content["score"] == 0
     assert "Invalid YAML" in r.structured_content["error"]
+
+
+async def test_discover_not_found_is_a_result(tmp_path, monkeypatch):
+    # /faf:setup reads found: false as "create one", so it must stay a result.
+    monkeypatch.chdir(tmp_path)
+    r = await _call("faf_discover", {"start_dir": str(tmp_path)})
+    assert r.is_error is False
+    assert r.structured_content["found"] is False

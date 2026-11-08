@@ -23,6 +23,8 @@ Edit project.faf to improve your score.
 ```
 If `faf_init` returns an error, show its `error` text and stop.
 
+An older `.faf` file (not `project.faf`) in this directory doesn't count: create `project.faf` beside it, which is the file `/faf:score` and `/faf:export` look for.
+
 ## Rules
 
 - Run faf_discover first, then faf_init only when this directory has no project.faf. faf_init never overwrites, and a refusal is reported as an error.
