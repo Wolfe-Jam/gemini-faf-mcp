@@ -17,7 +17,7 @@ Stop re-explaining your project to every new Gemini session. Every Gemini conver
 
 [![PyPI](https://img.shields.io/pypi/v/gemini-faf-mcp?style=for-the-badge&logo=pypi&logoColor=white)](https://pypi.org/project/gemini-faf-mcp/)
 [![FAF Trophy 100%](https://img.shields.io/badge/FAF-%F0%9F%8F%86%20100%25-000000?labelColor=FF6B35)](https://faf.one)
-[![Tests](https://img.shields.io/badge/Tests-320%20passing-brightgreen?style=for-the-badge)](https://github.com/Wolfe-Jam/gemini-faf-mcp)
+[![Tests](https://img.shields.io/badge/Tests-345%20passing-brightgreen?style=for-the-badge)](https://github.com/Wolfe-Jam/gemini-faf-mcp)
 [![IANA: vnd.faf+yaml](https://img.shields.io/badge/IANA-vnd.faf%2Byaml-00D4D4?style=for-the-badge)](https://www.iana.org/assignments/media-types/application/vnd.faf+yaml)
 [![IANA: vnd.fafm+yaml](https://img.shields.io/badge/IANA-vnd.fafm%2Byaml-00D4D4?style=for-the-badge)](https://www.iana.org/assignments/media-types/application/vnd.fafm+yaml)
 [![DOI: Context paper](https://img.shields.io/badge/DOI-Context%20paper-FF6B35?style=for-the-badge)](https://doi.org/10.5281/zenodo.18251362)
@@ -41,7 +41,15 @@ Gemini: [now ready to help]
 
 `.faf` is read once at session start. Every tool call lands on a Gemini that already knows your project.
 
-### What's New in v3.2.0 — The Straight Answers Edition
+### What's New in v3.2.1 — The Straight Answers Edition
+
+**3.2.1 lifts gemini-faf-mcp into Antigravity CLI: it installs as a plugin and works in your project.**
+
+- **Installs in Antigravity CLI** (`agy`, Google's successor to Gemini CLI): `agy plugin install https://github.com/Wolfe-Jam/gemini-faf-mcp`. Moving from Gemini CLI, `agy plugin import gemini` now converts the extension cleanly.
+- **Works in your project there.** `agy` starts a plugin's server in the plugin's own folder; gemini-faf-mcp now finds your project and writes there, never to a folder broader than it.
+- **The skills are `/setup`, `/score` and `/export` in `agy`** (`/faf:setup` and so on in Gemini CLI).
+
+#### v3.2.0 — The Straight Answers Edition
 
 **Every gemini-faf-mcp failure now reaches your client as an error: MCP's isError is set, the reason text is unchanged, and /faf:setup checks before it creates.**
 
@@ -116,11 +124,11 @@ Still on Gemini CLI through work? `gemini extensions install https://github.com/
 
 ### 3. Author your project context
 
-Ask the agent to run the **setup** skill (in Gemini CLI: `/faf:setup`).
+Run `/setup` (in Gemini CLI: `/faf:setup`).
 
-That writes a starter `project.faf` and scores it. Then ask Gemini to fill it in from your repo (it calls `faf_auto`), and run the **score** skill (`/faf:score` in Gemini CLI) to see what's left. From then on, every Gemini session in this project reads it automatically.
+That writes a starter `project.faf` and scores it. Then ask Gemini to fill it in from your repo (it calls `faf_auto`), and run `/score` (`/faf:score` in Gemini CLI) to see what's left. From then on, every Gemini session in this project reads it automatically.
 
-> **Tip:** Trophy ✪ = 100%: AI is optimized to code. The score skill shows exactly which slots are still empty.
+> **Tip:** Trophy ✪ = 100%: AI is optimized to code. `/score` shows exactly which slots are still empty.
 
 ---
 
@@ -155,7 +163,7 @@ You don't replace it. `.faf` **authors** it. Run `faf_gemini` and you get a fres
 
 ```bash
 > /faf:export
-# Authors GEMINI.md from project.faf (Gemini CLI; in Antigravity, ask for the export skill)
+# Authors GEMINI.md from project.faf (in Antigravity: /export)
 ```
 
 `.faf` is the source. `GEMINI.md` is one of its outputs. Same logic for `AGENTS.md` (OpenAI Codex), `.cursorrules`, `CLAUDE.md`, and others — write once, render everywhere.
@@ -312,7 +320,7 @@ Your `.faf` file is scored on completeness — how many slots are filled with re
 ## Architecture
 
 ```
-gemini-faf-mcp v3.2.0
+gemini-faf-mcp v3.2.1
 ├── server.py              → FastMCP MCP server (13 tools, dual-transport, Mk4 scoring)
 ├── safe_path.py           → path confinement for caller-supplied `path` args
 ├── inject.py              → non-destructive faf-managed-block injection
@@ -333,7 +341,7 @@ pip3 install -e ".[dev]"
 python -m pytest tests/ -v
 ```
 
-320 tests passing across the FastMCP server, CLI flags, Cloud Function, Mk4 WJTTC championship, Full-Facts grounding, path-confinement, write-guard, model-parity, Dart detection, and client-telemetry suites. Championship-grade test coverage — [WJTTC certified](https://github.com/Wolfe-Jam/WJTTC).
+345 tests passing across the FastMCP server, CLI flags, Cloud Function, Mk4 WJTTC championship, Full-Facts grounding, path-confinement, write-guard, model-parity, Dart detection, and client-telemetry suites. Championship-grade test coverage — [WJTTC certified](https://github.com/Wolfe-Jam/WJTTC).
 
 ---
 
