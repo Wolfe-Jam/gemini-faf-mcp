@@ -9,6 +9,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 ## [Unreleased]
 
 ### Fixed
+- **Works in your project under Antigravity CLI.** `agy` starts a plugin's MCP server in the plugin's own folder (`~/.gemini/config/plugins/gemini-faf-mcp`), so every write to your project was refused ("path escapes FAF_ALLOWED_ROOTS") and `faf_discover` found the plugin's own `project.faf`. At startup (local stdio only), when the server finds itself in its own plugin folder (`gemini-extension.json` or `plugin.json` named gemini-faf-mcp) and `PWD` is another existing folder, it works there: the folder `agy` was run in. Nothing changes for Claude Code, Gemini CLI, `uvx` by hand, or the hosted server. (`agy`'s plugin config fills in no workspace variable, and agy 1.5.5 can't answer an MCP roots round trip, so this is the signal it gives.) Checked under the real `agy` 1.5.5: `faf_discover` finds the project's file, `faf_init` writes into the project, and a non-UTF-8 GEMINI.md is refused by its own rule.
 - **The extension converts to an Antigravity plugin.** The repo carried `.gemini/project.faf`, a link to `../project.faf` used only while working on this repo. Gemini CLI's install rewrote it to point at a temporary folder that it then deleted, so `agy plugin import gemini` stopped with `stat …/.gemini/project.faf: no such file or directory`. The `.gemini/` folder is gone (the link and a stale `context.yaml`; nothing used them), and a test fails if the repo tracks a symlink again.
 
 ### Changed

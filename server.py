@@ -10,8 +10,10 @@ Spec: https://faf.one
 """
 
 import functools
+import json
 import os
 import sys
+from collections.abc import Mapping
 from pathlib import Path
 
 from faf_sdk import (
@@ -977,6 +979,42 @@ def _handle_flags(argv: list[str]) -> int | None:
     return None
 
 
+def _start_in_workspace(cwd: str | None = None, env: Mapping[str, str] | None = None) -> str | None:
+    """Move to the user's project when a host started us in our own plugin folder.
+
+    Antigravity CLI (`agy`) starts a plugin's MCP server with its working
+    directory set to the plugin's install folder (e.g.
+    `~/.gemini/config/plugins/gemini-faf-mcp`), not the project. Every relative
+    path, `faf_discover` with no arguments and the write boundary (cwd) then
+    point at the plugin, so writes to the project are refused. Its plugin
+    config substitutes no workspace variable, and agy 1.5.5 can't answer an MCP
+    roots round trip, but the inherited `PWD` is the folder agy was run in.
+
+    Acts only when all hold: the cwd holds *our* manifest (gemini-extension.json
+    or agy's plugin.json, named gemini-faf-mcp), PWD is an absolute, existing folder, and it differs
+    from the cwd. Anything else (Claude Code, Gemini CLI, uvx by hand, this
+    repo itself) is left alone. Returns the folder moved to, or None.
+    """
+    environ: Mapping[str, str] = os.environ if env is None else env
+    here = Path(cwd or os.getcwd()).resolve()
+    names = []
+    for manifest in (here / "gemini-extension.json", here / "plugin.json"):
+        try:
+            names.append(json.loads(manifest.read_text(encoding="utf-8")).get("name"))
+        except (OSError, ValueError, AttributeError):
+            continue
+    if "gemini-faf-mcp" not in names:
+        return None
+    pwd = environ.get("PWD")
+    if not pwd or not Path(pwd).is_absolute() or not Path(pwd).is_dir():
+        return None
+    target = Path(pwd).resolve()
+    if target == here:
+        return None
+    os.chdir(target)
+    return str(target)
+
+
 def main() -> None:
     """Single entry for both the console script (`gemini-faf-mcp`, via
     pyproject [project.scripts]) and `python server.py`.
@@ -997,6 +1035,9 @@ def main() -> None:
     _port = os.environ.get("PORT")
     _raw = os.environ.get("MCP_TRANSPORT", "http" if _port else "stdio")
     if _raw == "stdio":
+        moved = _start_in_workspace()
+        if moved:
+            print(f"gemini-faf-mcp: started in its plugin folder; working in {moved}", file=sys.stderr)
         mcp.run(transport="stdio")
     elif _raw in ("http", "sse", "streamable-http"):
         from typing import Literal, cast
