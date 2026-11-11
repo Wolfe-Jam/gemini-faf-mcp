@@ -13,6 +13,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
 ### Changed
 - **Antigravity CLI first** in the README, `docs/SETUP.md` and the project page: install with `agy plugin install https://github.com/Wolfe-Jam/gemini-faf-mcp`; a note for anyone moving from Gemini CLI (and the fix for the import error above); the Gemini CLI line kept for work accounts. The skills are named `setup`, `score` and `export` in Antigravity (`/faf:…` in Gemini CLI). `docs/SETUP.md` needs Python 3.11+, not 3.10. `gemini-faf-mcp --help`, the extension description and the skill prompts no longer send people to Gemini CLI only.
+- **`project.faf` describes the Antigravity era** (who, where, how, current focus), and `when` is now the stage and since when (`Stable since Jan 2026; moving to Antigravity CLI`) instead of a usage line. Still ✪ 100%; CLAUDE.md re-synced.
 
 ## [3.2.0] - 2026-11-08 — The Straight Answers Edition
 

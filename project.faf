@@ -8,7 +8,7 @@ ai_tldr:
   project: gemini-faf-mcp - MCP server for FAF project context (Gemini CLI)
   stack: Python + FastMCP + faf-python-sdk + Cloud Run
   quality_bar: production_ready
-  current_focus: Gemini Extensions Gallery listing
+  current_focus: Antigravity CLI plugin, moving users over from Gemini CLI
   your_role: Build features with perfect context
 instant_context:
   what_building: "Native MCP server for FAF \u2014 13 tools for Gemini CLI, plus Cloud\
@@ -111,12 +111,12 @@ tags:
 - iana-registered
 - pypi
 human_context:
-  who: Gemini CLI developers who want instant project context
+  who: Developers using Gemini in Antigravity CLI (or Gemini CLI on work accounts) who want instant project context
   what: MCP server that reads, validates, scores, and exports .faf project DNA
   why: Eliminate re-explaining your project every Gemini session
-  where: Gemini CLI via Extensions Gallery, local MCP server
-  when: "Every coding session \u2014 context loads automatically via GEMINI.md"
-  how: Install extension, run /faf:setup, project DNA flows to Gemini
+  where: Antigravity CLI plugin (agy plugin install), Gemini CLI extension, any MCP client via uvx
+  when: Stable since Jan 2026; moving to Antigravity CLI
+  how: Install the plugin, run the setup skill; Gemini reads project.faf through the faf tools
 ai_scoring_details:
   system_date: 2025-09-20
   slot_based_percentage: 100
