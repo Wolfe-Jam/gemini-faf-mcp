@@ -125,3 +125,45 @@ async def test_server_started_in_plugin_folder_works_in_the_project(tmp_path):
         assert wrote.is_error is False, wrote.structured_content
     assert (project / "AGENTS.md").is_file()
     assert not (plugin / "AGENTS.md").exists()
+
+
+async def test_faf_init_writes_into_an_empty_project(tmp_path):
+    """As in the agy check: faf_init in a project with no project.faf creates it there."""
+    from fastmcp.client import Client
+    from fastmcp.client.transports import StdioTransport
+
+    home, plugin, project = _layout(tmp_path)
+    server_tmp = tmp_path / "server-tmp"
+    server_tmp.mkdir()
+    env = {
+        "PATH": os.environ.get("PATH", ""),
+        "HOME": str(home),
+        "PYTHONPATH": str(REPO / "src"),
+        "TMPDIR": str(server_tmp),
+        "PLUGIN_ROOT": str(plugin),
+        "PWD": str(project),
+    }
+    transport = StdioTransport(command=sys.executable, args=[str(REPO / "server.py")], env=env, cwd=str(plugin))
+    async with Client(transport) as c:
+        r = await c.call_tool_mcp("faf_init", {"name": "fresh"})
+        assert r.is_error is False, r.structured_content
+    assert (project / "project.faf").is_file()
+    assert "the-plugin-itself" in (plugin / "project.faf").read_text()
+
+
+@pytest.mark.parametrize("transport", ["http", "sse", "streamable-http"])
+def test_hosted_transports_never_move(monkeypatch, transport):
+    """Only stdio calls _start_in_workspace; the hosted server is left alone."""
+    import server
+
+    called = []
+    monkeypatch.setattr(server, "_start_in_workspace", lambda *a, **k: called.append(1))
+    monkeypatch.setattr(server.mcp, "run", lambda *a, **k: None)
+    monkeypatch.setattr(sys, "argv", ["gemini-faf-mcp"])
+    monkeypatch.setenv("MCP_TRANSPORT", transport)
+    monkeypatch.delenv("PORT", raising=False)
+    server.main()
+    assert called == []
+    monkeypatch.setenv("MCP_TRANSPORT", "stdio")
+    server.main()
+    assert called == [1]
