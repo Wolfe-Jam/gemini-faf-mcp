@@ -209,7 +209,7 @@ You don't replace it. `.faf` **authors** it. Run `faf_gemini` and you get a fres
 
 ## Google Antigravity
 
-Antigravity reads one MCP config file, `~/.gemini/config/mcp_config.json`, and takes both modes.
+Antigravity reads MCP servers from `~/.gemini/config/mcp_config.json` (every project) or `.agents/mcp_config.json` (one project); both take both modes. A plugin installed with `agy plugin install` brings its own.
 
 Local (stdio):
 

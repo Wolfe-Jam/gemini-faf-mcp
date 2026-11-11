@@ -8,7 +8,7 @@ You are running the FAF Export command. Export the project's .faf DNA to context
 1. Use `faf_discover` to find the .faf file.
 
 2. If no .faf file found:
-   - Tell the user: "No .faf file found. Run `/faf:setup` to create one first."
+   - Tell the user: "No .faf file found. Run the setup skill (`/faf:setup` in Gemini CLI) to create one first."
    - Stop here.
 
 3. Use `faf_read` to load the project data and `faf_score` for the current score.
@@ -22,7 +22,7 @@ You are running the FAF Export command. Export the project's .faf DNA to context
 5. Ask the user which format(s) to export:
 
    "Which format would you like to export?
-   1. **GEMINI.md** — Context for Gemini CLI (auto-loaded by gemini-faf-mcp extension)
+   1. **GEMINI.md** — Context for Gemini CLI, which reads GEMINI.md from your project
    2. **AGENTS.md** — Universal agent context (OpenAI Codex, Cursor, any AI)
    3. **Both** — Export both files"
 
@@ -31,7 +31,7 @@ You are running the FAF Export command. Export the project's .faf DNA to context
    **For GEMINI.md:**
    - Use `faf_gemini`: it writes `GEMINI.md` in the project root itself, keeping the user's own text
    - Do not write `GEMINI.md` yourself — that would replace the whole file. If `faf_gemini` refuses, show its reason
-   - Note: "GEMINI.md is auto-loaded by this extension — Gemini will read it on every session"
+   - Note: "Gemini CLI reads GEMINI.md from your project on every session"
 
    **For AGENTS.md:**
    - Use `faf_agents`: it writes `AGENTS.md` in the project root itself, keeping the user's own text
@@ -52,7 +52,7 @@ You are running the FAF Export command. Export the project's .faf DNA to context
    ```
 
 8. If the score is below 85%, add:
-   "Tip: Your score is {score}%. Run `/faf:score` to see how to improve it."
+   "Tip: Your score is {score}%. Run the score skill (`/faf:score` in Gemini CLI) to see how to improve it."
 
 ## File Format Notes
 

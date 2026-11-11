@@ -22,5 +22,6 @@ def test_no_tracked_symlinks():
     out = subprocess.run(
         ["git", "ls-files", "-s"], cwd=ROOT, capture_output=True, text=True, check=True
     ).stdout
-    links = [line.split("\t", 1)[1] for line in out.splitlines() if line.startswith("120000 ")]
-    assert links == [], f"tracked symlinks ship in the extension and break agy plugin import: {links}"
+    # 120000 = symlink, 160000 = submodule: neither copies cleanly into an extension.
+    links = [line.split("\t", 1)[1] for line in out.splitlines() if line.split(" ", 1)[0] in ("120000", "160000")]
+    assert links == [], f"tracked symlinks or submodules ship in the extension and break agy plugin import: {links}"
