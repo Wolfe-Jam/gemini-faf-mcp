@@ -10,7 +10,6 @@ Spec: https://faf.one
 """
 
 import functools
-import json
 import os
 import sys
 from collections.abc import Mapping
@@ -980,7 +979,7 @@ def _handle_flags(argv: list[str]) -> int | None:
 
 
 def _start_in_workspace(cwd: str | None = None, env: Mapping[str, str] | None = None) -> str | None:
-    """Move to the user's project when a host started us in our own plugin folder.
+    """Move to the user's project when Antigravity starts us in our plugin folder.
 
     Antigravity CLI (`agy`) starts a plugin's MCP server with its working
     directory set to the plugin's install folder (e.g.
@@ -988,28 +987,30 @@ def _start_in_workspace(cwd: str | None = None, env: Mapping[str, str] | None = 
     path, `faf_discover` with no arguments and the write boundary (cwd) then
     point at the plugin, so writes to the project are refused. Its plugin
     config substitutes no workspace variable, and agy 1.5.5 can't answer an MCP
-    roots round trip, but the inherited `PWD` is the folder agy was run in.
+    roots round trip; but it sets `PLUGIN_ROOT` (= that folder) for every plugin
+    MCP server, and the inherited `PWD` is the folder agy was run in.
 
-    Acts only when all hold: the cwd holds *our* manifest (gemini-extension.json
-    or agy's plugin.json, named gemini-faf-mcp), PWD is an absolute, existing folder, and it differs
-    from the cwd. Anything else (Claude Code, Gemini CLI, uvx by hand, this
-    repo itself) is left alone. Returns the folder moved to, or None.
+    Acts only when all hold:
+    - `PLUGIN_ROOT` is set and is the cwd (Antigravity started us as a plugin;
+      Claude Code, Gemini CLI, uvx and a dev checkout don't set it);
+    - `PWD` is an absolute, existing folder, different from the cwd;
+    - `PWD` is not the filesystem root, the home folder, a folder that contains
+      the plugin folder (e.g. `~/.gemini`), or inside the plugin folder: those
+      would widen the write boundary, so we stay put and writes stay refused.
+    Returns the folder moved to, or None.
     """
     environ: Mapping[str, str] = os.environ if env is None else env
     here = Path(cwd or os.getcwd()).resolve()
-    names = []
-    for manifest in (here / "gemini-extension.json", here / "plugin.json"):
-        try:
-            names.append(json.loads(manifest.read_text(encoding="utf-8")).get("name"))
-        except (OSError, ValueError, AttributeError):
-            continue
-    if "gemini-faf-mcp" not in names:
+    plugin_root = environ.get("PLUGIN_ROOT")
+    if not plugin_root or Path(plugin_root).resolve() != here:
         return None
     pwd = environ.get("PWD")
     if not pwd or not Path(pwd).is_absolute() or not Path(pwd).is_dir():
         return None
     target = Path(pwd).resolve()
-    if target == here:
+    home = Path(environ.get("HOME") or Path.home()).resolve()
+    too_broad = target == Path(target.anchor) or target == home or here.is_relative_to(target)
+    if target == here or too_broad or target.is_relative_to(here):
         return None
     os.chdir(target)
     return str(target)
