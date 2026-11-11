@@ -102,19 +102,21 @@ uvx gemini-faf-mcp          # zero-install run via uvx (fetched from PyPI)
 # or: pip3 install gemini-faf-mcp
 ```
 
-### 2. Add to Gemini CLI
+### 2. Add to Antigravity CLI
 
 ```bash
-gemini extensions install https://github.com/Wolfe-Jam/gemini-faf-mcp
+agy plugin install https://github.com/Wolfe-Jam/gemini-faf-mcp
 ```
+
+Google replaced Gemini CLI with Antigravity CLI (`agy`) in 2026. The plugin brings the MCP server and the `setup`, `score` and `export` skills.
+
+**Moving from Gemini CLI?** `agy plugin import gemini` converts the extension you already have. If it stops on `.gemini/project.faf`, that's a link older versions shipped: delete `~/.gemini/extensions/gemini-faf-mcp/.gemini/project.faf` and run the import again, or install fresh with the line above.
+
+Still on Gemini CLI through work? `gemini extensions install https://github.com/Wolfe-Jam/gemini-faf-mcp` installs the same extension.
 
 ### 3. Author your project context
 
-In your Gemini CLI:
-
-```
-> /faf:setup
-```
+Run the **setup** skill (in Gemini CLI: `/faf:setup`).
 
 That writes a starter `project.faf` and scores it. Then ask Gemini to fill it in from your repo (it calls `faf_auto`), and run `/faf:score` to see what's left. From then on, every Gemini session in this project reads it automatically.
 
@@ -291,7 +293,7 @@ Your `.faf` file is scored on completeness — how many slots are filled with re
 
 ---
 
-## Using with Gemini CLI
+## Using with Antigravity or Gemini CLI
 
 ```
 > Create a .faf file for my Python FastAPI project
