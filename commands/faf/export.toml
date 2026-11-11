@@ -56,7 +56,7 @@ You are running the FAF Export command. Export the project's .faf DNA to context
 
 ## File Format Notes
 
-- **GEMINI.md**: Gemini CLI's hierarchical, `@file`-importable format — setup, verify, key files, stack, confirm-first actions. Auto-loaded by the gemini-faf-mcp extension via contextFileName in gemini-extension.json.
+- **GEMINI.md**: Gemini CLI's hierarchical, `@file`-importable format — setup, verify, key files, stack, confirm-first actions. Gemini CLI reads GEMINI.md from your project on every session.
 - **AGENTS.md**: Markdown format compatible with the AGENTS.md convention used by OpenAI Codex and other tools.
 - Both files are authored from the single source of truth: project.faf
 

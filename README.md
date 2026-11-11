@@ -155,7 +155,7 @@ You don't replace it. `.faf` **authors** it. Run `faf_gemini` and you get a fres
 
 ```bash
 > /faf:export
-# Authors GEMINI.md from project.faf
+# Authors GEMINI.md from project.faf (Gemini CLI; in Antigravity, ask for the export skill)
 ```
 
 `.faf` is the source. `GEMINI.md` is one of its outputs. Same logic for `AGENTS.md` (OpenAI Codex), `.cursorrules`, `CLAUDE.md`, and others — write once, render everywhere.
