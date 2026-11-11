@@ -108,19 +108,19 @@ uvx gemini-faf-mcp          # zero-install run via uvx (fetched from PyPI)
 agy plugin install https://github.com/Wolfe-Jam/gemini-faf-mcp
 ```
 
-Google replaced Gemini CLI with Antigravity CLI (`agy`) in 2026. The plugin brings the MCP server and the `setup`, `score` and `export` skills.
+Antigravity CLI (`agy`) is Google's successor to Gemini CLI ([announcement](https://developers.googleblog.com/an-important-update-transitioning-gemini-cli-to-antigravity-cli/)). The plugin brings the MCP server and the `setup`, `score` and `export` skills.
 
-**Moving from Gemini CLI?** `agy plugin import gemini` converts the extension you already have. If it stops on `.gemini/project.faf`, that's a link older versions shipped: delete `~/.gemini/extensions/gemini-faf-mcp/.gemini/project.faf` and run the import again, or install fresh with the line above.
+**Moving from Gemini CLI?** `agy plugin import gemini` converts the extension you already have. If it stops on `.gemini/project.faf`, that's a link versions up to 3.2.0 shipped: `rm -f ~/.gemini/extensions/gemini-faf-mcp/.gemini/project.faf`, then run the import again, or install fresh with the line above.
 
 Still on Gemini CLI through work? `gemini extensions install https://github.com/Wolfe-Jam/gemini-faf-mcp` installs the same extension.
 
 ### 3. Author your project context
 
-Run the **setup** skill (in Gemini CLI: `/faf:setup`).
+Ask the agent to run the **setup** skill (in Gemini CLI: `/faf:setup`).
 
-That writes a starter `project.faf` and scores it. Then ask Gemini to fill it in from your repo (it calls `faf_auto`), and run `/faf:score` to see what's left. From then on, every Gemini session in this project reads it automatically.
+That writes a starter `project.faf` and scores it. Then ask Gemini to fill it in from your repo (it calls `faf_auto`), and run the **score** skill (`/faf:score` in Gemini CLI) to see what's left. From then on, every Gemini session in this project reads it automatically.
 
-> **Tip:** Trophy ✪ = 100%: AI is optimized to code. `/faf:score` shows exactly which slots are still empty.
+> **Tip:** Trophy ✪ = 100%: AI is optimized to code. The score skill shows exactly which slots are still empty.
 
 ---
 

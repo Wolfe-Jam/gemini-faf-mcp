@@ -12,7 +12,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 - **The extension converts to an Antigravity plugin.** The repo carried `.gemini/project.faf`, a link to `../project.faf` used only while working on this repo. Gemini CLI's install rewrote it to point at a temporary folder that it then deleted, so `agy plugin import gemini` stopped with `stat …/.gemini/project.faf: no such file or directory`. The `.gemini/` folder is gone (the link and a stale `context.yaml`; nothing used them), and a test fails if the repo tracks a symlink again.
 
 ### Changed
-- **README: Antigravity CLI first.** Install with `agy plugin install https://github.com/Wolfe-Jam/gemini-faf-mcp`; a note for anyone moving from Gemini CLI (and the fix for the import error above); the Gemini CLI line kept for work accounts.
+- **Antigravity CLI first** in the README, `docs/SETUP.md` and the project page: install with `agy plugin install https://github.com/Wolfe-Jam/gemini-faf-mcp`; a note for anyone moving from Gemini CLI (and the fix for the import error above); the Gemini CLI line kept for work accounts. The skills are named `setup`, `score` and `export` in Antigravity (`/faf:…` in Gemini CLI). `docs/SETUP.md` needs Python 3.11+, not 3.10.
 
 ## [3.2.0] - 2026-11-08 — The Straight Answers Edition
 

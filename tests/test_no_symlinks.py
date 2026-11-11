@@ -7,13 +7,18 @@ the extension could not move to Antigravity. A plain file or nothing at all is
 safe; a link is not.
 """
 
+import shutil
 import subprocess
 from pathlib import Path
+
+import pytest
 
 ROOT = Path(__file__).resolve().parent.parent
 
 
 def test_no_tracked_symlinks():
+    if not (ROOT / ".git").exists() or shutil.which("git") is None:
+        pytest.skip("needs a git checkout (an sdist or tarball has no .git)")
     out = subprocess.run(
         ["git", "ls-files", "-s"], cwd=ROOT, capture_output=True, text=True, check=True
     ).stdout
