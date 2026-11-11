@@ -111,7 +111,7 @@ tags:
 - iana-registered
 - pypi
 human_context:
-  who: Developers using Gemini in Antigravity CLI (or Gemini CLI on work accounts) who want instant project context
+  who: Developers using Gemini in Antigravity CLI (or Gemini CLI on work accounts) who want instant, persistent project context
   what: MCP server that reads, validates, scores, and exports .faf project DNA
   why: Eliminate re-explaining your project every Gemini session
   where: Antigravity CLI plugin (agy plugin install), Gemini CLI extension, any MCP client via uvx

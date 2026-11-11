@@ -29,7 +29,7 @@ MCP server for FAF — read, validate, auto-detect, score, and export IANA-regis
 
 ## Context
 
-- **Who:** Developers using Gemini in Antigravity CLI (or Gemini CLI on work accounts) who want instant project context
+- **Who:** Developers using Gemini in Antigravity CLI (or Gemini CLI on work accounts) who want instant, persistent project context
 - **What:** MCP server that reads, validates, scores, and exports .faf project DNA
 - **Why:** Eliminate re-explaining your project every Gemini session
 - **Where:** Antigravity CLI plugin (agy plugin install), Gemini CLI extension, any MCP client via uvx
@@ -38,5 +38,5 @@ MCP server for FAF — read, validate, auto-detect, score, and export IANA-regis
 
 ---
 
-*STATUS: SYNC ACTIVE — 2026-11-11T12:55:36.021Z*
+*STATUS: SYNC ACTIVE — 2026-11-11T13:00:49.060Z*
 <!-- faf:end -->
