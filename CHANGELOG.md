@@ -1,12 +1,18 @@
 <!-- faf: gemini-faf-mcp | Python | mcp | FAF MCP server for Google Gemini — persistent project context via PyPI -->
-<!-- faf: doc=changelog | latest=v3.2.0 | canonical=project.faf | family=FAF -->
+<!-- faf: doc=changelog | latest=v3.2.1 | canonical=project.faf | family=FAF -->
 
 # Changelog
 
 All notable changes to gemini-faf-mcp are documented here.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
-## [Unreleased]
+## [3.2.1] - 2026-11-11 — The Straight Answers Edition
+
+**3.2.1 lifts gemini-faf-mcp into Antigravity CLI: it installs as a plugin and works in your project.**
+
+Antigravity CLI (`agy`) is Google's successor to Gemini CLI. Install: `agy plugin install https://github.com/Wolfe-Jam/gemini-faf-mcp`, then run `/setup` in your project.
+
+345 tests pass, 0 fail.
 
 ### Fixed
 - **Works in your project under Antigravity CLI.** `agy` starts a plugin's MCP server in the plugin's own folder (`~/.gemini/config/plugins/gemini-faf-mcp`), so every write to your project was refused ("path escapes FAF_ALLOWED_ROOTS") and `faf_discover` found the plugin's own `project.faf`. At startup (local stdio only), when `PLUGIN_ROOT` (which Antigravity sets for every plugin MCP server) is the current folder and `PWD` is another existing folder, the server works there: the folder `agy` was run in. It never moves to `/`, your home folder, a folder that contains the plugin folder, or a folder inside it; then it stays put and writes stay refused. Nothing changes for Claude Code, Gemini CLI, `uvx` by hand, a dev checkout or the hosted server (none set `PLUGIN_ROOT`). Not fixed on Windows, where `PWD` is usually unset. (`agy`'s plugin config fills in no workspace variable, and agy 1.5.5 can't answer an MCP roots round trip.) Checked under the real `agy` 1.5.5: `faf_discover` finds the project's file, `faf_init` writes into the project, and a non-UTF-8 GEMINI.md is refused by its own rule.
