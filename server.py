@@ -12,6 +12,7 @@ Spec: https://faf.one
 import functools
 import os
 import sys
+from collections.abc import Mapping
 from pathlib import Path
 
 from faf_sdk import (
@@ -977,6 +978,82 @@ def _handle_flags(argv: list[str]) -> int | None:
     return None
 
 
+def _start_in_workspace(cwd: str | None = None, env: Mapping[str, str] | None = None) -> str | None:
+    """Move to the user's project when Antigravity starts us in our plugin folder.
+
+    Antigravity CLI (`agy`) starts a plugin's MCP server with its working
+    directory set to the plugin's install folder (e.g.
+    `~/.gemini/config/plugins/gemini-faf-mcp`), not the project. Every relative
+    path, `faf_discover` with no arguments and the write boundary (cwd) then
+    point at the plugin, so writes to the project are refused. Its plugin
+    config substitutes no workspace variable, and agy 1.5.5 can't answer an MCP
+    roots round trip; but it sets `PLUGIN_ROOT` (= that folder) for every plugin
+    MCP server, and the inherited `PWD` is the folder agy was run in.
+
+    Acts only when all hold:
+    - `PLUGIN_ROOT` is set and is the cwd (Antigravity started us as a plugin;
+      Claude Code, Gemini CLI, uvx and a dev checkout don't set it);
+    - `PWD` is an absolute, existing folder, different from the cwd;
+    - `PWD` is not the filesystem root, the home folder, a folder that contains
+      the plugin folder (e.g. `~/.gemini`), or inside the plugin folder: those
+      would widen the write boundary, so we stay put and writes stay refused.
+    Returns the folder moved to, or None.
+    """
+    environ: Mapping[str, str] = os.environ if env is None else env
+    here = Path(cwd or os.getcwd()).resolve()
+    plugin_root = environ.get("PLUGIN_ROOT")
+    if not plugin_root or not Path(plugin_root).is_absolute() or not _same(plugin_root, here):
+        return None
+    pwd = environ.get("PWD")
+    if not pwd or not Path(pwd).is_absolute() or not Path(pwd).is_dir():
+        return None
+    target = Path(pwd).resolve()
+    # Compare as files on disk, not as text: on a case-insensitive volume
+    # (macOS, Windows) /users/me is the same folder as /Users/me. A folder we
+    # can't check counts as broad (fail closed).
+    broad = [Path(target.anchor), here, *here.parents]
+    home_env = environ.get("HOME")
+    try:
+        broad.append(Path(home_env) if home_env else Path.home())
+    except RuntimeError:  # no HOME and no passwd entry (some containers)
+        pass
+    # The plugin folder reached through another path inside PWD (a firmlink such
+    # as macOS /System/Volumes/Data, a mount alias) means PWD contains it too.
+    alias = target / here.relative_to(here.anchor)
+    if (
+        any(_same_or_unknown(target, p) for p in broad)
+        or any(_same_or_unknown(here, p) for p in target.parents)
+        or (os.path.lexists(alias) and _same_or_unknown(alias, here))
+    ):
+        print(
+            f"gemini-faf-mcp: PWD {target} is too broad or is the plugin folder; staying in {here}",
+            file=sys.stderr,
+        )
+        return None
+    os.chdir(target)
+    return str(target)
+
+
+def _same(a: str | Path, b: str | Path) -> bool:
+    """True when a and b are the same folder on disk (False if either is missing)."""
+    try:
+        return os.path.samefile(a, b)
+    except OSError:
+        return False
+
+
+def _same_or_unknown(a: str | Path, b: str | Path) -> bool:
+    """Like _same, but True when the check itself fails (permissions, I/O): for
+    the broad-folder guard, a folder we can't compare is treated as broad. A
+    folder that doesn't exist can't be the target, so that stays False."""
+    try:
+        return os.path.samefile(a, b)
+    except FileNotFoundError:
+        return False
+    except OSError:
+        return True
+
+
 def main() -> None:
     """Single entry for both the console script (`gemini-faf-mcp`, via
     pyproject [project.scripts]) and `python server.py`.
@@ -997,6 +1074,9 @@ def main() -> None:
     _port = os.environ.get("PORT")
     _raw = os.environ.get("MCP_TRANSPORT", "http" if _port else "stdio")
     if _raw == "stdio":
+        moved = _start_in_workspace()
+        if moved:
+            print(f"gemini-faf-mcp: started in its plugin folder; working in {moved}", file=sys.stderr)
         mcp.run(transport="stdio")
     elif _raw in ("http", "sse", "streamable-http"):
         from typing import Literal, cast
