@@ -1008,11 +1008,23 @@ def _start_in_workspace(cwd: str | None = None, env: Mapping[str, str] | None = 
     if not pwd or not Path(pwd).is_absolute() or not Path(pwd).is_dir():
         return None
     target = Path(pwd).resolve()
-    home = Path(environ.get("HOME") or Path.home())
     # Compare as files on disk, not as text: on a case-insensitive volume
-    # (macOS, Windows) /users/me is the same folder as /Users/me.
-    broad = [Path(target.anchor), home, here, *here.parents]
-    if any(_same(target, p) for p in broad) or any(_same(here, p) for p in target.parents):
+    # (macOS, Windows) /users/me is the same folder as /Users/me. A folder we
+    # can't check counts as broad (fail closed).
+    broad = [Path(target.anchor), here, *here.parents]
+    home_env = environ.get("HOME")
+    try:
+        broad.append(Path(home_env) if home_env else Path.home())
+    except RuntimeError:  # no HOME and no passwd entry (some containers)
+        pass
+    # The plugin folder reached through another path inside PWD (a firmlink such
+    # as macOS /System/Volumes/Data, a mount alias) means PWD contains it too.
+    alias = target / here.relative_to(here.anchor)
+    if (
+        any(_same_or_unknown(target, p) for p in broad)
+        or any(_same_or_unknown(here, p) for p in target.parents)
+        or (os.path.lexists(alias) and _same_or_unknown(alias, here))
+    ):
         print(
             f"gemini-faf-mcp: PWD {target} is too broad or is the plugin folder; staying in {here}",
             file=sys.stderr,
@@ -1028,6 +1040,18 @@ def _same(a: str | Path, b: str | Path) -> bool:
         return os.path.samefile(a, b)
     except OSError:
         return False
+
+
+def _same_or_unknown(a: str | Path, b: str | Path) -> bool:
+    """Like _same, but True when the check itself fails (permissions, I/O): for
+    the broad-folder guard, a folder we can't compare is treated as broad. A
+    folder that doesn't exist can't be the target, so that stays False."""
+    try:
+        return os.path.samefile(a, b)
+    except FileNotFoundError:
+        return False
+    except OSError:
+        return True
 
 
 def main() -> None:

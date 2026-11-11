@@ -201,3 +201,47 @@ def test_hosted_transports_never_move(monkeypatch, transport):
     monkeypatch.setenv("MCP_TRANSPORT", "stdio")
     server.main()
     assert called == [1]
+
+
+def test_a_folder_that_holds_the_plugin_through_an_alias_stays_put(tmp_path, monkeypatch):
+    """R1: like macOS /System/Volumes/Data, a folder can hold the plugin folder through
+    another path without being one of its parents. Built here with a symlink chain."""
+    home, plugin, project = _layout(tmp_path)
+    here = plugin.resolve()
+    alias = tmp_path / "alias-volume"
+    alias.mkdir()
+    top = here.relative_to(here.anchor).parts[0]
+    (alias / top).symlink_to(Path(here.anchor) / top)
+    assert (alias / here.relative_to(here.anchor)).resolve() == here
+    monkeypatch.chdir(plugin)
+    assert _start_in_workspace(env=_env(home, plugin, alias)) is None
+    assert Path.cwd() == here
+
+
+def test_no_home_folder_at_all_does_not_crash(tmp_path, monkeypatch):
+    """R2: HOME unset and Path.home() can't resolve (a uid with no passwd entry)."""
+    home, plugin, project = _layout(tmp_path)
+
+    def no_home():
+        raise RuntimeError("Could not determine home directory.")
+
+    monkeypatch.setattr(Path, "home", staticmethod(no_home))
+    env = _env(home, plugin, project)
+    del env["HOME"]
+    monkeypatch.chdir(plugin)
+    assert _start_in_workspace(env=env) == str(project.resolve())
+
+
+def test_a_folder_that_cannot_be_checked_counts_as_broad(tmp_path, monkeypatch):
+    """R3: if comparing with HOME fails (permissions), stay put rather than guess."""
+    home, plugin, project = _layout(tmp_path)
+    real = os.path.samefile
+
+    def flaky(a, b):
+        if Path(b) == home or Path(a) == home:
+            raise PermissionError("denied")
+        return real(a, b)
+
+    monkeypatch.setattr(os.path, "samefile", flaky)
+    monkeypatch.chdir(plugin)
+    assert _start_in_workspace(env=_env(home, plugin, project)) is None
