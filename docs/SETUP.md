@@ -1,6 +1,18 @@
 # Setup Guide — gemini-faf-mcp
 
-## Install
+## Install (Antigravity CLI)
+
+```bash
+agy plugin install https://github.com/Wolfe-Jam/gemini-faf-mcp
+```
+
+Antigravity CLI (`agy`) is Google's successor to Gemini CLI ([announcement](https://developers.googleblog.com/an-important-update-transitioning-gemini-cli-to-antigravity-cli/)). The plugin brings the MCP server and the `setup`, `score` and `export` skills. Run `agy` inside your project and ask the agent to run the **setup** skill.
+
+**Moving from Gemini CLI?** `agy plugin import gemini` converts the extension you already have. If it stops on `.gemini/project.faf` (a link versions up to 3.2.0 shipped): `rm -f ~/.gemini/extensions/gemini-faf-mcp/.gemini/project.faf`, then run the import again.
+
+## Gemini CLI (work accounts)
+
+The rest of this guide is for Gemini CLI.
 
 ```bash
 gemini extensions install https://github.com/Wolfe-Jam/gemini-faf-mcp
@@ -112,6 +124,6 @@ python -m pytest tests/ -v
 
 ## Requirements
 
-- Python 3.10+
-- Gemini CLI installed
+- Python 3.11+
+- Antigravity CLI, or Gemini CLI
 - See `docs/SYS-REQS.md` for full requirements

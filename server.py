@@ -956,7 +956,8 @@ Usage:
 Run on its own, it waits silently for an MCP client. That's correct; Ctrl+C to quit.
 
 Add it to a client:
-  gemini extensions install https://github.com/Wolfe-Jam/gemini-faf-mcp
+  agy plugin install https://github.com/Wolfe-Jam/gemini-faf-mcp         (Antigravity CLI)
+  gemini extensions install https://github.com/Wolfe-Jam/gemini-faf-mcp  (Gemini CLI)
   { "mcpServers": { "gemini-faf": { "command": "uvx", "args": ["gemini-faf-mcp"] } } }
 
 https://github.com/Wolfe-Jam/gemini-faf-mcp"""

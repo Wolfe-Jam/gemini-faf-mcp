@@ -102,23 +102,25 @@ uvx gemini-faf-mcp          # zero-install run via uvx (fetched from PyPI)
 # or: pip3 install gemini-faf-mcp
 ```
 
-### 2. Add to Gemini CLI
+### 2. Add to Antigravity CLI
 
 ```bash
-gemini extensions install https://github.com/Wolfe-Jam/gemini-faf-mcp
+agy plugin install https://github.com/Wolfe-Jam/gemini-faf-mcp
 ```
+
+Antigravity CLI (`agy`) is Google's successor to Gemini CLI ([announcement](https://developers.googleblog.com/an-important-update-transitioning-gemini-cli-to-antigravity-cli/)). The plugin brings the MCP server and the `setup`, `score` and `export` skills.
+
+**Moving from Gemini CLI?** `agy plugin import gemini` converts the extension you already have. If it stops on `.gemini/project.faf`, that's a link versions up to 3.2.0 shipped: `rm -f ~/.gemini/extensions/gemini-faf-mcp/.gemini/project.faf`, then run the import again, or install fresh with the line above.
+
+Still on Gemini CLI through work? `gemini extensions install https://github.com/Wolfe-Jam/gemini-faf-mcp` installs the same extension.
 
 ### 3. Author your project context
 
-In your Gemini CLI:
+Ask the agent to run the **setup** skill (in Gemini CLI: `/faf:setup`).
 
-```
-> /faf:setup
-```
+That writes a starter `project.faf` and scores it. Then ask Gemini to fill it in from your repo (it calls `faf_auto`), and run the **score** skill (`/faf:score` in Gemini CLI) to see what's left. From then on, every Gemini session in this project reads it automatically.
 
-That writes a starter `project.faf` and scores it. Then ask Gemini to fill it in from your repo (it calls `faf_auto`), and run `/faf:score` to see what's left. From then on, every Gemini session in this project reads it automatically.
-
-> **Tip:** Trophy ✪ = 100%: AI is optimized to code. `/faf:score` shows exactly which slots are still empty.
+> **Tip:** Trophy ✪ = 100%: AI is optimized to code. The score skill shows exactly which slots are still empty.
 
 ---
 
@@ -153,7 +155,7 @@ You don't replace it. `.faf` **authors** it. Run `faf_gemini` and you get a fres
 
 ```bash
 > /faf:export
-# Authors GEMINI.md from project.faf
+# Authors GEMINI.md from project.faf (Gemini CLI; in Antigravity, ask for the export skill)
 ```
 
 `.faf` is the source. `GEMINI.md` is one of its outputs. Same logic for `AGENTS.md` (OpenAI Codex), `.cursorrules`, `CLAUDE.md`, and others — write once, render everywhere.
@@ -207,7 +209,7 @@ You don't replace it. `.faf` **authors** it. Run `faf_gemini` and you get a fres
 
 ## Google Antigravity
 
-Antigravity reads one MCP config file, `~/.gemini/config/mcp_config.json`, and takes both modes.
+Antigravity reads MCP servers from `~/.gemini/config/mcp_config.json` (every project) or `.agents/mcp_config.json` (one project); both take both modes. A plugin installed with `agy plugin install` brings its own.
 
 Local (stdio):
 
@@ -291,7 +293,7 @@ Your `.faf` file is scored on completeness — how many slots are filled with re
 
 ---
 
-## Using with Gemini CLI
+## Using with Antigravity or Gemini CLI
 
 ```
 > Create a .faf file for my Python FastAPI project
