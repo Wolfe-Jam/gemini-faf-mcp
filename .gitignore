@@ -32,3 +32,6 @@ dist/
 
 # FAF auto-generated artifacts
 build/
+
+# test scratch (tests/test_start_in_workspace.py)
+tests/.ws-test-*

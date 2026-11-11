@@ -9,7 +9,9 @@ write boundary. The last test runs the real server over stdio the way agy does.
 """
 
 import os
+import shutil
 import sys
+import tempfile
 from pathlib import Path
 
 import pytest
@@ -30,6 +32,17 @@ def _layout(tmp_path):
     project = home / "work" / "my-project"
     project.mkdir(parents=True)
     return home, plugin, project
+
+
+@pytest.fixture
+def outside_tmp():
+    """A scratch folder outside /tmp and the system temp folder (both are write
+    roots in safe_path), so a write the old code refuses really is refused."""
+    d = Path(tempfile.mkdtemp(prefix=".ws-test-", dir=REPO / "tests"))
+    try:
+        yield d
+    finally:
+        shutil.rmtree(d, ignore_errors=True)
 
 
 def _env(home, plugin, pwd):
@@ -65,6 +78,7 @@ def test_follows_a_symlinked_pwd_to_the_real_folder(tmp_path, monkeypatch):
         "pwd-is-home",  # F1: the whole home folder
         "pwd-contains-plugin",  # ~/.gemini holds the plugin folder
         "pwd-inside-plugin",
+        "relative-plugin-root",  # N3: Antigravity's value is absolute
     ],
 )
 def test_stays_put(tmp_path, monkeypatch, case):
@@ -78,6 +92,8 @@ def test_stays_put(tmp_path, monkeypatch, case):
         env["PLUGIN_ROOT"] = str(project)
     elif case == "no-pwd":
         del env["PWD"]
+    elif case == "relative-plugin-root":
+        env["PLUGIN_ROOT"] = "."
     else:
         env["PWD"] = {
             "relative-pwd": "work/my-project",
@@ -94,7 +110,25 @@ def test_stays_put(tmp_path, monkeypatch, case):
     assert Path.cwd() == plugin.resolve()
 
 
-async def test_server_started_in_plugin_folder_works_in_the_project(tmp_path):
+def test_a_refusal_says_why(tmp_path, monkeypatch, capsys):
+    home, plugin, project = _layout(tmp_path)
+    monkeypatch.chdir(plugin)
+    assert _start_in_workspace(env=_env(home, plugin, home)) is None
+    assert "too broad" in capsys.readouterr().err
+
+
+def test_a_case_variant_of_home_is_still_home(tmp_path, monkeypatch):
+    """N1: on a case-insensitive volume /users/me is /Users/me; text comparison let it through."""
+    home, plugin, project = _layout(tmp_path)
+    variant = Path(str(home).swapcase())
+    if not variant.exists():
+        pytest.skip("case-sensitive filesystem")
+    monkeypatch.chdir(plugin)
+    assert _start_in_workspace(env=_env(home, plugin, variant)) is None
+    assert Path.cwd() == plugin.resolve()
+
+
+async def test_server_started_in_plugin_folder_works_in_the_project(outside_tmp):
     """The real server over stdio, as agy starts it: cwd = plugin, PLUGIN_ROOT, PWD = project.
 
     The child gets a minimal environment (no PORT / MCP_TRANSPORT / FAF_ALLOWED_ROOTS
@@ -104,9 +138,9 @@ async def test_server_started_in_plugin_folder_works_in_the_project(tmp_path):
     from fastmcp.client import Client
     from fastmcp.client.transports import StdioTransport
 
-    home, plugin, project = _layout(tmp_path)
+    home, plugin, project = _layout(outside_tmp)
     (project / "project.faf").write_text(FAF)
-    server_tmp = tmp_path / "server-tmp"
+    server_tmp = outside_tmp / "server-tmp"
     server_tmp.mkdir()
     env = {
         "PATH": os.environ.get("PATH", ""),
@@ -127,13 +161,13 @@ async def test_server_started_in_plugin_folder_works_in_the_project(tmp_path):
     assert not (plugin / "AGENTS.md").exists()
 
 
-async def test_faf_init_writes_into_an_empty_project(tmp_path):
+async def test_faf_init_writes_into_an_empty_project(outside_tmp):
     """As in the agy check: faf_init in a project with no project.faf creates it there."""
     from fastmcp.client import Client
     from fastmcp.client.transports import StdioTransport
 
-    home, plugin, project = _layout(tmp_path)
-    server_tmp = tmp_path / "server-tmp"
+    home, plugin, project = _layout(outside_tmp)
+    server_tmp = outside_tmp / "server-tmp"
     server_tmp.mkdir()
     env = {
         "PATH": os.environ.get("PATH", ""),

@@ -1002,18 +1002,32 @@ def _start_in_workspace(cwd: str | None = None, env: Mapping[str, str] | None = 
     environ: Mapping[str, str] = os.environ if env is None else env
     here = Path(cwd or os.getcwd()).resolve()
     plugin_root = environ.get("PLUGIN_ROOT")
-    if not plugin_root or Path(plugin_root).resolve() != here:
+    if not plugin_root or not Path(plugin_root).is_absolute() or not _same(plugin_root, here):
         return None
     pwd = environ.get("PWD")
     if not pwd or not Path(pwd).is_absolute() or not Path(pwd).is_dir():
         return None
     target = Path(pwd).resolve()
-    home = Path(environ.get("HOME") or Path.home()).resolve()
-    too_broad = target == Path(target.anchor) or target == home or here.is_relative_to(target)
-    if target == here or too_broad or target.is_relative_to(here):
+    home = Path(environ.get("HOME") or Path.home())
+    # Compare as files on disk, not as text: on a case-insensitive volume
+    # (macOS, Windows) /users/me is the same folder as /Users/me.
+    broad = [Path(target.anchor), home, here, *here.parents]
+    if any(_same(target, p) for p in broad) or any(_same(here, p) for p in target.parents):
+        print(
+            f"gemini-faf-mcp: PWD {target} is too broad or is the plugin folder; staying in {here}",
+            file=sys.stderr,
+        )
         return None
     os.chdir(target)
     return str(target)
+
+
+def _same(a: str | Path, b: str | Path) -> bool:
+    """True when a and b are the same folder on disk (False if either is missing)."""
+    try:
+        return os.path.samefile(a, b)
+    except OSError:
+        return False
 
 
 def main() -> None:
