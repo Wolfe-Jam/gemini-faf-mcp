@@ -1,5 +1,5 @@
 """
-gemini-faf-mcp v3.2.1 — FastMCP Server
+gemini-faf-mcp v3.2.1rc1 — FastMCP Server
 
 Native MCP server for FAF (Foundational AI-context Format).
 Powered by faf-python-sdk with Mk4 Championship Scoring Engine.
@@ -37,7 +37,7 @@ from interrogate import interrogate_repo
 from models import get_model, list_models
 from safe_path import PathConfinementError, confine_file_op, confine_path
 
-__version__ = "3.2.1"
+__version__ = "3.2.1rc1"
 
 # The .faf FORMAT version this server writes (distinct from __version__, the
 # server's own release). Matches faf-cli's FAF_VERSION / faf-python-sdk.
