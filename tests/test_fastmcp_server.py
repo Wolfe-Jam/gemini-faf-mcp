@@ -1068,10 +1068,12 @@ class TestTier9Gallery:
     def test_manifest_uses_uvx(self, manifest):
         """Extension runs via uvx (PyPI-distributed entry point).
         Migrated from the run.sh bootstrap in 2f6d7d8 (uvx-based Gemini CLI
-        extension); this test tracks that intentional change."""
+        extension); this test tracks that intentional change. The exact
+        launch (python -I -m server, not the console script) is pinned in
+        test_extension_launch.py."""
         server = manifest["mcpServers"]["faf"]
         assert server["command"] == "uvx"
-        assert server["args"] == ["gemini-faf-mcp"]
+        assert server["args"][:2] == ["--from", "gemini-faf-mcp"]
 
     def test_manifest_run_sh_exists(self):
         """run.sh exists at repo root."""
