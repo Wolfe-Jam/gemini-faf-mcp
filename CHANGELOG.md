@@ -9,7 +9,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 ## [Unreleased]
 
 ### Fixed
-- **3.2.1's project fix now works on the plugin's default launch.** The plugin started the server with `uvx gemini-faf-mcp`, and that command goes through uv's `#!/bin/sh` launcher. The shell resets `PWD` to the folder it starts in (the plugin folder), so the server could not see where `agy` was run: `faf_discover` found the plugin's own `project.faf`, and a relative write went into the plugin folder. The plugin now starts Python directly (`uvx --from gemini-faf-mcp python -I -m server`), which keeps `PWD`. `-I` keeps the current folder off Python's import path, so a project's own `server.py` is never run in place of ours. Other MCP clients are unchanged.
+- **3.2.1's project fix now works on the plugin's default launch.** The plugin started the server with `uvx gemini-faf-mcp`, and that command goes through uv's `#!/bin/sh` launcher. The shell resets `PWD` to the folder it starts in (the plugin folder), so the server could not see where `agy` was run: `faf_discover` found the plugin's own `project.faf`, and a relative write went into the plugin folder. The plugin now starts Python directly (`uvx --from "gemini-faf-mcp>=3.2.1" python -I -X utf8 -m server`), which keeps `PWD`. `-I` keeps the current folder off Python's import path, so a project's own `server.py` is never run in place of ours. `-X utf8` reads and writes files as UTF-8 on every platform (`-I` ignores `PYTHONUTF8`). `>=3.2.1` stops an older `uv tool install` copy, without the project fix, from being used. Other MCP clients are unchanged.
 
 ## [3.2.1] - 2026-11-11 — The Straight Answers Edition
 

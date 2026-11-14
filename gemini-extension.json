@@ -7,9 +7,11 @@
       "command": "uvx",
       "args": [
         "--from",
-        "gemini-faf-mcp",
+        "gemini-faf-mcp>=3.2.1",
         "python",
         "-I",
+        "-X",
+        "utf8",
         "-m",
         "server"
       ],

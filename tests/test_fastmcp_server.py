@@ -1066,14 +1066,14 @@ class TestTier9Gallery:
         assert "faf" in manifest["mcpServers"]
 
     def test_manifest_uses_uvx(self, manifest):
-        """Extension runs via uvx (PyPI-distributed entry point).
+        """Extension runs via uvx, from the PyPI package.
         Migrated from the run.sh bootstrap in 2f6d7d8 (uvx-based Gemini CLI
-        extension); this test tracks that intentional change. The exact
-        launch (python -I -m server, not the console script) is pinned in
+        extension). Since 3.3.0 uvx starts Python on the server module, not
+        the console script; the exact args are pinned in
         test_extension_launch.py."""
         server = manifest["mcpServers"]["faf"]
         assert server["command"] == "uvx"
-        assert server["args"][:2] == ["--from", "gemini-faf-mcp"]
+        assert server["args"][:2] == ["--from", "gemini-faf-mcp>=3.2.1"]
 
     def test_manifest_run_sh_exists(self):
         """run.sh exists at repo root."""
