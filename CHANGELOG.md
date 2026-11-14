@@ -1,12 +1,18 @@
 <!-- faf: gemini-faf-mcp | Python | mcp | FAF MCP server for Google Gemini — persistent project context via PyPI -->
-<!-- faf: doc=changelog | latest=v3.2.1 | canonical=project.faf | family=FAF -->
+<!-- faf: doc=changelog | latest=v3.3.0 | canonical=project.faf | family=FAF -->
 
 # Changelog
 
 All notable changes to gemini-faf-mcp are documented here.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
-## [Unreleased]
+## [3.3.0] - 2026-11-14 — The Antigravity Edition 🚀
+
+**3.3.0 brings gemini-faf-mcp to Antigravity CLI: install it as a plugin and it works in your project. Simple.**
+
+Install: `agy plugin install https://github.com/Wolfe-Jam/gemini-faf-mcp`, then run `/setup` in your project. Antigravity CLI (`agy`) is Google's successor to Gemini CLI.
+
+347 tests pass, 0 fail.
 
 ### Fixed
 - **3.2.1's project fix now works on the plugin's default launch.** The plugin started the server with `uvx gemini-faf-mcp`, and that command goes through uv's `#!/bin/sh` launcher. The shell resets `PWD` to the folder it starts in (the plugin folder), so the server could not see where `agy` was run: `faf_discover` found the plugin's own `project.faf`, and a relative write went into the plugin folder. The plugin now starts Python directly (`uvx --from "gemini-faf-mcp>=3.2.1" python -I -X utf8 -m server`), which keeps `PWD`. `-I` keeps the current folder off Python's import path, so a project's own `server.py` is never run in place of ours. `-X utf8` reads and writes files as UTF-8 on every platform (`-I` ignores `PYTHONUTF8`). `>=3.2.1` stops an older `uv tool install` copy, without the project fix, from being used. Other MCP clients are unchanged.

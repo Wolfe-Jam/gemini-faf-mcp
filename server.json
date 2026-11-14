@@ -33,7 +33,7 @@
       ]
     }
   ],
-  "version": "3.2.1",
+  "version": "3.3.0",
   "repository": {
     "url": "https://github.com/Wolfe-Jam/gemini-faf-mcp",
     "source": "github"
@@ -43,7 +43,7 @@
     {
       "registryType": "pypi",
       "identifier": "gemini-faf-mcp",
-      "version": "3.2.1",
+      "version": "3.3.0",
       "transport": {
         "type": "stdio"
       }

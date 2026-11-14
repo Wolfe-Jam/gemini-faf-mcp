@@ -17,7 +17,7 @@ Stop re-explaining your project to every new Gemini session. Every Gemini conver
 
 [![PyPI](https://img.shields.io/pypi/v/gemini-faf-mcp?style=for-the-badge&logo=pypi&logoColor=white)](https://pypi.org/project/gemini-faf-mcp/)
 [![FAF Trophy 100%](https://img.shields.io/badge/FAF-%F0%9F%8F%86%20100%25-000000?labelColor=FF6B35)](https://faf.one)
-[![Tests](https://img.shields.io/badge/Tests-345%20passing-brightgreen?style=for-the-badge)](https://github.com/Wolfe-Jam/gemini-faf-mcp)
+[![Tests](https://img.shields.io/badge/Tests-347%20passing-brightgreen?style=for-the-badge)](https://github.com/Wolfe-Jam/gemini-faf-mcp)
 [![IANA: vnd.faf+yaml](https://img.shields.io/badge/IANA-vnd.faf%2Byaml-00D4D4?style=for-the-badge)](https://www.iana.org/assignments/media-types/application/vnd.faf+yaml)
 [![IANA: vnd.fafm+yaml](https://img.shields.io/badge/IANA-vnd.fafm%2Byaml-00D4D4?style=for-the-badge)](https://www.iana.org/assignments/media-types/application/vnd.fafm+yaml)
 [![DOI: Context paper](https://img.shields.io/badge/DOI-Context%20paper-FF6B35?style=for-the-badge)](https://doi.org/10.5281/zenodo.18251362)
@@ -41,7 +41,16 @@ Gemini: [now ready to help]
 
 `.faf` is read once at session start. Every tool call lands on a Gemini that already knows your project.
 
-### What's New in v3.2.1 — The Straight Answers Edition
+### What's New in v3.3.0 — The Antigravity Edition 🚀
+
+**3.3.0 brings gemini-faf-mcp to Antigravity CLI: install it as a plugin and it works in your project. Simple.**
+
+- **Install it as a plugin** in Antigravity CLI (`agy`, Google's successor to Gemini CLI): `agy plugin install https://github.com/Wolfe-Jam/gemini-faf-mcp`, then run `/setup` in your project. Moving from Gemini CLI, `agy plugin import gemini` converts the extension.
+- **It works in your project.** `agy` starts a plugin's server in the plugin's own folder. The plugin now starts Python directly, so the server sees the folder you ran `agy` in, and finds your `project.faf` and writes there. In 3.2.1 this only worked when the server was started by hand.
+- **Safe to start anywhere.** A `server.py` (or any module) in your project is never run in place of the server's own, files are read and written as UTF-8 on every platform, and an older installed copy without the fix is never used.
+- **The skills are `/setup`, `/score` and `/export` in `agy`** (`/faf:setup` and so on in Gemini CLI).
+
+#### v3.2.1 — The Straight Answers Edition
 
 **3.2.1 lifts gemini-faf-mcp into Antigravity CLI: it installs as a plugin and works in your project.**
 
@@ -320,7 +329,7 @@ Your `.faf` file is scored on completeness — how many slots are filled with re
 ## Architecture
 
 ```
-gemini-faf-mcp v3.2.1
+gemini-faf-mcp v3.3.0
 ├── server.py              → FastMCP MCP server (13 tools, dual-transport, Mk4 scoring)
 ├── safe_path.py           → path confinement for caller-supplied `path` args
 ├── inject.py              → non-destructive faf-managed-block injection
@@ -341,7 +350,7 @@ pip3 install -e ".[dev]"
 python -m pytest tests/ -v
 ```
 
-345 tests passing across the FastMCP server, CLI flags, Cloud Function, Mk4 WJTTC championship, Full-Facts grounding, path-confinement, write-guard, model-parity, Dart detection, and client-telemetry suites. Championship-grade test coverage — [WJTTC certified](https://github.com/Wolfe-Jam/WJTTC).
+347 tests passing across the FastMCP server, CLI flags, Cloud Function, Mk4 WJTTC championship, Full-Facts grounding, path-confinement, write-guard, model-parity, Dart detection, and client-telemetry suites. Championship-grade test coverage — [WJTTC certified](https://github.com/Wolfe-Jam/WJTTC).
 
 ---
 
