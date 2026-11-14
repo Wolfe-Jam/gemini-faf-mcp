@@ -6,7 +6,14 @@
     "faf": {
       "command": "uvx",
       "args": [
-        "gemini-faf-mcp"
+        "--from",
+        "gemini-faf-mcp>=3.2.1",
+        "python",
+        "-I",
+        "-X",
+        "utf8",
+        "-m",
+        "server"
       ],
       "timeout": 30000
     }
