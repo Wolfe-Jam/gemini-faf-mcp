@@ -252,6 +252,8 @@ Antigravity expects `serverUrl`, not `url` or `httpUrl`.
 
 ## All 13 Tools
 
+Real input and output for every tool: [docs/TOOLS.md](docs/TOOLS.md). Install, first run and fixes: [docs/SETUP.md](docs/SETUP.md).
+
 Every tool carries MCP tool annotations: **read only** (`faf_read`, `faf_validate`, `faf_score`, `faf_discover`, `faf_stringify`, `faf_context`, `faf_about`, `faf_model`), **writes without losing anything** (`faf_init`, `faf_auto`, `faf_gemini`, `faf_agents`), **rewrites the file** (`faf_migrate`).
 
 ### Create & Detect
