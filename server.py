@@ -11,6 +11,7 @@ Spec: https://faf.one
 
 import functools
 import os
+import re
 import sys
 from collections.abc import Mapping
 from pathlib import Path
@@ -785,6 +786,8 @@ def faf_auto(directory: str = ".", path: str = "project.faf") -> dict:
         faf_path = faf_path.resolve()
 
         created = not faf_path.exists()
+        written = []
+        not_written: dict[str, dict[str, str]] = {}
 
         def _yv(v: str) -> str:
             """Quote a detected value for YAML unless it is the bare sentinel."""
@@ -868,14 +871,17 @@ state:
             if detected.get("main_language") and ("main_language: null" in updated or "main_language: unknown" in updated):
                 updated = updated.replace("main_language: null", f"main_language: {detected['main_language']}")
                 updated = updated.replace("main_language: unknown", f"main_language: {detected['main_language']}")
+                written.append("main_language")
             
             # Fill metadata if missing
             for field, key in [("name", "name"), ("goal", "goal"), ("version", "version")]:
                 val = detected.get(key)
                 if val and f"{field}: null" in updated:
                     updated = updated.replace(f"{field}: null", f"{field}: {val}")
+                    written.append(field)
                 if val and field == "goal" and "Describe your project goal" in updated:
                     updated = updated.replace("Describe your project goal", val)
+                    written.append(field)
 
             # Fill null stack fields — includes the Full-Facts slots
             # (database / cache / search / storage / runtime / hosting) grounded
@@ -894,13 +900,31 @@ state:
                     if field == "backend" and val not in BACKEND_FRAMEWORKS:
                         continue
                     updated = updated.replace(f"  {field}: null", f'  {field}: {_yv(val)}')
+                    written.append(field)
 
             # Fill empty command slots from Makefile / justfile targets
             for cmd, val in commands.items():
                 for empty in (f'  {cmd}: ""', f"  {cmd}: null"):
                     if empty in updated:
                         updated = updated.replace(empty, f'  {cmd}: {_yv(val)}')
+                        written.append(f"commands.{cmd}")
                         break
+
+            # Detected values whose slot already holds something (a value, or
+            # slotignored) were not written: say so, never imply they were.
+            for field, key in _stack_fill:
+                val = detected.get(key)
+                if not val or field in written:
+                    continue
+                if field == "frontend" and val not in FRONTEND_FRAMEWORKS:
+                    continue
+                if field == "backend" and val not in BACKEND_FRAMEWORKS:
+                    continue
+                m = re.search(rf"^  {field}: (.+)$", updated, re.MULTILINE)
+                if m and m.group(1).strip() not in ("null", '""'):
+                    current = m.group(1).strip().strip('"')
+                    if current != val:
+                        not_written[field] = {"detected": val, "current": current}
 
             if updated != existing:
                 faf_path.write_text(updated)
@@ -916,16 +940,28 @@ state:
 
         lang = detected.get("main_language", "unknown")
         fw = detected.get("framework")
-        action = "Created" if created else "Updated"
         msg_parts = [f"Detected {lang}"]
         if fw:
             msg_parts[0] += f"/{fw}"
-        msg_parts.append(f"{action} {faf_path.name} at {score}%.")
+        if created:
+            msg_parts.append(f"Created {faf_path.name} at {score}%.")
+        elif written:
+            msg_parts.append(f"Updated {faf_path.name} at {score}%: wrote {', '.join(written)}.")
+        else:
+            msg_parts.append(f"{faf_path.name} unchanged at {score}%: no empty slot for what was detected.")
+        if not_written:
+            msg_parts.append(
+                "Not written (slot already set): "
+                + ", ".join(f"{k} is {v['current']}, detected {v['detected']}" for k, v in not_written.items())
+                + "."
+            )
 
         return {
             "success": True,
             "path": str(faf_path),
             "created": created,
+            "written": written,
+            "not_written": not_written,
             "detected": {
                 "main_language": detected.get("main_language"),
                 "package_manager": detected.get("package_manager"),
