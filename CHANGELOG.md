@@ -6,6 +6,12 @@
 All notable changes to gemini-faf-mcp are documented here.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
+## [Unreleased]
+
+### Docs
+- `docs/SETUP.md` rewritten for Antigravity CLI: install, moving from Gemini CLI, any MCP client, the first `/setup` (real output), working folder, and fixes (slow first start on an Intel Mac, a release not showing up yet, writes refused outside the project, Windows untested).
+- New `docs/TOOLS.md`: all 13 tools with real input and output from 3.3.1.
+
 ## [3.3.1] - 2026-11-16 — The Antigravity Edition 🚀
 
 **3.3.1: /setup detects your stack; your goal and six W's stay yours.**
