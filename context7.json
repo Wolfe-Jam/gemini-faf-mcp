@@ -2,7 +2,16 @@
   "$schema": "https://context7.com/schema/context7.json",
   "projectTitle": "gemini-faf-mcp",
   "description": "MCP server and Antigravity CLI plugin. Keeps a project's facts (stack, goal, commands) in project.faf, an IANA-registered YAML file, and gives Gemini tools to read, score and validate it and to write GEMINI.md and AGENTS.md from it.",
-  "excludeFolders": ["tests", "build", "dist", "assets", "server-card", "node_modules", ".venv"],
+  "excludeFolders": [
+    "tests",
+    "build",
+    "dist",
+    "assets",
+    "server-card",
+    "node_modules",
+    ".venv",
+    "src"
+  ],
   "excludeFiles": [
     "CHANGELOG.md",
     "GITHUB-RELEASE-CHANGELOG.md",
@@ -10,9 +19,19 @@
     "LICENSE.md",
     "CLAUDE.md",
     "AGENTS.md",
-    "GEMINI.md"
+    "GEMINI.md",
+    "CONTRIBUTING.md",
+    "SYS-REQS.md",
+    "main.py",
+    "server.py",
+    "models.py",
+    "safe_path.py",
+    "inject.py",
+    "interrogate.py"
   ],
-  "includeExtensions": [".faf"],
+  "includeExtensions": [
+    ".faf"
+  ],
   "rules": [
     "Run /setup in a project before the other tools; it creates or scores project.faf.",
     "Treat project.faf as the source of the project's facts; GEMINI.md and AGENTS.md are generated from it."

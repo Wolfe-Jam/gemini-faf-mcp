@@ -8,7 +8,12 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
 ## [Unreleased]
 
+### Fixed
+- **The hosted badge uses faf-cli's tier ladder:** ✪ 100 · ★ 99 · ◆ 95 · ◇ 85 · ● 70 · ● 55 · ○ 1+ · ♡ 0. It still used the retired emoji ladder (🏆 🥉 🟢 🟡 🔴), with no Gold or Silver. Live after the next Cloud Run deploy.
+
 ### Docs
+- **The Big Orange FAQ:** the Big Orange 🍊 is a planned honor, not a score, and isn't awarded yet. The FAQ said it needed "a strict 100% Logic Score" and listed "Gold Transport: 100% 🍊"; no single score earns it, and Gold is the 99% tier. The FAQ now lists the four criteria it will be awarded on.
+- `context7.json` keeps source code and contributor docs (CONTRIBUTING.md, SYS-REQS.md) out of the Context7 listing, so agents get the user docs first.
 - `docs/SETUP.md` rewritten for Antigravity CLI: install, moving from Gemini CLI, any MCP client, the first `/setup` (real output), working folder, and fixes (slow first start on an Intel Mac, a release not showing up yet, writes refused outside the project, Windows untested).
 - New `docs/TOOLS.md`: all 13 tools with real input and output from 3.3.1.
 
