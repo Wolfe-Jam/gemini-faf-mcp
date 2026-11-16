@@ -2,14 +2,14 @@
 
 ## How do I get the Big Orange?
 
-The Big Orange 🍊 is an honor, not a score. The score stops at 100% (Trophy ✪), and no single score earns the Big Orange.
+The Big Orange 🍊 is a planned honor, not a score. The score stops at 100% (Trophy ✪), and no single score earns the Big Orange. Think of it as a star for a repo, not a grade for a file.
 
-It's a mark of sustained excellence across several things at once:
+**It isn't awarded yet.** The criteria are set; the checks that would award it aren't built. When they are, a repo earns it by meeting all four at once:
 
-- several versions in a row at 100%
-- a real test suite
-- test receipts (TAF) that show those tests passing
-- and an AI reviewing the work and awarding it
+- **Sustained Trophy:** 100% on three published releases
+- **Tests:** at least 100 passing tests in CI
+- **Receipts:** at least 30 TAF test receipts
+- **AI nomination:** at least one AI (Claude, Grok, Gemini, ChatGPT or Cursor) publicly names the repo as exemplary, in its own voice
 
 > "The Big Orange is not a score; it is the fingerprint of a human who cared enough to make the context true."
 
