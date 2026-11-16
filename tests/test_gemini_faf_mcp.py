@@ -615,7 +615,7 @@ class TestTier7Fixes:
         from gemini_faf_mcp import validate_faf
         result = validate_faf({})
         assert result["score"] == 0
-        assert result["tier"] == "Red"
+        assert result["tier"] == "White"  # always-33: 0% is White, as in faf-cli
         assert not result["valid"]
         assert len(result["issues"]) > 0
 
@@ -623,7 +623,7 @@ class TestTier7Fixes:
         """validate_faf reports missing required sections."""
         from gemini_faf_mcp import validate_faf
         result = validate_faf({"faf_version": "2.5.2"})
-        assert result["score"] > 0  # faf_version counted
+        assert result["score"] == 0  # always-33: faf_version isn't a slot
         assert not result["valid"]  # missing project + human_context
         assert any("project.name" in issue for issue in result["issues"])
 

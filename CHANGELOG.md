@@ -8,6 +8,9 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
 ## [Unreleased]
 
+### Changed
+- **`validate_faf` scores with the always-33 kernel** (faf-python-sdk `score_faf`), the same number as faf-cli, `faf_score` and mcpaas.live. It used to count its own 10 slots "against v2.5.2", a second scorer with a different number. The function, its name and its keys stay; it adds `populated`, `active` and `total`. `filled_slots` / `total_slots` now carry the kernel's populated / active counts, and `tier` is the kernel's (0% is White, as in faf-cli). `issues` still lists the missing basics (`faf_version`, `project.name/goal/main_language`, the six W's).
+
 ### Docs (dev setup, Context7 refresh)
 - The dev install moves from `docs/SETUP.md` to `CONTRIBUTING.md`; the setup guide shows user setup only.
 - Context7 refreshes on every push to `main` (`.github/workflows/context7-refresh.yml`; skips until the `CONTEXT7_API_KEY` secret is set).
