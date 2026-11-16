@@ -2,20 +2,14 @@
 
 ## How do I get the Big Orange?
 
-The 🍊 isn't a gift; it's a verification.
+The Big Orange 🍊 is an honor, not a score. The score stops at 100% (Trophy ✪), and no single score earns the Big Orange.
 
-To unlock the "Big Orange" distinction in your `.faf` manifest, your project must hit a strict **100% Logic Score**. This means:
+It's a mark of sustained excellence across several things at once:
 
-- Zero context drift
-- Full SW-01/SW-02 compliance
-- A verified "Source of Truth" anchor
-
-It's the difference between a project that works and a project that has Glory.
-
-```
-Standard Compliance: 0-99%
-Gold Transport: 100% 🍊 (Additional, High-Utility Elegance)
-```
+- several versions in a row at 100%
+- a real test suite
+- test receipts (TAF) that show those tests passing
+- and an AI reviewing the work and awarding it
 
 > "The Big Orange is not a score; it is the fingerprint of a human who cared enough to make the context true."
 

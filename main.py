@@ -412,23 +412,31 @@ def transform_to_xml(data, root='dna'):
     return f'<?xml version="1.0"?><{root}>{dict_to_xml(data)}</{root}>'
 
 
+# The tier ladder, as faf-cli src/core/tiers.ts defines it (the source of truth).
+# The old emoji ladder (🏆 🥉 🟢 🟡 🔴) is retired.
+BADGE_TIERS = [
+    (100, "✪", "#4c1"),      # Trophy
+    (99, "★", "#dfb317"),    # Gold
+    (95, "◆", "#9f9f9f"),    # Silver
+    (85, "◇", "#cd7f32"),    # Bronze
+    (70, "●", "#2ecc71"),    # Green
+    (55, "●", "#f1c40f"),    # Yellow
+    (1, "○", "#e74c3c"),     # Red
+    (0, "♡", "#9f9f9f"),     # White
+]
+
+
+def badge_tier(score):
+    """Return (symbol, color) for a score, using faf-cli's tier ladder."""
+    for floor, symbol, color in BADGE_TIERS:
+        if score >= floor:
+            return symbol, color
+    return BADGE_TIERS[-1][1], BADGE_TIERS[-1][2]
+
+
 def generate_badge(score, has_orange):
     """Generate SVG badge showing FAF score and distinction."""
-    if score == 100:
-        status = "🏆"
-        color = "#4c1"  # Green
-    elif score >= 85:
-        status = "🥉"
-        color = "#cd7f32"  # Bronze
-    elif score >= 70:
-        status = "🟢"
-        color = "#2ecc71"
-    elif score >= 55:
-        status = "🟡"
-        color = "#f1c40f"
-    else:
-        status = "🔴"
-        color = "#e74c3c"
+    status, color = badge_tier(score)
 
     orange = "🍊" if has_orange else ""
     display = f"{score}% {status}{orange}"

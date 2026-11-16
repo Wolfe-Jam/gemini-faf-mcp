@@ -196,7 +196,7 @@ class TestTier3Aero:
         """Badge shows tier indicator."""
         r = requests.get(BASE_URL)
         # Should contain one of the tier symbols
-        tier_symbols = ["🏆", "🥉", "🟢", "🟡", "🔴"]
+        tier_symbols = ["✪", "★", "◆", "◇", "●", "○", "♡"]  # faf-cli tiers.ts
         assert any(symbol in r.text for symbol in tier_symbols)
 
     def test_score_in_response(self):
