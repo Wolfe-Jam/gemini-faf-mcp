@@ -156,22 +156,9 @@ Not tested yet. Windows shells usually don't set the working-folder variable the
 
 Quit and restart Gemini CLI: the MCP server connects at startup. If it stays disconnected, run `/trust` in Gemini CLI to trust your workspace, then `/mcp refresh`.
 
-## Dev environment
+## Working on gemini-faf-mcp itself
 
-```bash
-git clone https://github.com/Wolfe-Jam/gemini-faf-mcp
-cd gemini-faf-mcp
-pip install -e ".[dev]"
-
-# The full test suite
-python -m pytest tests/
-
-# Lint and types
-ruff check .
-mypy server.py models.py safe_path.py inject.py src/ --ignore-missing-imports
-```
-
-`pip install -e ".[dev]"` installs `pytest-asyncio`, which the MCP server tests need. See [SYS-REQS.md](SYS-REQS.md) for the full environment.
+Clone, dev install and the test suite are in [CONTRIBUTING.md](../CONTRIBUTING.md).
 
 ## Requirements
 

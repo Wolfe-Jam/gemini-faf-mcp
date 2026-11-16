@@ -74,12 +74,22 @@ We use Championship-grade testing:
 | 4 | VOICE | Voice-to-FAF specific |
 | 5 | SECURITY | SW-01/SW-02 enforcement |
 
-Run tests:
+### Dev environment
+
 ```bash
-pytest tests/test_gemini_faf_mcp.py -v
+git clone https://github.com/Wolfe-Jam/gemini-faf-mcp
+cd gemini-faf-mcp
+pip install -e ".[dev]"
+
+# The full test suite
+python -m pytest tests/
+
+# Lint and types
+ruff check .
+mypy server.py models.py safe_path.py inject.py src/ --ignore-missing-imports
 ```
 
-All tests use `dry_run=true` to prevent production pollution.
+`pip install -e ".[dev]"` installs `pytest-asyncio`, which the MCP server tests need. `tests/test_gemini_faf_mcp.py` calls the live hosted function (it needs network); its tests use `dry_run=true` to prevent production pollution. See [docs/SYS-REQS.md](docs/SYS-REQS.md) for the full environment.
 
 ---
 
