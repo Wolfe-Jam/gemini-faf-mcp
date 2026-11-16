@@ -9,8 +9,11 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 ## [Unreleased]
 
 ### Fixed
-- **`/setup` detects your stack first.** It used to create a starter file with `faf_init`, which marks every stack slot `slotignored`; asking Gemini to "fill it in" (`faf_auto`) then had no empty slot to fill. On a FastAPI project that path ended at 21% with no stack written. `/setup` now creates `project.faf` with `faf_auto`, so the same project starts at 75% with its backend, API type, package manager and test runner filled.
+- **`/setup` detects your stack first.** It used to create a starter file with `faf_init`, which marks every stack slot `slotignored`; asking Gemini to "fill it in" (`faf_auto`) then had no empty slot to fill. On a FastAPI project that path ended at 21% with no stack written. `/setup` now creates `project.faf` with `faf_auto`, so the same project starts with its backend, API type, package manager and test runner filled (42%, the same score faf-cli 8.10 gives it, with the goal and six W's left for you).
 - **`faf_auto` says what it really wrote.** It reported "Updated project.faf" even when it wrote nothing. The message now names the slots it wrote, says "unchanged" when it wrote none, and lists detected values it did not write because the slot already holds something (for example `backend is slotignored, detected FastAPI`). The result has two new fields, `written` and `not_written`.
+- **`faf_init` no longer locks the stack.** It wrote every stack slot as `slotignored`, so `faf_auto` could never fill them. It now leaves them empty, and `faf_auto` fills a slot that is `null` or empty (and the language when it's empty or `unknown`).
+- **Your goal and the six W's are yours (Human Slots, as in faf-cli 8.10).** gemini-faf-mcp no longer writes placeholders or defaults into them (`why: Why does this project exist?`, `who: Developers`, `goal: Describe your project goal`), and `faf_auto` no longer copies the description from `pyproject.toml` into `goal`. It offers it instead: a new `suggested.goal` field, and `/setup` shows it for you to confirm. Scores now match faf-cli on the same project; a new file scores lower until you fill these in, because empty slots are no longer counted as filled.
+- `faf_init` quotes the name, goal and language, so a goal with a colon can't break the YAML.
 
 ## [3.3.0] - 2026-11-14 — The Antigravity Edition 🚀
 

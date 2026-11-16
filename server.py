@@ -10,6 +10,7 @@ Spec: https://faf.one
 """
 
 import functools
+import json
 import os
 import re
 import sys
@@ -244,26 +245,36 @@ def faf_init(
     if safe.exists():
         return {"success": False, "error": f"File already exists: {path}"}
 
+    # Human Slots (parity with faf-cli 8.10): the goal and the six W's are the
+    # person's to write. No placeholders, no defaults: an empty slot is honest,
+    # a question stored as the answer is not. Stack slots start empty (not
+    # slotignored) so faf_auto can fill what it detects.
+    def q(v: str) -> str:  # a JSON string is a valid YAML double-quoted scalar
+        return json.dumps(v, ensure_ascii=False)
+
     content = f"""faf_version: "{FAF_FORMAT_VERSION}"
 project:
-  name: {name}
-  goal: {goal or 'Describe your project goal'}
-  main_language: {language or 'unknown'}
+  name: {q(name)}
+  goal: {q(goal)}
+  main_language: {q(language)}
 commands:
   install: ""
   build: ""
   test: ""
 key_files: []
 stack:
-  frontend: slotignored
-  backend: slotignored
-  database: slotignored
-  runtime: slotignored
-  testing: slotignored
+  frontend: ""
+  backend: ""
+  database: ""
+  runtime: ""
+  testing: ""
 human_context:
-  who: Developers
-  what: {goal or 'What problem does this solve?'}
-  why: Why does this project exist?
+  who: ""
+  what: ""
+  why: ""
+  where: ""
+  when: ""
+  how: ""
 ai_instructions:
   working_style:
     quality_bar: zero_errors
@@ -276,7 +287,7 @@ state:
   version: 0.1.0
   status: active
 """
-    safe.write_text(content)
+    safe.write_text(content, encoding="utf-8")
     return {"success": True, "path": str(safe), "message": f"Created {path} — edit to match your project"}
 
 
@@ -797,7 +808,7 @@ def faf_auto(directory: str = ".", path: str = "project.faf") -> dict:
             # Author a new .faf from detection + Full-Facts grounding.
             name = detected.get("name") or dir_path.name or "my-project"
             lang = detected.get("main_language", "unknown")
-            goal = detected.get("goal") or "Describe your project goal"
+            goal = ""  # a human slot: suggested below, never written unconfirmed
             version = detected.get("version") or "0.1.0"
             fw = detected.get("framework")
             _stack = {
@@ -846,9 +857,12 @@ commands:
 {cmd_lines}
 key_files: []
 human_context:
-  who: Developers
-  what: {_yv(goal)}
-  why: Why does this project exist?
+  who: ""
+  what: ""
+  why: ""
+  where: ""
+  when: ""
+  how: ""
 ai_instructions:
   working_style:
     quality_bar: zero_errors
@@ -868,13 +882,16 @@ state:
             existing = faf_path.read_text()
             updated = existing
             # Fill null main_language
-            if detected.get("main_language") and ("main_language: null" in updated or "main_language: unknown" in updated):
-                updated = updated.replace("main_language: null", f"main_language: {detected['main_language']}")
-                updated = updated.replace("main_language: unknown", f"main_language: {detected['main_language']}")
+            lang_empty = next(
+                (e for e in ("main_language: null", 'main_language: ""', "main_language: unknown", 'main_language: "unknown"') if e in updated),
+                None,
+            )
+            if detected.get("main_language") and lang_empty:
+                updated = updated.replace(lang_empty, f"main_language: {detected['main_language']}", 1)
                 written.append("main_language")
             
             # Fill metadata if missing
-            for field, key in [("name", "name"), ("goal", "goal"), ("version", "version")]:
+            for field, key in [("name", "name"), ("version", "version")]:
                 val = detected.get(key)
                 if val and f"{field}: null" in updated:
                     updated = updated.replace(f"{field}: null", f"{field}: {val}")
@@ -894,12 +911,13 @@ state:
             ]
             for field, key in _stack_fill:
                 val = detected.get(key)
-                if val and f"  {field}: null" in updated:
+                empty = next((e for e in (f"  {field}: null", f'  {field}: ""') if e in updated), None)
+                if val and empty:
                     if field == "frontend" and val not in FRONTEND_FRAMEWORKS:
                         continue
                     if field == "backend" and val not in BACKEND_FRAMEWORKS:
                         continue
-                    updated = updated.replace(f"  {field}: null", f'  {field}: {_yv(val)}')
+                    updated = updated.replace(empty, f'  {field}: {_yv(val)}', 1)
                     written.append(field)
 
             # Fill empty command slots from Makefile / justfile targets
@@ -949,6 +967,8 @@ state:
             msg_parts.append(f"Updated {faf_path.name} at {score}%: wrote {', '.join(written)}.")
         else:
             msg_parts.append(f"{faf_path.name} unchanged at {score}%: no empty slot for what was detected.")
+        if detected.get("goal"):
+            msg_parts.append(f"Suggested goal (confirm before adding): {detected['goal']}")
         if not_written:
             msg_parts.append(
                 "Not written (slot already set): "
@@ -962,6 +982,7 @@ state:
             "created": created,
             "written": written,
             "not_written": not_written,
+            "suggested": {"goal": detected["goal"]} if detected.get("goal") else {},
             "detected": {
                 "main_language": detected.get("main_language"),
                 "package_manager": detected.get("package_manager"),

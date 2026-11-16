@@ -22,6 +22,7 @@ Score: {score}% ({tier})
 
 Fill in what only you know: the goal, who it's for, and why it exists.
 ```
+If the result has `suggested.goal`, show it on its own line as `Suggested goal: {goal}` and say the user can add it to project.faf if it's right. Do not write it yourself.
 If `faf_auto` returns an error, show its `error` text and stop.
 
 An older `.faf` file (not `project.faf`) in this directory doesn't count: create `project.faf` beside it, which is the file the score and export skills look for.
