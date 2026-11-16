@@ -8,6 +8,10 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
 ## [Unreleased]
 
+### Docs (dev setup, Context7 refresh)
+- The dev install moves from `docs/SETUP.md` to `CONTRIBUTING.md`; the setup guide shows user setup only.
+- Context7 refreshes on every push to `main` (`.github/workflows/context7-refresh.yml`; skips until the `CONTEXT7_API_KEY` secret is set).
+
 ### Fixed
 - **The hosted badge uses faf-cli's tier ladder:** ✪ 100 · ★ 99 · ◆ 95 · ◇ 85 · ● 70 · ● 55 · ○ 1+ · ♡ 0. It still used the retired emoji ladder (🏆 🥉 🟢 🟡 🔴), with no Gold or Silver. Live after the next Cloud Run deploy.
 
