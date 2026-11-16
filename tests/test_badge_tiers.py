@@ -1,6 +1,13 @@
 """The hosted badge uses faf-cli's tier ladder (src/core/tiers.ts), not the retired emoji ladder."""
 
-import main
+import sys
+from pathlib import Path
+
+# main.py (the hosted Cloud Function) isn't a packaged module: import it from the repo root,
+# whatever order pytest collects the test files in.
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+import main  # noqa: E402
 
 RETIRED = ["🏆", "🥇", "🥈", "🥉", "🟢", "🟡", "🔴", "🤍"]
 
