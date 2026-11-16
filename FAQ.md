@@ -21,9 +21,7 @@ YNWA.
 
 **SW-01: Temporal Integrity**
 
-SW-01 prevents "Context Hijacking" by binding mutations to cryptographic hashes. It rejects stale timestamps and ensures every update to your project DNA is temporally valid.
-
-If someone tries to replay an old mutation, SW-01 blocks it.
+SW-01 is a check in the hosted function: it rejects an update whose `generated` timestamp isn't newer than the one already stored, so an old update can't be replayed over a newer one.
 
 ---
 
@@ -31,14 +29,10 @@ If someone tries to replay an old mutation, SW-01 blocks it.
 
 **SW-02: Meritocratic Guard**
 
-SW-02 programmatically prevents "Metadata Spoofing."
-
-In v2.5.1, you can't just *type* that you have a 100 score; the system performs a forensic audit of your DNA mutations against the BigQuery telemetry. If the logic doesn't hold up, the 🍊 won't trigger.
-
-Hardened reality only.
+SW-02 refuses an update that sets the Big Orange 🍊 when the project's score, recomputed from the updated file, is below 100%. Typing the distinction into the file isn't enough. The refusal reads:
 
 ```
-SW-02: METADATA SPOOFING - Score < 100 ⊗ 🍊
+SW-02: Scoring guard - Big Orange requires 100%, current: 42%
 ```
 
 ---
@@ -51,10 +45,10 @@ Whether you're using Gemini, Claude, or Grok, they all read the same DNA. The Mu
 
 | Agent | Format | Content-Type |
 |-------|--------|--------------|
-| Claude | XML (thinking blocks) | application/xml |
+| Claude | XML | application/xml |
 | Gemini | Structured JSON | application/json |
 | Grok | Direct JSON | application/json |
-| Jules | Minimal (50 tokens) | application/json |
+| Jules | Minimal | application/json |
 | Codex | Code-focused | application/json |
 
 Use the `X-FAF-Agent` header to identify your agent, or let the system auto-detect via User-Agent.
@@ -79,7 +73,7 @@ Dry-run validates your mutation, shows what would change, and returns a preview�
 
 ## Where is the telemetry stored?
 
-All mutations are logged to BigQuery for forensic audit:
+Every mutation is logged to BigQuery:
 
 ```
 Project: bucket-460122
@@ -113,4 +107,4 @@ application/vnd.faf+yaml
 
 Open an issue or join the discussion. We build in public.
 
-YNWA. 🏆🍊
+YNWA. ✪
