@@ -980,7 +980,7 @@ class TestAutoTier7Contract:
         (tmp_path / "pyproject.toml").write_text('[project]\nname = "schema-test"\n')
         target = str(tmp_path / "project.faf")
         data = _parse(await client.call_tool("faf_auto", {"directory": str(tmp_path), "path": target}))
-        expected = {"success", "path", "created", "detected", "score", "tier", "message"}
+        expected = {"success", "path", "created", "written", "not_written", "detected", "score", "tier", "message"}
         assert expected == set(data.keys())
         assert isinstance(data["detected"], dict)
         detected_keys = {

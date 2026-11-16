@@ -14,21 +14,22 @@ Score: {score}% ({tier})
 ```
 If score < 85%, run `faf_validate` and list the errors and warnings.
 
-**Otherwise** (`found: false`, or the file it found is in a parent directory): run `faf_init` with `path` set to `project.faf`, then `faf_score`, and show the result.
+**Otherwise** (`found: false`, or the file it found is in a parent directory): run `faf_auto` with `directory` set to `.` and `path` set to `project.faf`. It detects the stack from the repo's own files and writes project.faf. Show the result:
 ```
 Created: project.faf
+Detected: {main_language}{/framework if any}
 Score: {score}% ({tier})
 
-Edit project.faf to improve your score.
+Fill in what only you know: the goal, who it's for, and why it exists.
 ```
-If `faf_init` returns an error, show its `error` text and stop.
+If `faf_auto` returns an error, show its `error` text and stop.
 
 An older `.faf` file (not `project.faf`) in this directory doesn't count: create `project.faf` beside it, which is the file the score and export skills look for.
 
 ## Rules
 
-- Run faf_discover first, then faf_init only when this directory has no project.faf. faf_init never overwrites, and a refusal is reported as an error.
+- Run faf_discover first, then faf_auto only when this directory has no project.faf. faf_auto creates the file from what it detects; it never overwrites a value.
 - faf_discover is the only lookup. Do not search for .faf files any other way. Do not explore the filesystem.
 - Do not ask the user questions. Just do it.
-- Use FAF MCP tools only (faf_discover, faf_init, faf_score, faf_validate). Never built-in file tools.
+- Use FAF MCP tools only (faf_discover, faf_auto, faf_score, faf_validate). Never built-in file tools.
 """

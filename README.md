@@ -135,7 +135,7 @@ Still on Gemini CLI through work? `gemini extensions install https://github.com/
 
 Run `/setup` (in Gemini CLI: `/faf:setup`).
 
-That writes a starter `project.faf` and scores it. Then ask Gemini to fill it in from your repo (it calls `faf_auto`), and run `/score` (`/faf:score` in Gemini CLI) to see what's left. From then on, every Gemini session in this project reads it automatically.
+That detects your stack from the repo's own files (it calls `faf_auto`), writes `project.faf` and scores it. Then fill in what only you know (the goal, who it's for, why it exists), and run `/score` (`/faf:score` in Gemini CLI) to see what's left. From then on, every Gemini session in this project reads it automatically.
 
 > **Tip:** Trophy ✪ = 100%: AI is optimized to code. `/score` shows exactly which slots are still empty.
 

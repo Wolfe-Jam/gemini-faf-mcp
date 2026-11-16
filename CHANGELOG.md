@@ -6,6 +6,12 @@
 All notable changes to gemini-faf-mcp are documented here.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
+## [Unreleased]
+
+### Fixed
+- **`/setup` detects your stack first.** It used to create a starter file with `faf_init`, which marks every stack slot `slotignored`; asking Gemini to "fill it in" (`faf_auto`) then had no empty slot to fill. On a FastAPI project that path ended at 21% with no stack written. `/setup` now creates `project.faf` with `faf_auto`, so the same project starts at 75% with its backend, API type, package manager and test runner filled.
+- **`faf_auto` says what it really wrote.** It reported "Updated project.faf" even when it wrote nothing. The message now names the slots it wrote, says "unchanged" when it wrote none, and lists detected values it did not write because the slot already holds something (for example `backend is slotignored, detected FastAPI`). The result has two new fields, `written` and `not_written`.
+
 ## [3.3.0] - 2026-11-14 — The Antigravity Edition 🚀
 
 **3.3.0 brings gemini-faf-mcp to Antigravity CLI: install it as a plugin and it works in your project. Simple.**
