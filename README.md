@@ -43,7 +43,7 @@ Gemini: [now ready to help]
 
 ### What's New in v3.3.1 — The Antigravity Edition 🚀
 
-**3.3.1: /setup detects your stack first, and your goal and six W's stay yours.**
+**3.3.1: /setup detects your stack; your goal and six W's stay yours.**
 
 - **`/setup` detects your stack first.** It now creates `project.faf` with `faf_auto`, so a new project starts with its language, framework, API type, package manager and test runner filled in. Before, it wrote a starter file that locked the stack, and filling it in afterwards wrote nothing.
 - **Your goal and the six W's are yours** (the Human Slots rule, as in faf-cli 8.10). No placeholders or defaults are written into them. A description found in `pyproject.toml` is offered as a suggested goal for you to confirm, not written. Scores now match faf-cli on the same project; a new file scores lower until you fill these in, because empty slots no longer count as filled.

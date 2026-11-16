@@ -8,7 +8,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
 ## [3.3.1] - 2026-11-16 — The Antigravity Edition 🚀
 
-**3.3.1: /setup detects your stack first, and your goal and six W's stay yours.**
+**3.3.1: /setup detects your stack; your goal and six W's stay yours.**
 
 354 tests pass, 0 fail.
 
