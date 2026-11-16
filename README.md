@@ -17,7 +17,7 @@ Stop re-explaining your project to every new Gemini session. Every Gemini conver
 
 [![PyPI](https://img.shields.io/pypi/v/gemini-faf-mcp?style=for-the-badge&logo=pypi&logoColor=white)](https://pypi.org/project/gemini-faf-mcp/)
 [![FAF Trophy 100%](https://img.shields.io/badge/FAF-%F0%9F%8F%86%20100%25-000000?labelColor=FF6B35)](https://faf.one)
-[![Tests](https://img.shields.io/badge/Tests-347%20passing-brightgreen?style=for-the-badge)](https://github.com/Wolfe-Jam/gemini-faf-mcp)
+[![Tests](https://img.shields.io/badge/Tests-354%20passing-brightgreen?style=for-the-badge)](https://github.com/Wolfe-Jam/gemini-faf-mcp)
 [![IANA: vnd.faf+yaml](https://img.shields.io/badge/IANA-vnd.faf%2Byaml-00D4D4?style=for-the-badge)](https://www.iana.org/assignments/media-types/application/vnd.faf+yaml)
 [![IANA: vnd.fafm+yaml](https://img.shields.io/badge/IANA-vnd.fafm%2Byaml-00D4D4?style=for-the-badge)](https://www.iana.org/assignments/media-types/application/vnd.fafm+yaml)
 [![DOI: Context paper](https://img.shields.io/badge/DOI-Context%20paper-FF6B35?style=for-the-badge)](https://doi.org/10.5281/zenodo.18251362)
@@ -41,7 +41,15 @@ Gemini: [now ready to help]
 
 `.faf` is read once at session start. Every tool call lands on a Gemini that already knows your project.
 
-### What's New in v3.3.0 — The Antigravity Edition 🚀
+### What's New in v3.3.1 — The Antigravity Edition 🚀
+
+**3.3.1: /setup detects your stack first, and your goal and six W's stay yours.**
+
+- **`/setup` detects your stack first.** It now creates `project.faf` with `faf_auto`, so a new project starts with its language, framework, API type, package manager and test runner filled in. Before, it wrote a starter file that locked the stack, and filling it in afterwards wrote nothing.
+- **Your goal and the six W's are yours** (the Human Slots rule, as in faf-cli 8.10). No placeholders or defaults are written into them. A description found in `pyproject.toml` is offered as a suggested goal for you to confirm, not written. Scores now match faf-cli on the same project; a new file scores lower until you fill these in, because empty slots no longer count as filled.
+- **`faf_auto` says what it really wrote:** the slots it filled, "unchanged" when none, and detected values it skipped because the slot was already set.
+
+#### v3.3.0 — The Antigravity Edition 🚀
 
 **3.3.0 brings gemini-faf-mcp to Antigravity CLI: install it as a plugin and it works in your project. Simple.**
 
@@ -329,7 +337,7 @@ Your `.faf` file is scored on completeness — how many slots are filled with re
 ## Architecture
 
 ```
-gemini-faf-mcp v3.3.0
+gemini-faf-mcp v3.3.1
 ├── server.py              → FastMCP MCP server (13 tools, dual-transport, Mk4 scoring)
 ├── safe_path.py           → path confinement for caller-supplied `path` args
 ├── inject.py              → non-destructive faf-managed-block injection
@@ -350,7 +358,7 @@ pip3 install -e ".[dev]"
 python -m pytest tests/ -v
 ```
 
-347 tests passing across the FastMCP server, CLI flags, Cloud Function, Mk4 WJTTC championship, Full-Facts grounding, path-confinement, write-guard, model-parity, Dart detection, and client-telemetry suites. Championship-grade test coverage — [WJTTC certified](https://github.com/Wolfe-Jam/WJTTC).
+354 tests passing across the FastMCP server, CLI flags, Cloud Function, Mk4 WJTTC championship, Full-Facts grounding, path-confinement, write-guard, model-parity, Dart detection, and client-telemetry suites. Championship-grade test coverage — [WJTTC certified](https://github.com/Wolfe-Jam/WJTTC).
 
 ---
 

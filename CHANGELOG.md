@@ -1,12 +1,16 @@
 <!-- faf: gemini-faf-mcp | Python | mcp | FAF MCP server for Google Gemini — persistent project context via PyPI -->
-<!-- faf: doc=changelog | latest=v3.3.0 | canonical=project.faf | family=FAF -->
+<!-- faf: doc=changelog | latest=v3.3.1 | canonical=project.faf | family=FAF -->
 
 # Changelog
 
 All notable changes to gemini-faf-mcp are documented here.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
-## [Unreleased]
+## [3.3.1] - 2026-11-16 — The Antigravity Edition 🚀
+
+**3.3.1: /setup detects your stack first, and your goal and six W's stay yours.**
+
+354 tests pass, 0 fail.
 
 ### Fixed
 - **`/setup` detects your stack first.** It used to create a starter file with `faf_init`, which marks every stack slot `slotignored`; asking Gemini to "fill it in" (`faf_auto`) then had no empty slot to fill. On a FastAPI project that path ended at 21% with no stack written. `/setup` now creates `project.faf` with `faf_auto`, so the same project starts with its backend, API type, package manager and test runner filled (42%, the same score faf-cli 8.10 gives it, with the goal and six W's left for you).
