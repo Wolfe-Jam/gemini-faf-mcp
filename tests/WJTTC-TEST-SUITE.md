@@ -246,7 +246,7 @@
 
 | Test | Expected | Actual | Status |
 |------|----------|--------|--------|
-| Empty dict → Red tier, score 0 | Red/0 | Red/0 | PASS |
+| Empty dict → WHITE tier, score 0 (always-33) | WHITE/0 | WHITE/0 | PASS |
 | Missing sections reported | issues list | reported | PASS |
 
 ### T7.5 - Score Reading

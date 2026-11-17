@@ -507,9 +507,10 @@ class TestTier6PyPI:
         if os.path.exists(faf_path):
             parsed = parse_faf(faf_path)
             result = validate_faf(parsed)
-            assert "score" in result
-            assert "tier" in result
-            assert result["score"] >= 0  # Valid score returned
+            from faf_sdk import score_faf
+            with open(faf_path, encoding="utf-8") as f:
+                kernel = score_faf(f.read())
+            assert (result["score"], result["tier"]) == (kernel.score, kernel.tier)
 
     def test_fafclient_remote_connection(self):
         """FAFClient has expected methods."""
@@ -615,7 +616,7 @@ class TestTier7Fixes:
         from gemini_faf_mcp import validate_faf
         result = validate_faf({})
         assert result["score"] == 0
-        assert result["tier"] == "Red"
+        assert result["tier"] == "WHITE"  # always-33: the kernel's tier, as faf_score returns it
         assert not result["valid"]
         assert len(result["issues"]) > 0
 
@@ -623,7 +624,7 @@ class TestTier7Fixes:
         """validate_faf reports missing required sections."""
         from gemini_faf_mcp import validate_faf
         result = validate_faf({"faf_version": "2.5.2"})
-        assert result["score"] > 0  # faf_version counted
+        assert result["score"] == 0  # always-33: faf_version isn't a slot
         assert not result["valid"]  # missing project + human_context
         assert any("project.name" in issue for issue in result["issues"])
 
