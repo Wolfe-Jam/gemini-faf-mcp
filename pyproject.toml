@@ -4,11 +4,11 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "gemini-faf-mcp"
-version = "3.3.1"
+version = "3.3.3"
 authors = [
   { name="wolfejam", email="team@faf.one" },
 ]
-description = "Persistent Project Context for Google Gemini. IANA-registered .faf format, MCP server + Cloud Run REST API, unifies CLAUDE.md, GEMINI.md, AGENTS.md."
+description = "Persistent Project Context for Google Gemini. IANA-registered .faf format, MCP server + Cloud Run REST API; writes GEMINI.md and AGENTS.md from it."
 readme = "README.md"
 requires-python = ">=3.11"
 license = {text = "MIT"}
