@@ -181,7 +181,7 @@ gemini-faf-mcp is a Gemini Extensions Gallery MCP server that gives Gemini CLI n
 
 ### NFR-001: Performance
 **Target:** MCP tool calls complete in <2 seconds for typical `.faf` files
-**Measurement:** pytest execution time per test (current: ~3s for 111 tests)
+**Measurement:** pytest execution time per test
 
 ### NFR-002: Reliability
 **Target:** Zero crashes on malformed input — all tools return structured error responses

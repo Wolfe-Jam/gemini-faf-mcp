@@ -6,7 +6,11 @@
 All notable changes to gemini-faf-mcp are documented here.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
-## [Unreleased]
+## [3.3.3] - 2026-11-17 — The Antigravity Edition 🚀
+
+**3.3.3: one engine, one number, in the Python SDK too.**
+
+390 tests pass, 0 fail.
 
 ### Changed
 - **`validate_faf` scores with the always-33 kernel** (faf-python-sdk `score_faf`): the same number and tier as `faf_score` and faf-cli for ordinary files. It used to count its own 10 slots "against v2.5.2". The function and its name stay. What changes for callers:

@@ -44,13 +44,13 @@ The skills are `/faf:setup`, `/faf:score` and `/faf:export` in Gemini CLI.
 gemini-faf-mcp is a standard stdio MCP server on PyPI. No account needed:
 
 ```json
-{ "mcpServers": { "gemini-faf": { "command": "uvx", "args": ["gemini-faf-mcp==3.3.1"] } } }
+{ "mcpServers": { "gemini-faf": { "command": "uvx", "args": ["gemini-faf-mcp==3.3.3"] } } }
 ```
 
 Claude Code:
 
 ```bash
-claude mcp add gemini-faf-mcp -- uvx gemini-faf-mcp==3.3.1
+claude mcp add gemini-faf-mcp -- uvx gemini-faf-mcp==3.3.3
 ```
 
 ## First run: create project.faf with /setup

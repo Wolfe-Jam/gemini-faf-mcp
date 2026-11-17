@@ -1,7 +1,7 @@
 <!-- faf: gemini-faf-mcp | Python | mcp | FAF MCP server for Google Gemini — persistent project context via PyPI -->
 <!-- faf: doc=readme | canonical=project.faf | score=100 | family=FAF -->
 
-# gemini-faf-mcp v3.2 — The Straight Answers Edition
+# gemini-faf-mcp v3.3 — The Antigravity Edition 🚀
 
 **Persistent Project Context for Google Gemini. Define once. Sync everywhere.**
 
@@ -16,8 +16,8 @@ Stop re-explaining your project to every new Gemini session. Every Gemini conver
 <!-- mcp-name: one.faf/gemini-faf-mcp -->
 
 [![PyPI](https://img.shields.io/pypi/v/gemini-faf-mcp?style=for-the-badge&logo=pypi&logoColor=white)](https://pypi.org/project/gemini-faf-mcp/)
-[![FAF Trophy 100%](https://img.shields.io/badge/FAF-%F0%9F%8F%86%20100%25-000000?labelColor=FF6B35)](https://faf.one)
-[![Tests](https://img.shields.io/badge/Tests-354%20passing-brightgreen?style=for-the-badge)](https://github.com/Wolfe-Jam/gemini-faf-mcp)
+[![FAF Trophy 100%](https://img.shields.io/badge/FAF-%E2%9C%AA%20100%25-000000?labelColor=FF6B35)](https://faf.one)
+[![Tests](https://img.shields.io/badge/Tests-390%20passing-brightgreen?style=for-the-badge)](https://github.com/Wolfe-Jam/gemini-faf-mcp)
 [![IANA: vnd.faf+yaml](https://img.shields.io/badge/IANA-vnd.faf%2Byaml-00D4D4?style=for-the-badge)](https://www.iana.org/assignments/media-types/application/vnd.faf+yaml)
 [![IANA: vnd.fafm+yaml](https://img.shields.io/badge/IANA-vnd.fafm%2Byaml-00D4D4?style=for-the-badge)](https://www.iana.org/assignments/media-types/application/vnd.fafm+yaml)
 [![DOI: Context paper](https://img.shields.io/badge/DOI-Context%20paper-FF6B35?style=for-the-badge)](https://doi.org/10.5281/zenodo.18251362)
@@ -39,9 +39,17 @@ You: "It's a REST API for..."
 Gemini: [now ready to help]
 ```
 
-`.faf` is read once at session start. Every tool call lands on a Gemini that already knows your project.
+Gemini reads `project.faf` through the faf tools, and `GEMINI.md` written from it loads at session start, so a new session starts with your project.
 
-### What's New in v3.3.1 — The Antigravity Edition 🚀
+### What's New in v3.3.3 — The Antigravity Edition 🚀
+
+**3.3.3: one engine, one number, in the Python SDK too.**
+
+- **`validate_faf` gives the same score and tier as `faf_score` and faf-cli** (the always-33 kernel). It used to count its own 10 slots. `valid` now means what it means in `faf_validate` (the structure is valid), `issues` lists each empty slot, and `tier` is upper case (`TROPHY` … `WHITE`). It scores data already parsed; for a file's exact score, use `faf_score`. See the [CHANGELOG](./CHANGELOG.md) for every key that changed.
+- **The hosted badge uses faf-cli's tiers** (✪ ★ ◆ ◇ ● ○ ♡), not the retired emoji ladder.
+- **The FAQ says only what the code does**, and the Big Orange 🍊 is described as a planned honor, not a score.
+
+#### v3.3.1 — The Antigravity Edition 🚀
 
 **3.3.1: /setup detects your stack; your goal and six W's stay yours.**
 
@@ -143,7 +151,7 @@ Still on Gemini CLI through work? `gemini extensions install https://github.com/
 
 Run `/setup` (in Gemini CLI: `/faf:setup`).
 
-That detects your stack from the repo's own files (it calls `faf_auto`), writes `project.faf` and scores it. Then fill in what only you know (the goal, who it's for, why it exists), and run `/score` (`/faf:score` in Gemini CLI) to see what's left. From then on, every Gemini session in this project reads it automatically.
+That detects your stack from the repo's own files (it calls `faf_auto`), writes `project.faf` and scores it. Then fill in what only you know (the goal, who it's for, why it exists), and run `/score` (`/faf:score` in Gemini CLI) to see what's left. From then on, Gemini reads it through the faf tools; `/export` writes `GEMINI.md` from it, which Gemini loads at the start of every session.
 
 > **Tip:** Trophy ✪ = 100%: AI is optimized to code. `/score` shows exactly which slots are still empty.
 
@@ -170,7 +178,7 @@ human_context:
   why: Replace legacy PHP service
 ```
 
-**Result:** Gemini reads this once and knows your project. No 20-minute onboarding. No wrong assumptions. Every session starts aligned.
+**Result:** Gemini knows your stack and goal from the file, not from you re-typing them each session.
 
 > **FAF defines. MD instructs. AI codes.**
 
@@ -199,21 +207,20 @@ You don't replace it. `.faf` **authors** it. Run `faf_gemini` and you get a fres
 {
   "detected": {
     "main_language": "Python",
-    "package_manager": "uv",
+    "package_manager": "pip",
     "framework": "FastAPI",
     "api_type": "REST",
     "database": "PostgreSQL",
     "cache": "Redis",
     "hosting": "Docker Compose",
-    "cicd": "GitHub Actions",
     "commands": { "test": "make test", "build": "make build", "lint": "make check-all" }
   },
-  "score": 79,
-  "tier": "GREEN"
+  "score": 56,
+  "tier": "YELLOW"
 }
 ```
 
-`database` and `cache` came from `docker-compose.yml`, `commands` from the `Makefile`, `cicd` from `.github/workflows/` — none of which the manifest scan sees. Fill in the six W's and you are at Trophy.
+Shortened output from a real 3.3.3 run on a FastAPI project. `database` and `cache` came from `docker-compose.yml` and `commands` from the `Makefile`; `cicd: GitHub Actions` (from `.github/workflows/`) is written to the file too. None of these come from the manifest. The goal and the six W's are yours to fill in.
 
 **What it scans:**
 
@@ -339,7 +346,7 @@ Your `.faf` file is scored on completeness — how many slots are filled with re
 ## Architecture
 
 ```
-gemini-faf-mcp v3.3.1
+gemini-faf-mcp v3.3.3
 ├── server.py              → FastMCP MCP server (13 tools, dual-transport, Mk4 scoring)
 ├── safe_path.py           → path confinement for caller-supplied `path` args
 ├── inject.py              → non-destructive faf-managed-block injection
@@ -355,12 +362,9 @@ The MCP server delegates to `faf-python-sdk` for parsing, validation, Mk4 scorin
 
 ## Testing
 
-```bash
-pip3 install -e ".[dev]"
-python -m pytest tests/ -v
-```
+Clone, dev install and the full suite: [CONTRIBUTING.md](./CONTRIBUTING.md).
 
-354 tests passing across the FastMCP server, CLI flags, Cloud Function, Mk4 WJTTC championship, Full-Facts grounding, path-confinement, write-guard, model-parity, Dart detection, and client-telemetry suites. Championship-grade test coverage — [WJTTC certified](https://github.com/Wolfe-Jam/WJTTC).
+390 tests passing across the FastMCP server, CLI flags, Cloud Function, Mk4 WJTTC championship, Full-Facts grounding, path-confinement, write-guard, model-parity, Dart detection, and client-telemetry suites. Championship-grade test coverage — [WJTTC](https://github.com/Wolfe-Jam/wjttc-public).
 
 ---
 
@@ -483,7 +487,7 @@ Built by [@wolfe_jam](https://x.com/wolfe_jam) | [wolfejam.dev](https://wolfejam
 
 ### Get the CLI
 
-> **faf-cli** — The original AI-Context CLI. A must-have for every builder.
+> **faf-cli** — the original AI-context CLI.
 
 ```bash
 npx faf-cli auto
