@@ -8,6 +8,7 @@ These tests compare a file's TEXT with validate_faf(parse_faf(file)) and with th
 
 import collections
 import decimal
+import enum
 import json
 import pathlib
 
@@ -46,33 +47,41 @@ def test_same_number_as_the_files_text(tmp_path, name):
     assert (r["score"], r["tier"], r["populated"], r["active"]) == (k.score, k.tier, k.populated, k.active)
 
 
-async def test_same_as_the_faf_score_tool(tmp_path):
-    p = _write(tmp_path, "stack", FILES["stack"])
+def _data(res):
+    return res.data if isinstance(getattr(res, "data", None), dict) else json.loads(res.content[0].text)
+
+
+@pytest.mark.parametrize("name", list(FILES))
+async def test_same_as_the_faf_score_and_faf_validate_tools(tmp_path, name):
+    p = _write(tmp_path, name, FILES[name])
     async with Client(transport=mcp) as c:
-        res = await c.call_tool("faf_score", {"path": str(p)})
-    tool = res.data if isinstance(getattr(res, "data", None), dict) else json.loads(res.content[0].text)
+        score = _data(await c.call_tool("faf_score", {"path": str(p)}))
+        valid = _data(await c.call_tool("faf_validate", {"path": str(p)}))
     r = validate_faf(parse_faf(str(p)))
-    assert (r["score"], r["tier"]) == (tool["score"], tool["tier"])
+    assert (r["score"], r["tier"]) == (score["score"], score["tier"])
+    assert r["valid"] == valid["valid"]
 
 
-def test_issues_valid_and_score_agree():
+def test_issues_list_every_empty_slot():
     r = validate_faf(yaml.safe_load(FILES["placeholders"]))
-    assert r["score"] == 0 and r["valid"] is False
+    assert r["score"] == 0
     assert "Missing or placeholder: project.name" in r["issues"]
     assert "Missing or placeholder: human_context.who" in r["issues"]
-    assert len(r["issues"]) == r["active"] - r["populated"]
+    empty = [i for i in r["issues"] if i.startswith("Missing or placeholder:")]
+    assert len(empty) == r["active"] - r["populated"]
 
 
-def test_valid_only_when_nothing_is_empty():
-    r = validate_faf({"faf_version": "3.0", "project": {"name": "x"}})
-    assert r["valid"] is False and r["issues"]
-
-
-def test_duplicate_keys_are_refused_like_faf_cli(tmp_path):
-    text = FILES["basics"] + "stack:\n  backend: FastAPI\nstack:\n  backend: Flask\n"
-    assert score_faf(text).score == 0
-    with pytest.raises(ValueError, match="duplicate key"):
-        parse_faf(str(_write(tmp_path, "dup", text)))
+@pytest.mark.parametrize(
+    "keys",
+    ["yes: 1\ntrue: 2\n", "Yes: 1\nyes: 2\n", "on: push\ntrue: 2\n", "1: a\ntrue: b\n",
+     "1_000: a\n1000: b\n", "010: a\n8: b\n"],
+)
+def test_parse_faf_accepts_what_the_kernel_accepts(tmp_path, keys):
+    text = FILES["basics"] + keys
+    k = score_faf(text)
+    assert k.score > 0
+    r = validate_faf(parse_faf(str(_write(tmp_path, "keys", text))))
+    assert (r["score"], r["tier"]) == (k.score, k.tier)
 
 
 def test_merge_keys_still_load(tmp_path):
@@ -113,9 +122,35 @@ def test_total_slots_is_active_and_can_be_zero():
     k = score_faf("project:\n  name: x\n")
     r = validate_faf({"project": {"name": "x"}})
     assert r["total"] == 33 and r["total_slots"] == r["active"] == k.active
+    slots = [s for s, _ in score_faf("{}").slots]
+    tree: dict = {}
+    for slot in slots:
+        a, b = slot.split(".")
+        tree.setdefault(a, {})[b] = "slotignored"
+    z = validate_faf(tree)
+    assert z["total_slots"] == z["active"] == 0
 
 
-def test_missing_faf_version_is_a_warning_not_an_issue():
+def test_str_enum_keys_score_like_plain_keys():
+    class K(str, enum.Enum):  # noqa: UP042 — the str + Enum case the recheck found
+        P = "project"
+
+    assert validate_faf({K.P: {"name": "x"}})["score"] == validate_faf({"project": {"name": "x"}})["score"] > 0
+
+
+@pytest.mark.parametrize("empty", [b"", collections.deque(), range(0)])
+def test_empty_unusual_values_stay_empty(empty):
+    assert validate_faf({"project": {"name": empty}})["populated"] == 0
+
+
+@pytest.mark.parametrize("extra", [{"note": "\ud83c"}, {"0o14": "a", 12: "b"}, {"1e3": "a", 1000.0: "b"}])
+def test_data_the_kernel_cannot_read_is_reported(extra):
+    base = yaml.safe_load(FILES["basics"])
+    r = validate_faf({**base, **extra})
+    assert r["valid"] is False and r["issues"] == ["Could not score: the kernel could not read the data"]
+
+
+def test_missing_faf_version_is_invalid_as_in_faf_validate():
     r = validate_faf({"project": {"name": "x"}})
-    assert "Missing: faf_version" in r["warnings"]
-    assert all("faf_version" not in i for i in r["issues"])
+    assert r["valid"] is False
+    assert "Missing required field: faf_version" in r["issues"]

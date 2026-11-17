@@ -389,6 +389,7 @@ from gemini_faf_mcp import FAFClient, parse_faf, validate_faf, find_faf_file
 data = parse_faf("project.faf")
 result = validate_faf(data)
 print(f"Score: {result['score']}%, Tier: {result['tier']}")
+# validate_faf scores data already parsed; for a file's exact score (same as faf-cli), use the faf_score tool
 
 # Find .faf files automatically
 faf_path = find_faf_file(".")

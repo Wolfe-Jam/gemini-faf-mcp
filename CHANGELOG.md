@@ -9,13 +9,14 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 ## [Unreleased]
 
 ### Changed
-- **`validate_faf` scores with the always-33 kernel** (faf-python-sdk `score_faf`), the same number and tier as `faf_score`, faf-cli and mcpaas.live. It used to count its own 10 slots "against v2.5.2". The function and its name stay. What changes for callers:
+- **`validate_faf` scores with the always-33 kernel** (faf-python-sdk `score_faf`): the same number and tier as `faf_score` and faf-cli for ordinary files. It used to count its own 10 slots "against v2.5.2". The function and its name stay. What changes for callers:
   - `tier` is the kernel's, upper case as `faf_score` returns it: `TROPHY` … `RED`, and `WHITE` at 0% (was `Trophy` … `Red`; 0% was `Red`).
-  - `issues` lists each empty active slot (`Missing or placeholder: <slot>`), using the kernel's own placeholder rules; `valid` is true only when nothing is empty. Before, both used a separate 10-field rule and could contradict the score.
-  - New keys `populated`, `active`, `total`, `warnings` (a missing `faf_version` is now a warning, not an issue).
+  - `valid` means what it means in the `faf_validate` tool: the structure is valid (a missing `faf_version` makes it false). A valid file can still score low.
+  - `issues` lists structure errors, then each empty active slot (`Missing or placeholder: <slot>`), using the kernel's own placeholder rules. `warnings` is new (as `faf_validate`).
+  - New keys `populated`, `active`, `total`, `warnings`.
   - `filled_slots` / `total_slots` carry the kernel's populated / active counts. `total_slots` was always 10; it now varies and **is 0 when every slot is `slotignored`**, so guard any division by it.
-  - Input it can't score (not a mapping, or data that refers to itself) gives `valid: False` and an issue starting `Could not score:`, not a silent 0 or a crash. Mapping subclasses, `str` subclasses and other values (`Path`, `Decimal`) are scored as plain YAML.
-- **`parse_faf` refuses duplicate keys** ("duplicate key …", raised as the existing `ValueError` for invalid YAML), as faf-cli and the kernel do. YAML merge keys (`<<`) still load; `validate_faf` scores the merged data, so for a file's exact score use `faf_score`.
+  - Input it can't score (not a mapping, data that refers to itself, or data the kernel can't read back) gives `valid: False` and an issue starting `Could not score:`, not a silent 0 or a crash. Mapping subclasses, `str` subclasses (keys and values, including `str` Enums) and other values (`Path`, `Decimal`) are scored as plain YAML; an empty value stays empty.
+  - `validate_faf` takes data PyYAML already parsed, so YAML merge keys (`<<`) are applied and duplicate keys collapsed before it scores. For the exact score of a file's text, use `faf_score`.
 
 ### Docs (FAQ)
 - `FAQ.md` says only what the code does: SW-01 compares timestamps (no "cryptographic hashes"); SW-02 refuses the Big Orange below a recomputed 100% (no "forensic audit against BigQuery telemetry"); the agent table and telemetry wording match the code; the sign-off uses ✪.
