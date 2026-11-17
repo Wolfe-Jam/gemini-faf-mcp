@@ -9,7 +9,13 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 ## [Unreleased]
 
 ### Changed
-- **`validate_faf` scores with the always-33 kernel** (faf-python-sdk `score_faf`), the same number as faf-cli, `faf_score` and mcpaas.live. It used to count its own 10 slots "against v2.5.2", a second scorer with a different number. The function, its name and its keys stay; it adds `populated`, `active` and `total`. `filled_slots` / `total_slots` now carry the kernel's populated / active counts, and `tier` is the kernel's (0% is White, as in faf-cli). `issues` still lists the missing basics (`faf_version`, `project.name/goal/main_language`, the six W's).
+- **`validate_faf` scores with the always-33 kernel** (faf-python-sdk `score_faf`), the same number and tier as `faf_score`, faf-cli and mcpaas.live. It used to count its own 10 slots "against v2.5.2". The function and its name stay. What changes for callers:
+  - `tier` is the kernel's, upper case as `faf_score` returns it: `TROPHY` … `RED`, and `WHITE` at 0% (was `Trophy` … `Red`; 0% was `Red`).
+  - `issues` lists each empty active slot (`Missing or placeholder: <slot>`), using the kernel's own placeholder rules; `valid` is true only when nothing is empty. Before, both used a separate 10-field rule and could contradict the score.
+  - New keys `populated`, `active`, `total`, `warnings` (a missing `faf_version` is now a warning, not an issue).
+  - `filled_slots` / `total_slots` carry the kernel's populated / active counts. `total_slots` was always 10; it now varies and **is 0 when every slot is `slotignored`**, so guard any division by it.
+  - Input it can't score (not a mapping, or data that refers to itself) gives `valid: False` and an issue starting `Could not score:`, not a silent 0 or a crash. Mapping subclasses, `str` subclasses and other values (`Path`, `Decimal`) are scored as plain YAML.
+- **`parse_faf` refuses duplicate keys** ("duplicate key …", raised as the existing `ValueError` for invalid YAML), as faf-cli and the kernel do. YAML merge keys (`<<`) still load; `validate_faf` scores the merged data, so for a file's exact score use `faf_score`.
 
 ### Docs (dev setup, Context7 refresh)
 - The dev install moves from `docs/SETUP.md` to `CONTRIBUTING.md`; the setup guide shows user setup only.

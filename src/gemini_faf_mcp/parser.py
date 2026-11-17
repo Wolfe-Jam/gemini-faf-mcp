@@ -6,11 +6,34 @@ Parses .faf files and scores them with the always-33 kernel (faf-python-sdk's
 Format: application/vnd.faf+yaml (IANA registered)
 """
 
+from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
 
 import yaml
 from faf_sdk import score_faf
+
+
+class _UniqueKeyLoader(yaml.SafeLoader):
+    """SafeLoader that rejects duplicate mapping keys, as faf-cli and the kernel do."""
+
+    def construct_mapping(self, node, deep=False):  # type: ignore[no-untyped-def]
+        if isinstance(node, yaml.MappingNode):
+            seen: set[Any] = set()
+            for key_node, _ in node.value:
+                if key_node.tag == "tag:yaml.org,2002:merge":
+                    continue
+                key = self.construct_object(key_node, deep=True)
+                try:
+                    duplicate = key in seen
+                except TypeError:
+                    continue
+                if duplicate:
+                    raise yaml.constructor.ConstructorError(
+                        None, None, f"duplicate key {key!r}", key_node.start_mark
+                    )
+                seen.add(key)
+        return super().construct_mapping(node, deep=deep)
 
 
 def parse_faf(path: str = "project.faf") -> dict[str, Any]:
@@ -36,64 +59,92 @@ def parse_faf(path: str = "project.faf") -> dict[str, Any]:
         content = f.read()
 
     try:
-        data = yaml.safe_load(content)
+        data = yaml.load(content, Loader=_UniqueKeyLoader)  # noqa: S506 (a SafeLoader subclass)
     except yaml.YAMLError as e:
         raise ValueError(f"Invalid YAML in FAF file: {e}") from e
 
     return data or {}
 
 
+def _plain(value: Any, _seen: frozenset[int] = frozenset()) -> Any:
+    """Turn any mapping, sequence or str subclass into plain YAML types; anything else becomes its str()."""
+    if value is None or isinstance(value, (bool, int, float)) and type(value) in (bool, int, float):
+        return value
+    if isinstance(value, str):
+        return str(value)
+    if isinstance(value, (Mapping, list, tuple, set, frozenset)):
+        if id(value) in _seen:
+            raise ValueError("the data refers to itself")
+        seen = _seen | {id(value)}
+        if isinstance(value, Mapping):
+            return {str(k) if not isinstance(k, (str, int, float, bool)) or k is None else k: _plain(v, seen) for k, v in value.items()}
+        return [_plain(v, seen) for v in value]
+    return str(value)
+
+
 def validate_faf(data: dict[str, Any]) -> dict[str, Any]:
     """
-    Score a parsed .faf with the always-33 kernel and list what's missing.
+    Score a parsed .faf with the always-33 kernel and list the empty slots.
 
-    One engine, one number: the score is faf-python-sdk's ``score_faf``, the
-    same as faf-cli, ``faf_score`` and mcpaas.live. All 33 slots count unless
-    the file marks them ``slotignored``.
+    One engine, one number: the score and tier are faf-python-sdk's
+    ``score_faf``, the same as ``faf_score``, faf-cli and mcpaas.live. All
+    33 slots count unless the file marks them ``slotignored``.
+
+    ``data`` is already parsed, so YAML merge keys (``<<``) have already been
+    applied. For the exact score of a file's text, use ``faf_score``.
 
     Args:
         data: Parsed FAF data
 
     Returns:
-        ``score`` (0-100), ``tier`` (Trophy, Gold, Silver, Bronze, Green,
-        Yellow, Red or White), ``populated`` / ``active`` / ``total`` slots
-        (``filled_slots`` / ``total_slots`` are the same populated / active
-        counts, kept for existing callers), ``issues`` (missing basics) and
-        ``valid`` (no issues).
+        ``score`` (0-100); ``tier`` (the kernel's: TROPHY, GOLD, SILVER,
+        BRONZE, GREEN, YELLOW, RED, WHITE); ``populated`` / ``active`` /
+        ``total`` slots; ``filled_slots`` / ``total_slots`` (populated /
+        active, kept for existing callers; ``total_slots`` is 0 when every
+        slot is slotignored); ``issues`` (each empty active slot, or why the
+        data couldn't be scored); ``warnings`` (e.g. no ``faf_version``);
+        ``valid`` (scored, with no issues).
     """
-    issues = []
-
+    warnings: list[str] = []
+    if not isinstance(data, Mapping):
+        return {
+            "valid": False, "score": 0, "tier": "WHITE",
+            "populated": 0, "active": 33, "total": 33,
+            "filled_slots": 0, "total_slots": 33,
+            "issues": [f"Could not score: expected a mapping, got {type(data).__name__}"],
+            "warnings": warnings,
+        }
     if "faf_version" not in data:
-        issues.append("Missing: faf_version")
-
-    project = data.get("project") or {}
-    for field in ("name", "goal", "main_language"):
-        if not (isinstance(project, dict) and project.get(field)):
-            issues.append(f"Missing: project.{field}")
-
-    human_context = data.get("human_context") or {}
-    for field in ("who", "what", "why", "where", "when", "how"):
-        value = human_context.get(field) if isinstance(human_context, dict) else None
-        if not value or value in ("None", "Unknown", "TBD"):
-            issues.append(f"Missing or placeholder: human_context.{field}")
+        warnings.append("Missing: faf_version")
 
     try:
-        result = score_faf(yaml.safe_dump(data, sort_keys=False, allow_unicode=True))
-        score, tier = result.score, result.tier.title()
-        populated, active, total = result.populated, result.active, result.total
-    except Exception:
-        score, tier, populated, active, total = 0, "White", 0, 33, 33
+        result = score_faf(yaml.safe_dump(_plain(data), sort_keys=False, allow_unicode=True))
+    except Exception as e:  # noqa: BLE001 — reported as an issue, never a silent 0
+        return {
+            "valid": False, "score": 0, "tier": "WHITE",
+            "populated": 0, "active": 33, "total": 33,
+            "filled_slots": 0, "total_slots": 33,
+            "issues": [f"Could not score: {e}"],
+            "warnings": warnings,
+        }
+
+    issues = [
+        f"Missing or placeholder: {slot}"
+        for slot, state in result.slots
+        if state.name == "EMPTY"
+    ]
 
     return {
-        "valid": len(issues) == 0,
-        "score": score,
-        "tier": tier,
-        "populated": populated,
-        "active": active,
-        "total": total,
-        "filled_slots": populated,
-        "total_slots": active,
+        "valid": not issues,
+        "score": result.score,
+        "tier": result.tier,
+        "populated": result.populated,
+        "active": result.active,
+        "total": result.total,
+        "filled_slots": result.populated,
+        "total_slots": result.active,
         "issues": issues,
+        "warnings": warnings,
     }
 
 
