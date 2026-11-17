@@ -17,6 +17,9 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
   - Input it can't score (not a mapping, or data that refers to itself) gives `valid: False` and an issue starting `Could not score:`, not a silent 0 or a crash. Mapping subclasses, `str` subclasses and other values (`Path`, `Decimal`) are scored as plain YAML.
 - **`parse_faf` refuses duplicate keys** ("duplicate key …", raised as the existing `ValueError` for invalid YAML), as faf-cli and the kernel do. YAML merge keys (`<<`) still load; `validate_faf` scores the merged data, so for a file's exact score use `faf_score`.
 
+### Docs (FAQ)
+- `FAQ.md` says only what the code does: SW-01 compares timestamps (no "cryptographic hashes"); SW-02 refuses the Big Orange below a recomputed 100% (no "forensic audit against BigQuery telemetry"); the agent table and telemetry wording match the code; the sign-off uses ✪.
+
 ### Docs (dev setup, Context7 refresh)
 - The dev install moves from `docs/SETUP.md` to `CONTRIBUTING.md`; the setup guide shows user setup only.
 - Context7 refreshes on every push to `main` (`.github/workflows/context7-refresh.yml`; skips until the `CONTEXT7_API_KEY` secret is set).
