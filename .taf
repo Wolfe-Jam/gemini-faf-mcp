@@ -15,4 +15,17 @@ test_history:
         - tests.test_start_in_workspace >
           test_a_case_variant_of_home_is_still_home
       hash: sha256:84c5b3aae405e79f24d4515c3d0d7a99d6f0161347962502c7b4b2334798b990
-last_updated: 2026-11-19T17:31:33.970Z
+  - timestamp: 2026-11-22T06:05:06.450Z
+    result: PASSED
+    tests:
+      total: 390
+      passed: 389
+      failed: 0
+      skipped: 1
+    trigger: github-actions
+    skipped_tests:
+      names:
+        - tests.test_start_in_workspace >
+          test_a_case_variant_of_home_is_still_home
+      hash: sha256:84c5b3aae405e79f24d4515c3d0d7a99d6f0161347962502c7b4b2334798b990
+last_updated: 2026-11-22T06:05:06.456Z
